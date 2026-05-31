@@ -99,8 +99,7 @@
             display: flex; background: var(--nav-bg);
             border-radius: 14px; padding: 4px; margin-bottom: 24px;
             position: relative; z-index: 10;
-            user-select: none; /* Zapobiega zaznaczaniu tekstu przy długim kliknięciu */
-            -webkit-user-select: none;
+            user-select: none; -webkit-user-select: none;
         }
         
         .tab-btn {
@@ -219,14 +218,18 @@
         
         .chart-container { position: relative; height: 160px; width: 100%; margin-bottom: 10px; }
 
-        /* NOWE: Style dla Trybu Inżynierskiego */
+        /* Tryb Inżynierski & OTA */
         .eng-mode-wrapper { display: none; margin-top: 24px; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .eng-card { border-color: rgba(255, 149, 0, 0.5); background: rgba(255, 149, 0, 0.03); }
-        .eng-title { color: var(--accent-orange); display: flex; align-items: center; gap: 6px; }
-        .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; }
+        .eng-title { color: var(--accent-orange); display: flex; align-items: center; gap: 6px; font-size: 15px; margin-bottom: 12px; font-weight: 800; }
+        .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; align-items: center; }
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
         .btn-eng { background: rgba(255, 149, 0, 0.15); color: var(--accent-orange); }
+        
+        .file-input { display: block; width: 100%; padding: 8px; font-size: 12px; color: var(--text-sub); border: 1px dashed var(--border-light); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
+        .progress-container { width: 100%; background: var(--range-bg); border-radius: 8px; margin-top: 10px; overflow: hidden; display: none; height: 8px; }
+        .progress-bar { height: 100%; background: var(--accent-orange); width: 0%; transition: width 0.2s ease; }
     </style>
 </head>
 <body>
@@ -326,6 +329,7 @@
                 <div class="log-container" id="logBox">
                     <div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div>
                 </div>
+                <button class="btn-test" onclick="eksportujCSV()" style="margin-top: 15px; background: rgba(52, 199, 89, 0.1); color: var(--accent-green);">📥 Pobierz raport (.csv)</button>
             </div>
 
             <h2>Test Pompy</h2>
@@ -338,8 +342,8 @@
             </div>
 
             <div id="eng-mode-box" class="eng-mode-wrapper">
-                <h2 class="eng-title">🔧 Diagnostyka ADC & Kalibracja</h2>
                 <div class="section-card eng-card">
+                    <h3 class="eng-title">🔧 Diagnostyka ADC & Kalibracja</h3>
                     <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
                     <div class="eng-data-row"><span>Surowy odczyt ADC:</span> <b id="eng-raw-adc">---</b></div>
                     <div class="eng-data-row" style="border-bottom:none; margin-top:15px; margin-bottom:4px;">
@@ -350,7 +354,19 @@
                         <span>Wartość WATER (Mokro):</span>
                         <input type="number" id="calib-water" class="eng-input" value="1500">
                     </div>
-                    <button class="btn-test btn-eng" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz w ESP32</button>
+                    <button class="btn-test btn-eng" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz kalibrację</button>
+                </div>
+
+                <div class="section-card eng-card" style="margin-top: 16px;">
+                    <h3 class="eng-title">🚀 Aktualizacja Firmware (OTA)</h3>
+                    <label style="font-size: 12px; color: var(--text-sub); display:block; margin-bottom: 6px;">Wybierz skompilowany plik .bin</label>
+                    <input type="file" id="ota-file" accept=".bin" class="file-input">
+                    <button class="btn-test btn-eng" onclick="wgrywajOTA()">⚡ Wgraj aktualizację</button>
+                    
+                    <div id="ota-progress-container" class="progress-container">
+                        <div id="ota-progress-bar" class="progress-bar"></div>
+                    </div>
+                    <div id="ota-status" style="font-size: 12px; font-weight: 600; text-align: center; margin-top: 8px; color: var(--accent-orange);"></div>
                 </div>
             </div>
         </div>
@@ -359,8 +375,6 @@
 
 <script>
 let chartInstance = null;
-
-// --- NOWE: Logika aktywacji Trybu Inżynierskiego ---
 let engTimer;
 const btnSerwis = document.getElementById('btn-serwis');
 
@@ -375,21 +389,17 @@ function startEngTimer() {
         toast.innerText = "🔧 Tryb inżynierski " + (isHidden ? "aktywowany" : "ukryty");
         toast.style.opacity = "1";
         setTimeout(() => toast.style.opacity = "0", 3000);
-    }, 3000); // 3 sekundy przytrzymania
+    }, 3000); 
 }
 
-function clearEngTimer() {
-    clearTimeout(engTimer);
-}
+function clearEngTimer() { clearTimeout(engTimer); }
 
-// Obsługa dotyku (mobile) i myszy (desktop)
 btnSerwis.addEventListener('touchstart', startEngTimer, {passive: true});
 btnSerwis.addEventListener('touchend', clearEngTimer);
 btnSerwis.addEventListener('touchcancel', clearEngTimer);
 btnSerwis.addEventListener('mousedown', startEngTimer);
 btnSerwis.addEventListener('mouseup', clearEngTimer);
 btnSerwis.addEventListener('mouseleave', clearEngTimer);
-// ---------------------------------------------------
 
 const domyslneProfile = {
     'pomidory': { th: 40, time: 2, sleep: 4, name: 'Pomidory' },
@@ -411,7 +421,6 @@ function aktywujProfil(id) {
 function wczytajProfilDoEdycji() {
     const id = document.getElementById('edit-profile-select').value;
     const p = profileData[id];
-    
     document.getElementById('edit-th').value = p.th;
     document.getElementById('edit-th-val').innerText = p.th + '%';
     document.getElementById('edit-time').value = p.time;
@@ -423,17 +432,13 @@ function wczytajProfilDoEdycji() {
 function zapiszEdytowanyProfil() {
     haptyka(15);
     const id = document.getElementById('edit-profile-select').value;
-    
     profileData[id].th = document.getElementById('edit-th').value;
     profileData[id].time = document.getElementById('edit-time').value;
     profileData[id].sleep = document.getElementById('edit-sleep').value;
     
     localStorage.setItem('bazaProfili', JSON.stringify(profileData));
     alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
-    
-    if(document.getElementById('prof-' + id).classList.contains('selected')) {
-        aktywujProfil(id);
-    }
+    if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
 }
 
 function haptyka(wzor) { if ("vibrate" in navigator) navigator.vibrate(wzor); }
@@ -463,7 +468,7 @@ function zmienMotyw(motyw) {
 }
 
 function zmienZakladke(tab) {
-    if(tab === 'serwis') haptyka(15); // Zwykły klik to lekka wibracja
+    if(tab === 'serwis') haptyka(15);
     else haptyka(15);
 
     document.getElementById('btn-pulpit').classList.remove('active');
@@ -477,7 +482,6 @@ function zmienZakladke(tab) {
 
 window.onload = function() {
     wczytajProfilDoEdycji(); 
-
     const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
     zmienMotyw(zapisanyMotyw);
 
@@ -495,7 +499,6 @@ window.onload = function() {
     } else {
         document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     }
-
     pobierzDaneZESP32();
 }
 
@@ -510,7 +513,6 @@ function sformatujCzas(timestamp) {
 function rysujWykres(logi) {
     const ctx = document.getElementById('moistureChart').getContext('2d');
     const daneOdwrocone = [...logi].reverse(); 
-    
     const etykiety = daneOdwrocone.map((_, i) => `T-${logi.length - i}`);
     const punkty = daneOdwrocone.map(log => log.moisture);
 
@@ -530,15 +532,11 @@ function rysujWykres(logi) {
                 backgroundColor: 'rgba(0, 122, 255, 0.1)',
                 borderWidth: 2,
                 pointBackgroundColor: kolorLinii,
-                pointRadius: 4,
-                fill: true,
-                tension: 0.3
+                pointRadius: 4, fill: true, tension: 0.3
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
             scales: {
                 y: { min: 0, max: 100, ticks: { color: kolorTekstu, stepSize: 25 }, grid: { color: 'rgba(150,150,150,0.1)' } },
                 x: { ticks: { color: kolorTekstu }, grid: { display: false } }
@@ -550,18 +548,14 @@ function rysujWykres(logi) {
 function renderujDane(data, timestamp, trybDemo = false) {
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
 
-    // Baza
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     
-    // --- NOWE: Aktualizacja Trybu Inżynierskiego ---
     if(data.voltage !== undefined) document.getElementById("eng-voltage").innerText = data.voltage.toFixed(3) + " V";
     if(data.raw_adc !== undefined) document.getElementById("eng-raw-adc").innerText = data.raw_adc;
     if(data.air_val !== undefined) document.getElementById("calib-air").value = data.air_val;
     if(data.water_val !== undefined) document.getElementById("calib-water").value = data.water_val;
-    // -----------------------------------------------
 
-    // Bateria i Prognoza Zapasu
     if (data.voltage) {
         let vFloat = parseFloat(data.voltage);
         if (!isNaN(vFloat)) {
@@ -630,7 +624,6 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cachedData = localStorage.getItem('lastESPData');
         if(!cachedData) {
-            // Demo uwzględnia nowe pola raw
             const demoData = {
                 temp: 32.5, air_hum: 28, voltage: 3.952, raw_adc: 2840, air_val: 3200, water_val: 1500, water: "OK",
                 logs: [ {moisture: 42, action: "OK"}, {moisture: 38, action: "OK"}, {moisture: 18, action: "ZA GORĄCO"}, {moisture: 90, action: "RĘCZNE"}, {moisture: 80, action: "OK"} ]
@@ -668,21 +661,101 @@ function uruchomTest() {
     .catch(() => { haptyka([50, 100, 50]); alert("❌ Błąd: Brak połączenia z serwerem ESP32."); });
 }
 
-// --- NOWE: Funkcja wysyłająca dane kalibracyjne do ESP32 ---
 function zapiszKalibracje() {
     haptyka([20, 30, 20]);
     const air = document.getElementById('calib-air').value;
     const water = document.getElementById('calib-water').value;
 
     fetch(`http://192.168.4.1/calibrate?air=${air}&water=${water}`, { mode: 'no-cors' })
-    .then(() => {
-        alert("✅ Dane kalibracyjne zostały wysłane i zapisane w ESP32.");
-        // Wymuś odświeżenie danych, by pokazać nowe %
-        pobierzDaneZESP32(); 
-    })
-    .catch(() => {
-        alert("⚠️ Tryb Offline (Demo). Nie można połączyć z ESP32.");
+    .then(() => { alert("✅ Dane kalibracyjne zostały wysłane i zapisane w ESP32."); pobierzDaneZESP32(); })
+    .catch(() => { alert("⚠️ Tryb Offline (Demo). Nie można połączyć z ESP32."); });
+}
+
+// --- NOWE: Eksport CSV ---
+function eksportujCSV() {
+    haptyka(15);
+    const cachedData = localStorage.getItem('lastESPData');
+    if(!cachedData) { alert("Brak danych do eksportu."); return; }
+    
+    try {
+        const parsed = JSON.parse(cachedData);
+        const logs = parsed.data.logs;
+        if(!logs || logs.length === 0) { alert("Brak zapisanych pomiarów."); return; }
+
+        let csvContent = "data:text/csv;charset=utf-8,ID_Pomiaru,Wilgotnosc_Gleby_Pct,Zarejestrowana_Akcja\n";
+        
+        logs.forEach((log, index) => {
+            csvContent += `${index + 1},${log.moisture},${log.action}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "szklarnia_historia_logow.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch(e) {
+        alert("Wystąpił błąd podczas generowania raportu CSV.");
+    }
+}
+
+// --- NOWE: Wgrywanie OTA przez HTML ---
+function wgrywajOTA() {
+    const fileInput = document.getElementById('ota-file');
+    const file = fileInput.files[0];
+    
+    if(!file) { alert("Wybierz plik z firmwarem (.bin) z urządzenia."); return; }
+    if(!file.name.endsWith('.bin')) { alert("Do aktualizacji wymagany jest skompilowany plik w formacie .bin!"); return; }
+
+    haptyka([20, 50, 20]);
+    const status = document.getElementById('ota-status');
+    const progressContainer = document.getElementById('ota-progress-container');
+    const progressBar = document.getElementById('ota-progress-bar');
+
+    status.innerText = "Nawiązywanie połączenia...";
+    status.style.color = "var(--accent-orange)";
+    progressContainer.style.display = "block";
+    progressBar.style.width = "0%";
+    progressBar.style.background = "var(--accent-orange)";
+
+    const formData = new FormData();
+    formData.append("update", file, file.name);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://192.168.4.1/update", true);
+
+    xhr.upload.addEventListener("progress", function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            progressBar.style.width = percentComplete + "%";
+            status.innerText = `Przesyłanie danych: ${Math.round(percentComplete)}%`;
+        }
     });
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            status.innerText = "✅ Sukces! Plik przesłany. ESP32 właśnie się restartuje...";
+            status.style.color = "var(--accent-green)";
+            progressBar.style.background = "var(--accent-green)";
+            haptyka([50, 100, 50, 100, 50]);
+            
+            // Opcjonalne: Wyzerowanie pliku w inpucie po sukcesie
+            setTimeout(() => { fileInput.value = ""; }, 3000);
+        } else {
+            status.innerText = "❌ Błąd aktualizacji na serwerze ESP32.";
+            status.style.color = "var(--accent-red)";
+            progressBar.style.background = "var(--accent-red)";
+        }
+    };
+
+    xhr.onerror = function() {
+        status.innerText = "❌ Błąd sieci. Upewnij się, że jesteś podłączony do sieci Szklarnia-Net.";
+        status.style.color = "var(--accent-red)";
+        progressBar.style.background = "var(--accent-red)";
+    };
+
+    xhr.send(formData);
 }
 </script>
 </body>
