@@ -32,34 +32,42 @@
             }
         }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-color); transition: 0.3s; }
-        .card { background: var(--card-bg); max-width: 400px; width: 100%; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
-        h1 { color: var(--accent-color); margin-top: 0; font-size: 26px; font-weight: 700; }
+        .card { background: var(--card-bg); max-width: 400px; width: 100%; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        h1 { color: var(--accent-color); margin: 0 0 15px 0; font-size: 24px; font-weight: 700; }
+        h2 { font-size: 14px; text-align: left; margin: 15px 0 8px 0; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* Profile Roślin */
-        .profile-container { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
-        .profile-btn { flex: 1; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 5px; font-size: 12px; font-weight: 600; color: var(--text-color); cursor: pointer; transition: 0.2s; }
-        .profile-btn:active { transform: scale(0.95); }
-        .profile-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+        .profile-container { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; }
+        .profile-btn { flex: 1; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px 4px; font-size: 11px; font-weight: 600; color: var(--text-color); cursor: pointer; }
+        .profile-icon { font-size: 18px; display: block; margin-bottom: 2px; }
 
-        .moisture-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(52, 199, 89, 0.15); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-bottom: 20px; }
-        .moisture-bar-container { width: 100%; height: 8px; background: var(--input-bg); border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .moisture-bar { height: 100%; width: 40%; background: #007aff; transition: width 0.3s ease; }
+        .moisture-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(52, 199, 89, 0.15); color: var(--accent-color); padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; margin-bottom: 15px; }
+        .moisture-bar-container { width: 100%; height: 6px; background: var(--input-bg); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+        .moisture-bar { height: 100%; width: 40%; background: #007aff; transition: width 0.3s; }
         
-        .form-group { text-align: left; margin-bottom: 18px; position: relative; }
-        label { font-weight: 600; font-size: 14px; color: var(--text-color); display: block; margin-bottom: 6px; }
-        input { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-color); }
-        input:focus { border-color: var(--accent-color); outline: none; }
-        .unit-hint { font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block; }
+        .form-group { text-align: left; margin-bottom: 14px; }
+        label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 4px; }
+        input[type="number"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-size: 15px; background: var(--input-bg); color: var(--text-color); }
+        .unit-hint { font-size: 11px; color: var(--text-secondary); margin-top: 3px; display: block; }
         
-        .stats-box { background: var(--input-bg); padding: 15px; border-radius: 14px; margin-top: 15px; text-align: left; font-size: 13px; border-left: 4px solid #007aff; }
-        .stats-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .stats-val { font-weight: 600; color: var(--text-color); }
+        /* Diagnostyka i Statystyki */
+        .stats-box { background: var(--input-bg); padding: 12px; border-radius: 12px; font-size: 13px; border-left: 4px solid #007aff; text-align: left; margin-bottom: 15px; }
+        .stats-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .stats-row:last-child { margin-bottom: 0; }
+        .stats-val { font-weight: 600; }
 
-        .btn-save { display: block; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; background: var(--accent-color); color: white; cursor: pointer; transition: 0.2s; margin-top: 20px; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2); }
-        
-        /* Nowy przycisk podlewania ręcznego */
-        .btn-manual { display: block; width: 100%; padding: 12px; border: 2px solid #007aff; border-radius: 14px; font-size: 14px; font-weight: 600; background: transparent; color: #007aff; cursor: pointer; transition: 0.2s; margin-top: 12px; }
-        .btn-manual:active { background: rgba(0, 122, 255, 0.1); }
+        /* Suwak Testowy */
+        .slider-group { background: var(--input-bg); padding: 12px; border-radius: 12px; text-align: left; margin-bottom: 15px; }
+        input[type="range"] { width: 100%; margin: 8px 0; }
+
+        /* Oś czasu logów */
+        .log-container { background: var(--input-bg); padding: 12px; border-radius: 12px; text-align: left; font-size: 12px; max-height: 120px; overflow-y: auto; }
+        .log-item { padding: 4px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+        .log-item:last-child { border: none; }
+        .log-ok { color: var(--accent-color); font-weight: 500; }
+        .log-water { color: #007aff; font-weight: 500; }
+
+        .btn-save { display: block; width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; background: var(--accent-color); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2); }
+        .btn-test { display: block; width: 100%; padding: 10px; border: 2px solid #007aff; border-radius: 12px; font-size: 13px; font-weight: 600; background: transparent; color: #007aff; cursor: pointer; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -67,17 +75,10 @@
 <div class="card">
     <h1>🌱 Szklarnia Panel</h1>
     
-    <label style="text-align: left; font-weight:600; font-size:14px; margin-bottom:8px;">Szybkie profile upraw:</label>
     <div class="profile-container">
-        <button class="profile-btn" onclick="ustawProfil(40, 2, 4)">
-            <span class="profile-icon">🍅</span>Pomidory
-        </button>
-        <button class="profile-btn" onclick="ustawProfil(60, 1, 2)">
-            <span class="profile-icon">🥒</span>Ogórki
-        </button>
-        <button class="profile-btn" onclick="ustawProfil(50, 0.5, 1)">
-            <span class="profile-icon">🌱</span>Sadzonki
-        </button>
+        <button class="profile-btn" onclick="ustawProfil(40, 2, 4)"><span class="profile-icon">🍅</span>Pomidory</button>
+        <button class="profile-btn" onclick="ustawProfil(60, 1, 2)"><span class="profile-icon">🥒</span>Ogórki</button>
+        <button class="profile-btn" onclick="ustawProfil(50, 0.5, 1)"><span class="profile-icon">🌱</span>Sadzonki</button>
     </div>
 
     <div class="moisture-badge">
@@ -87,39 +88,75 @@
     <div class="form-group">
         <label>Minimalna wilgotność ziemi (%):</label>
         <input type="number" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs(true)">
-        <div class="moisture-bar-container">
-            <div id="moistureBar" class="moisture-bar"></div>
-        </div>
+        <div class="moisture-bar-container"><div id="moistureBar" class="moisture-bar"></div></div>
         <span id="adviceText" class="unit-hint" style="font-weight: 500;">Wczytywanie...</span>
     </div>
     
     <div class="form-group">
-        <label>Czas podlewania (w minutach):</label>
+        <label>Czas podlewania (minuty):</label>
         <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1" oninput="aktualizujInterfejs(true)">
     </div>
     
     <div class="form-group">
-        <label>Interwał sprawdzania (w godzinach):</label>
+        <label>Interwał sprawdzania (godziny):</label>
         <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1" oninput="aktualizujInterfejs(true)">
     </div>
 
+    <h2>📊 Diagnostyka i Szacunki</h2>
     <div class="stats-box">
-        <div class="stats-row"><span>Szacowane wylanie wody:</span><span class="stats-val" id="waterCalc">-</span></div>
+        <div class="stats-row"><span>Woda na cykl:</span><span class="stats-val" id="waterCalc">-</span></div>
         <div class="stats-row"><span>Pomiary na dobę:</span><span class="stats-val" id="checksCalc">-</span></div>
+        <div class="stats-row"><span>Zasilanie ESP32:</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
+    </div>
+
+    <h2>🎛️ Test manualny pompy</h2>
+    <div class="slider-group">
+        <label>Czas testu: <span id="testDurationVal" style="color:#007aff; font-weight:700;">15 sekund</span></label>
+        <input type="range" id="testSlider" min="5" max="120" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + ' sekund'">
+        <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom test pompy</button>
+    </div>
+
+    <h2>📜 Historia ostatnich pomiarów</h2>
+    <div class="log-container" id="logBox">
+        <div class="log-item" style="color:var(--text-secondary)">Połącz się z "Szklarnia-Net" aby pobrać logi.</div>
     </div>
     
-    <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz harmonogram w ESP32</button>
-    
-    <button class="btn-manual" onclick="podlejTeraz()">🌊 Podlej teraz ręcznie (1 min)</button>
+    <button class="btn-save" style="margin-top:15px;" onclick="zapiszPrzezWiFi()">Zapisz harmonogram w ESP32</button>
 </div>
 
 <script>
-// Funkcja wczytująca zapamiętane ustawienia z pamięci iPhone'a (localStorage)
 window.onload = function() {
     if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
     if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
     if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
     aktualizujInterfejs(false);
+    pobierzDaneZESP32();
+}
+
+// Pobieranie logów i diagnostyki z ESP32 po wejściu na stronę
+function pobierzDaneZESP32() {
+    fetch('http://192.168.4.1/data')
+    .then(response => response.json())
+    .then(data => {
+        // Zasilanie
+        document.getElementById("voltCalc").innerText = data.voltage;
+        if(data.v_status === "LOW") document.getElementById("voltCalc").style.color = "#ff3b30";
+        else document.getElementById("voltCalc").style.color = "#34c759";
+
+        // Logi historii
+        const logBox = document.getElementById("logBox");
+        logBox.innerHTML = "";
+        if(data.logs.length === 0) {
+            logBox.innerHTML = "<div class='log-item'>Brak wpisów w historii.</div>";
+        } else {
+            data.logs.forEach(log => {
+                let klasa = log.action === "PODLANO" ? "log-water" : "log-ok";
+                logBox.innerHTML += `<div class='log-item'><span>Pomiar #${log.id}: <b>${log.moisture}%</b></span><span class='${klasa}'>${log.action}</span></div>`;
+            });
+        }
+    }).catch(() => {
+        console.log("Działanie lokalne offline - brak połączenia z ESP32.");
+    });
 }
 
 function ustawProfil(th, time, sleep) {
@@ -144,19 +181,17 @@ function aktualizujInterfejs(zapiszDoPamieci) {
     const bar = document.getElementById("moistureBar");
     bar.style.width = pct + "%";
     
-    if(pct < 25) { bar.style.backgroundColor = "#ff3b30"; }
-    else if(pct > 75) { bar.style.backgroundColor = "#ff9500"; }
-    else { bar.style.backgroundColor = "#007aff"; }
+    if(pct < 25) bar.style.backgroundColor = "#ff3b30";
+    else if(pct > 75) bar.style.backgroundColor = "#ff9500";
+    else bar.style.backgroundColor = "#007aff";
 
     const advice = document.getElementById("adviceText");
-    if(pct < 25) { advice.innerText = "⚠️ Za sucho dla pomidorów!"; advice.style.color = "#ff3b30"; }
-    else if(pct > 75) { advice.innerText = "⚠️ Ryzyko gnicia korzeni!"; advice.style.color = "#ff9500"; }
-    else { advice.innerText = "✓ Optymalna wilgotność gleby."; advice.style.color = "#34c759"; }
+    if(pct < 25) advice.innerText = "⚠️ Za sucho dla pomidorów!";
+    else if(pct > 75) advice.innerText = "⚠️ Ryzyko gnicia korzeni!";
+    else advice.innerText = "✓ Optymalna wilgotność gleby.";
 
     document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10} Litrów`;
-    if (hrs > 0) {
-        document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} razy / dobę`;
-    }
+    if (hrs > 0) document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} razy / dobę`;
 }
 
 function zapiszPrzezWiFi() {
@@ -165,14 +200,14 @@ function zapiszPrzezWiFi() {
     const secondsSleep = Math.round(document.getElementById("sleepInput").value * 3600);
     
     fetch(`http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`, { mode: 'no-cors' })
-    .then(() => alert("🚀 Harmonogram zapisany! Szklarnia wraca do snu."))
+    .then(() => alert("🚀 Harmonogram zapisany!"))
     .catch(() => alert("❌ Brak połączenia z 'Szklarnia-Net'"));
 }
 
-// NOWOŚĆ: Funkcja natychmiastowego podlewania
-function podlejTeraz() {
-    fetch(`http://192.168.4.1/manual`, { mode: 'no-cors' })
-    .then(() => alert("🌊 Sygnał wysłany! Pompa włączy się na 60 sekund, po czym układ zaśnie."))
+function uruchomTest() {
+    const sekundy = document.getElementById("testSlider").value;
+    fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
+    .then(() => alert(`🌊 Test uruchomiony! Pompa włącza się na ${sekundy} sekund.`))
     .catch(() => alert("❌ Brak połączenia z 'Szklarnia-Net'"));
 }
 </script>
