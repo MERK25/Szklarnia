@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Szklarnia Kontrola</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Szklarnia">
+    
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/tworzenie-ikon/ikona/main/apple-touch-icon.png">
+
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f2f2f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; max-width: 380px; width: 100%; padding: 30px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); text-align: center; box-sizing: border-box; }
+        h1 { color: #34c759; margin-top: 0; font-size: 24px; font-weight: 700; }
+        .btn-save { display: block; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; background: #34c759; color: white; cursor: pointer; transition: 0.2s; margin-top: 25px; }
+        .btn-save:active { background: #248a3d; }
+        .form-group { text-align: left; margin-bottom: 18px; }
+        label { font-weight: 500; font-size: 14px; color: #8e8e93; display: block; margin-bottom: 6px; }
+        input { width: 100%; padding: 14px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 16px; background: #f2f2f7; color: #000; }
+        input:focus { border-color: #34c759; outline: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🌱 Szklarnia Panel</h1>
+    <p style="font-size: 13px; color: #8e8e93; margin-bottom: 25px;">Upewnij się, że jesteś połączony z siecią "Szklarnia-Net"</p>
+    
+    <div class="form-group">
+        <label>Próg suchości (1000 - 4000):</label>
+        <input type="number" id="thInput" value="2700">
+    </div>
+    
+    <div class="form-group">
+        <label>Czas podlewania (w sekundach):</label>
+        <input type="number" id="timeInput" value="25">
+    </div>
+    
+    <div class="form-group">
+        <label>Interwał snu (w sekundach):</label>
+        <input type="number" id="sleepInput" value="14400">
+    </div>
+    
+    <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz ustawienia w ESP32</button>
+</div>
+
+<script>
+function zapiszPrzezWiFi() {
+    const th = document.getElementById("thInput").value;
+    const time = document.getElementById("timeInput").value;
+    const sleep = document.getElementById("sleepInput").value;
+    
+    // Adres IP naszego ESP32 pracującego jako punkt dostępowy
+    const esp32_url = `http://192.168.4.1/save?th=${th}&time=${time}&sleep=${sleep}`;
+    
+    // Wysyłamy dane ukrytym żądaniem sieciowym w tle
+    fetch(esp32_url, { mode: 'no-cors' })
+    .then(() => {
+        alert("🚀 Ustawienia wysłane! ESP32 zapisało konfigurację i wraca do trybu głębokiego snu.");
+    })
+    .catch((error) => {
+        alert("❌ Błąd połączenia! Sprawdź czy na pewno połączyłeś się z Wi-Fi 'Szklarnia-Net'.");
+    });
+}
+</script>
+</body>
+</html>
