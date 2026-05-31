@@ -109,40 +109,6 @@
         .file-input { display: block; width: 100%; padding: 8px; font-size: 12px; color: var(--text-sub); border: 1px dashed var(--border-light); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
         .progress-container { width: 100%; background: var(--range-bg); border-radius: 8px; margin-top: 10px; overflow: hidden; display: none; height: 8px; }
         .progress-bar { height: 100%; background: var(--accent-orange); width: 0%; transition: width 0.2s ease; }
-        /* Nowy styl zbiornika wody */
-.water-tank-box {
-    position: relative;
-    width: 100%;
-    height: 60px;
-    background: var(--nav-bg);
-    border-radius: 20px;
-    overflow: hidden;
-    margin-top: 10px;
-    border: 1px solid var(--border-light);
-}
-.water-fill {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: linear-gradient(to top, var(--accent-blue), #5ac8fa);
-    transition: height 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    opacity: 0.6;
-}
-.water-label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
-    font-weight: 800;
-    pointer-events: none;
-}
     </style>
 </head>
 <body>
@@ -178,14 +144,10 @@
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
                 
-               <div class="weather-card full-width">
-                <div class="weather-lbl" style="margin-bottom: 5px;">Woda w zbiorniku</div>
-                <div class="water-tank-box">
-                    <div id="water-fill" class="water-fill" style="height: 0%;"></div>
-                    <div class="water-label">
-                        <span id="dash-water-pct" style="font-size: 18px;">--%</span>
-                        <span id="dash-water-liters" style="font-size: 10px; opacity: 0.8;">-- L</span>
-                    </div>
+                <div class="weather-card full-width" style="padding-bottom: 8px;">
+                    <div class="weather-val skeleton" id="dash-water-meter">-</div>
+                    <div class="weather-lbl">Estymacja wody w zbiorniku</div>
+                    <button class="btn-test" onclick="zresetujLicznikWody()" style="margin-top: 10px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); font-size: 13px; padding: 10px;">💦 Zresetuj stan po napełnieniu beczki</button>
                 </div>
             </div>
 
@@ -464,7 +426,7 @@ window.onload = function() {
     zmienMotyw(localStorage.getItem('theme') || 'auto');
     const act = localStorage.getItem("activeProfile"); if(act && document.getElementById(act)) document.getElementById(act).classList.add('selected');
     const cachedData = localStorage.getItem('lastESPData');
-    if(cachedData) { try { const parsed = JSON.parse(cachedData); Dane(parsed.data, parsed.timestamp, false); } catch(e) {} }
+    if(cachedData) { try { const parsed = JSON.parse(cachedData); renderujDane(parsed.data, parsed.timestamp, false); } catch(e) {} }
     else document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     
     fetch(`http://192.168.4.1/sync?t=${Math.floor(Date.now() / 1000)}`, {mode:'no-cors'}).catch(()=>{});
@@ -540,16 +502,9 @@ function renderujDane(data, timestamp, trybDemo = false) {
         let usedLiters = (data.pump_sec / 60) * fRate;
         let remLiters = Math.max(0, tVol - usedLiters);
         let pct = Math.round((remLiters / tVol) * 100);
-
-        // Animacja wypełnienia
-        document.getElementById("water-fill").style.height = pct + "%";
-        document.getElementById("dash-water-pct").innerText = pct + "%";
-        document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
-        
-        // Zmiana koloru wody na czerwony gdy kończy się woda
-        document.getElementById("water-fill").style.background = pct <= 15 ? 
-            "linear-gradient(to top, var(--accent-red), #ff3b30)" : 
-            "linear-gradient(to top, var(--accent-blue), #5ac8fa)";
+        let wEl = document.getElementById("dash-water-meter");
+        wEl.innerText = `${pct}% (~${Math.round(remLiters)} L)`;
+        wEl.style.color = pct <= 15 ? "var(--accent-red)" : "var(--accent-blue)";
     }
 
     if(data.outdoors !== undefined) {
