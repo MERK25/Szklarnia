@@ -134,11 +134,12 @@
             border-radius: 22px; padding: 16px; margin-bottom: 16px; box-sizing: border-box;
         }
 
-        .profile-container { display: flex; gap: 8px; margin-bottom: 15px; }
+        .profile-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .profile-btn { 
-            flex: 1; background: var(--glass-card); border: 1px solid var(--border-light); 
-            border-radius: 16px; padding: 14px 6px; font-size: 13px; font-weight: 600; 
-            color: var(--text-main); cursor: pointer;
+            flex: 1 1 calc(33.333% - 6px); min-width: 90px;
+            background: var(--glass-card); border: 1px solid var(--border-light); 
+            border-radius: 16px; padding: 14px 4px; font-size: 13px; font-weight: 600; 
+            color: var(--text-main); cursor: pointer; box-sizing: border-box;
         }
         .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
         .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
@@ -212,14 +213,20 @@
 
         <h2>Co dzisiaj rośnie?</h2>
         <div class="profile-container">
-            <button class="profile-btn" id="prof-pomidory" onclick="ustawProfilZapisz(40, 2, 4, 'prof-pomidory', 'Pomidory')">
+            <button class="profile-btn" id="prof-pomidory" onclick="aktywujProfil('pomidory')">
                 <span class="profile-icon">🍅</span>Pomidory
             </button>
-            <button class="profile-btn" id="prof-ogorki" onclick="ustawProfilZapisz(60, 1, 2, 'prof-ogorki', 'Ogórki')">
+            <button class="profile-btn" id="prof-ogorki" onclick="aktywujProfil('ogorki')">
                 <span class="profile-icon">🥒</span>Ogórki
             </button>
-            <button class="profile-btn" id="prof-sadzonki" onclick="ustawProfilZapisz(50, 0.5, 1, 'prof-sadzonki', 'Sadzonki')">
+            <button class="profile-btn" id="prof-sadzonki" onclick="aktywujProfil('sadzonki')">
                 <span class="profile-icon">🌱</span>Sadzonki
+            </button>
+            <button class="profile-btn" id="prof-arbuz" onclick="aktywujProfil('arbuz')">
+                <span class="profile-icon">🍉</span>Arbuz
+            </button>
+            <button class="profile-btn" id="prof-borowka" onclick="aktywujProfil('borowka')">
+                <span class="profile-icon">🫐</span>Borówka
             </button>
         </div>
         <div id="pulpit-toast"></div>
@@ -235,7 +242,36 @@
             </div>
         </div>
 
-        <h2>Parametry nawadniania</h2>
+        <h2>Edycja Profili Upraw</h2>
+        <div class="section-card">
+            <label>Wybierz roślinę do edycji</label>
+            <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
+                <option value="pomidory">🍅 Pomidory</option>
+                <option value="ogorki">🥒 Ogórki</option>
+                <option value="sadzonki">🌱 Sadzonki</option>
+                <option value="arbuz">🍉 Arbuz</option>
+                <option value="borowka">🫐 Borówka</option>
+            </select>
+
+            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
+                <span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span>
+            </div>
+            <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
+
+            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;">
+                <span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span>
+            </div>
+            <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
+
+            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;">
+                <span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span>
+            </div>
+            <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
+
+            <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany w profilu</button>
+        </div>
+
+        <h2>Parametry nawadniania (Aktywne)</h2>
         <div class="section-card">
             <div class="moisture-header">
                 <label style="margin:0;">Wilgotność aktywacji</label><span id="badgeVal" class="moisture-badge">40%</span>
@@ -278,13 +314,65 @@
             <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
         </div>
         
-        <button class="btn-save" onclick="zapiszPrzezWiFi()">⚡ Zapisz do ESP32</button>
+        <button class="btn-save" onclick="zapiszPrzezWiFi()">⚡ Zapisz aktywne do ESP32</button>
     </div>
 
 </div>
 
 <script>
-let chartInstance = null; // Zmienna globalna dla wykresu
+let chartInstance = null;
+
+// Baza profili
+const domyslneProfile = {
+    'pomidory': { th: 40, time: 2, sleep: 4, name: 'Pomidory' },
+    'ogorki': { th: 60, time: 1, sleep: 2, name: 'Ogórki' },
+    'sadzonki': { th: 50, time: 0.5, sleep: 1, name: 'Sadzonki' },
+    'arbuz': { th: 55, time: 3, sleep: 3, name: 'Arbuz' },
+    'borowka': { th: 70, time: 1.5, sleep: 2, name: 'Borówka' }
+};
+
+// Ładowanie zapisanych profili lub ustawienie domyślnych
+let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslneProfile;
+// Dodanie nowych roślin, jeśli ktoś aktualizuje z wcześniejszej wersji bez nich
+if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
+if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
+
+function aktywujProfil(id) {
+    const p = profileData[id];
+    ustawProfilZapisz(p.th, p.time, p.sleep, 'prof-' + id, p.name);
+}
+
+function wczytajProfilDoEdycji() {
+    const id = document.getElementById('edit-profile-select').value;
+    const p = profileData[id];
+    
+    document.getElementById('edit-th').value = p.th;
+    document.getElementById('edit-th-val').innerText = p.th + '%';
+    
+    document.getElementById('edit-time').value = p.time;
+    document.getElementById('edit-time-val').innerText = p.time + ' min';
+    
+    document.getElementById('edit-sleep').value = p.sleep;
+    document.getElementById('edit-sleep-val').innerText = p.sleep + ' h';
+}
+
+function zapiszEdytowanyProfil() {
+    haptyka(15);
+    const id = document.getElementById('edit-profile-select').value;
+    
+    profileData[id].th = document.getElementById('edit-th').value;
+    profileData[id].time = document.getElementById('edit-time').value;
+    profileData[id].sleep = document.getElementById('edit-sleep').value;
+    
+    localStorage.setItem('bazaProfili', JSON.stringify(profileData));
+    
+    alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
+    
+    // Jeśli ten profil jest aktualnie wybrany na pulpicie, odśwież wartości wysyłane do ESP
+    if(document.getElementById('prof-' + id).classList.contains('selected')) {
+        aktywujProfil(id);
+    }
+}
 
 function haptyka(wzor) { if ("vibrate" in navigator) navigator.vibrate(wzor); }
 
@@ -316,6 +404,8 @@ function zmienZakladke(tab) {
 }
 
 window.onload = function() {
+    wczytajProfilDoEdycji(); // Inicjalizacja formularza edycji
+
     const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
     zmienMotyw(zapisanyMotyw);
 
@@ -346,7 +436,6 @@ function sformatujCzas(timestamp) {
 function rysujWykres(logi) {
     const ctx = document.getElementById('moistureChart').getContext('2d');
     
-    // Odwracamy logi by na wykresie najstarsze były po lewej, nowe po prawej
     const daneOdwrocone = [...logi].reverse(); 
     
     const etykiety = daneOdwrocone.map((_, i) => `T-${logi.length - i}`);
@@ -354,7 +443,6 @@ function rysujWykres(logi) {
 
     if(chartInstance) chartInstance.destroy();
 
-    // Kolory adaptacyjne
     const kolorLinii = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim() || '#007aff';
     const kolorTekstu = getComputedStyle(document.documentElement).getPropertyValue('--text-sub').trim() || '#636366';
 
@@ -423,7 +511,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
     if(!data.logs || data.logs.length === 0) {
         logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów.</div>";
     } else {
-        // Generowanie tabeli logów
         [...data.logs].reverse().forEach(log => {
             let statusKlasa = "bg-ok";
             if(log.action === "PODLANO") statusKlasa = "bg-water";
@@ -434,7 +521,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
         });
         
-        // Rysowanie wykresu
         rysujWykres(data.logs);
     }
 }
