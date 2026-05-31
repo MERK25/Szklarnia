@@ -52,9 +52,9 @@
         @keyframes pulseAlert { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
 
-        /* Ulepszona siatka na 6 kafelków (2 rzędy po 3, lub 3 rzędy po 2) */
         .weather-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .weather-card { flex: 1 1 calc(33.333% - 8px); min-width: 90px; background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 20px; padding: 12px 4px; text-align: center; box-sizing: border-box; }
+        .weather-card.full-width { flex: 1 1 100%; padding: 16px 10px; }
         .weather-val { font-size: 19px; font-weight: 800; margin-bottom: 2px; min-height: 22px; }
         .weather-lbl { font-size: 9px; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
 
@@ -74,6 +74,7 @@
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; background: var(--range-bg); outline: none; margin: 12px 0; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; border: 0.5px solid rgba(0,0,0,0.04); transition: transform 0.1s; }
         input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
+        .text-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; box-sizing: border-box; margin-bottom: 15px;}
 
         .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
@@ -137,6 +138,8 @@
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
+                
+                <div class="weather-card full-width"><div class="weather-val skeleton" id="dash-water-meter">-</div><div class="weather-lbl">Estymacja wody w zbiorniku</div></div>
             </div>
 
             <h2 id="plants-title">Co dzisiaj rośnie?</h2>
@@ -158,7 +161,7 @@
                     <div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div>
                     <div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Na zewnątrz</div>
                 </div>
-                <p style="font-size: 11px; color: var(--text-sub); margin-top: 10px; line-height: 1.4; text-align: center;">Określa czy system ma uwzględniać prognozę burz (barometr) i algorytm przewiewu powietrza (VPD).</p>
+                <p style="font-size: 11px; color: var(--text-sub); margin-top: 10px; line-height: 1.4; text-align: center;">Określa czy system ma uwzględniać prognozę burz (barometr).</p>
             </div>
 
             <h2>Wygląd aplikacji</h2>
@@ -168,6 +171,15 @@
                     <div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div>
                     <div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div>
                 </div>
+            </div>
+
+            <h2>Parametry Zbiornika Wody</h2>
+            <div class="section-card">
+                <label>Pojemność całkowita (L)</label>
+                <input type="number" id="tank-vol" class="text-input" value="200" onchange="zapiszParametryZbiornika()">
+                <label>Wydajność pompy (L/min)</label>
+                <input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
+                <button class="btn-test" onclick="zresetujLicznikWody()" style="margin-top: 10px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue);">💧 Zresetuj po dolaniu wody do pełna</button>
             </div>
 
             <h2>Edycja Profili Upraw</h2>
@@ -240,7 +252,6 @@ let batteryChartInstance = null;
 let engTimer;
 const btnSerwis = document.getElementById('btn-serwis');
 
-// --- UKRYTY TRYB INŻYNIERSKI ---
 function startEngTimer() {
     engTimer = setTimeout(() => {
         haptyka([100, 50, 100]);
@@ -260,15 +271,11 @@ btnSerwis.addEventListener('mousedown', startEngTimer);
 btnSerwis.addEventListener('mouseup', clearEngTimer);
 btnSerwis.addEventListener('mouseleave', clearEngTimer);
 
-// Zoptymalizowana baza profili agrotechnicznych (Off-grid)
 const domyslneProfile = {
-    'pomidory': { th: 40, time: 3, sleep: 6, name: 'Pomidory' },
-    'ogorki':   { th: 65, time: 1.5, sleep: 3, name: 'Ogórki' },
-    'sadzonki': { th: 55, time: 0.5, sleep: 2, name: 'Sadzonki' },
-    'arbuz':    { th: 45, time: 4, sleep: 6, name: 'Arbuz' },
-    'borowka':  { th: 70, time: 1, sleep: 3, name: 'Borówka' }
+    'pomidory': { th: 40, time: 3, sleep: 6, name: 'Pomidory' }, 'ogorki': { th: 65, time: 1.5, sleep: 3, name: 'Ogórki' },
+    'sadzonki': { th: 55, time: 0.5, sleep: 2, name: 'Sadzonki' }, 'arbuz': { th: 45, time: 4, sleep: 6, name: 'Arbuz' }, 'borowka': { th: 70, time: 1, sleep: 3, name: 'Borówka' }
 };
-    
+
 let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslneProfile;
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
@@ -293,6 +300,23 @@ function zapiszEdytowanyProfil() {
     if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
 }
 
+// NOWE: Funkcje dla wodomierza
+function wczytajParametryZbiornika() {
+    document.getElementById('tank-vol').value = localStorage.getItem('tankVol') || 200;
+    document.getElementById('pump-flow').value = localStorage.getItem('pumpFlow') || 2.0;
+}
+function zapiszParametryZbiornika() {
+    localStorage.setItem('tankVol', document.getElementById('tank-vol').value);
+    localStorage.setItem('pumpFlow', document.getElementById('pump-flow').value);
+    pobierzDaneZESP32(); // Odśwież, żeby przeliczyło na nowo wodomierz
+}
+function zresetujLicznikWody() {
+    haptyka([30, 30, 30]);
+    if(confirm("Czy na pewno chcesz wyzerować licznik zużytej wody?")) {
+        fetch('http://192.168.4.1/resetWater', { mode: 'no-cors' }).then(() => { alert("✅ Licznik wody wyzerowany."); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
+    }
+}
+
 function haptyka(wzor) { if ("vibrate" in navigator) navigator.vibrate(wzor); }
 
 function zmienMotyw(motyw) {
@@ -313,6 +337,7 @@ function zmienZakladke(tab) {
 
 window.onload = function() {
     wczytajProfilDoEdycji(); 
+    wczytajParametryZbiornika();
     zmienMotyw(localStorage.getItem('theme') || 'auto');
     const act = localStorage.getItem("activeProfile"); if(act && document.getElementById(act)) document.getElementById(act).classList.add('selected');
     const cachedData = localStorage.getItem('lastESPData');
@@ -329,15 +354,13 @@ function sformatujCzas(timestamp) {
     return `${Math.floor(minuty / 60)} godz. temu`;
 }
 
-// --- WYZNACZANIE VPD ---
 function obliczVPD(temp, hum) {
     if(!temp || !hum || temp <= 0 || hum <= 0) return "-";
-    const svp = 0.61078 * Math.exp((17.27 * temp) / (temp + 237.3)); // Saturation Vapor Pressure
-    const avp = svp * (hum / 100); // Actual Vapor Pressure
+    const svp = 0.61078 * Math.exp((17.27 * temp) / (temp + 237.3));
+    const avp = svp * (hum / 100);
     return (svp - avp).toFixed(2);
 }
 
-// --- GENEROWANIE PODWÓJNYCH WYKRESÓW ---
 function rysujWykresy(logi) {
     const ctxM = document.getElementById('moistureChart').getContext('2d');
     const ctxB = document.getElementById('batteryChart').getContext('2d');
@@ -369,7 +392,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     
-    // VPD (Stres Wodny)
     let vpdVal = obliczVPD(data.temp, data.air_hum);
     let vpdEl = document.getElementById("dash-vpd");
     vpdEl.innerText = vpdVal !== "-" ? vpdVal + " kPa" : "-";
@@ -379,18 +401,25 @@ function renderujDane(data, timestamp, trybDemo = false) {
         else vpdEl.style.color = "var(--accent-green)";
     }
 
-    // Ciśnienie
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
-    // Obsługa przełącznika lokalizacji
-    if(data.outdoors !== undefined) {
-        document.getElementById('loc-in').classList.remove('active');
-        document.getElementById('loc-out').classList.remove('active');
-        if(data.outdoors === 1) document.getElementById('loc-out').classList.add('active');
-        else document.getElementById('loc-in').classList.add('active');
+    // NOWE: Przeliczanie Wodomierza
+    if(data.pump_sec !== undefined) {
+        let tVol = parseFloat(localStorage.getItem('tankVol')) || 200;
+        let fRate = parseFloat(localStorage.getItem('pumpFlow')) || 2.0;
+        let usedLiters = (data.pump_sec / 60) * fRate;
+        let remLiters = Math.max(0, tVol - usedLiters);
+        let pct = Math.round((remLiters / tVol) * 100);
+        let wEl = document.getElementById("dash-water-meter");
+        wEl.innerText = `${pct}% (~${Math.round(remLiters)} L)`;
+        wEl.style.color = pct <= 15 ? "var(--accent-red)" : "var(--accent-blue)";
     }
 
-    // Tryb Inż. Dane
+    if(data.outdoors !== undefined) {
+        document.getElementById('loc-in').classList.remove('active'); document.getElementById('loc-out').classList.remove('active');
+        if(data.outdoors === 1) document.getElementById('loc-out').classList.add('active'); else document.getElementById('loc-in').classList.add('active');
+    }
+
     if(data.voltage !== undefined) document.getElementById("eng-voltage").innerText = data.voltage.toFixed(3) + " V";
     if(data.raw_adc !== undefined) document.getElementById("eng-raw-adc").innerText = data.raw_adc;
     if(data.air_val !== undefined) document.getElementById("calib-air").value = data.air_val;
@@ -417,7 +446,11 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     unlockBtn.style.display = "none"; pContainer.style.display = "flex"; pTitle.style.display = "block";
 
-    if(data.fault === 1) {
+    // NOWE: Obsługa alertu Auto-Survival
+    if(data.survival === 1) {
+        hIcon.innerText = "🔋"; hIcon.classList.add("pulse-alert");
+        hText.innerText = "Tryb przetrwania (Słaba Bateria)"; hText.style.color = "var(--accent-orange)";
+    } else if(data.fault === 1) {
         hIcon.innerText = "🔥"; hIcon.classList.add("pulse-alert");
         hText.innerText = "AWARIA SYSTEMU POMP!"; hText.style.color = "var(--accent-red)";
         unlockBtn.style.display = "block"; pContainer.style.display = "none"; pTitle.style.display = "none";
@@ -441,7 +474,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
         [...data.logs].reverse().forEach(log => {
             let cls = "bg-ok";
             if(log.action === "PODLANO") cls = "bg-water"; if(log.action === "BRAK WODY!" || log.action === "AWARIA POMPY!") cls = "bg-error";
-            if(log.action === "ZA GORĄCO" || log.action === "BLOKADA (SŁOŃCE)" || log.action === "BLOKADA (BURZA)") cls = "bg-warn"; if(log.action === "RĘCZNE") cls = "bg-manual";
+            if(log.action === "ZA GORĄCO" || log.action === "BLOKADA (SŁOŃCE)" || log.action === "BLOKADA (BURZA)" || log.action === "TRYB SURVIVAL") cls = "bg-warn"; if(log.action === "RĘCZNE") cls = "bg-manual";
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${cls}'>${log.action}</span></div>`;
         });
         rysujWykresy(data.logs);
@@ -456,7 +489,7 @@ function pobierzDaneZESP32() {
         renderujDane(data, now, false);
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, fault: 0, water: "OK", outdoors: 0, logs: [{moisture: 42, v: 3.95, action: "OK"}]}, new Date().getTime(), true);
+        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, logs: [{moisture: 42, v: 3.95, action: "OK"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
@@ -470,7 +503,6 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
     .catch(() => { toast.innerText = "✓ (Demo) Ustawiono lokalnie"; setTimeout(() => toast.style.opacity = "0", 3000); });
 }
 
-// NOWE: Funkcja przełącznika lokalizacji
 function ustawLokalizacje(isOutdoors) {
     haptyka(15);
     document.getElementById('loc-in').classList.remove('active'); document.getElementById('loc-out').classList.remove('active');
@@ -481,7 +513,6 @@ function ustawLokalizacje(isOutdoors) {
 function uruchomTest() { haptyka(15); const sec = document.getElementById("testSlider").value; fetch(`http://192.168.4.1/test?sec=${sec}`, { mode: 'no-cors' }).then(() => alert(`🌊 Test pompy (${sec}s) aktywny.`)).catch(() => alert("❌ Tryb offline.")); }
 function zapiszKalibracje() { haptyka([20, 30, 20]); fetch(`http://192.168.4.1/calibrate?air=${document.getElementById('calib-air').value}&water=${document.getElementById('calib-water').value}`, { mode: 'no-cors' }).then(() => { alert("✅ Zapisano kalibrację"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
 
-// Zaktualizowany CSV (Zawiera kolumnę Napięcie)
 function eksportujCSV() {
     haptyka(15); const cached = localStorage.getItem('lastESPData'); if(!cached) return alert("Brak danych.");
     const logs = JSON.parse(cached).data.logs; if(!logs) return;
