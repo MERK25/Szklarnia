@@ -464,7 +464,7 @@ window.onload = function() {
     zmienMotyw(localStorage.getItem('theme') || 'auto');
     const act = localStorage.getItem("activeProfile"); if(act && document.getElementById(act)) document.getElementById(act).classList.add('selected');
     const cachedData = localStorage.getItem('lastESPData');
-    if(cachedData) { try { const parsed = JSON.parse(cachedData); renderujDane(parsed.data, parsed.timestamp, false); } catch(e) {} }
+    if(cachedData) { try { const parsed = JSON.parse(cachedData); Dane(parsed.data, parsed.timestamp, false); } catch(e) {} }
     else document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     
     fetch(`http://192.168.4.1/sync?t=${Math.floor(Date.now() / 1000)}`, {mode:'no-cors'}).catch(()=>{});
@@ -540,9 +540,16 @@ function renderujDane(data, timestamp, trybDemo = false) {
         let usedLiters = (data.pump_sec / 60) * fRate;
         let remLiters = Math.max(0, tVol - usedLiters);
         let pct = Math.round((remLiters / tVol) * 100);
-        let wEl = document.getElementById("dash-water-meter");
-        wEl.innerText = `${pct}% (~${Math.round(remLiters)} L)`;
-        wEl.style.color = pct <= 15 ? "var(--accent-red)" : "var(--accent-blue)";
+
+        // Animacja wypełnienia
+        document.getElementById("water-fill").style.height = pct + "%";
+        document.getElementById("dash-water-pct").innerText = pct + "%";
+        document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
+        
+        // Zmiana koloru wody na czerwony gdy kończy się woda
+        document.getElementById("water-fill").style.background = pct <= 15 ? 
+            "linear-gradient(to top, var(--accent-red), #ff3b30)" : 
+            "linear-gradient(to top, var(--accent-blue), #5ac8fa)";
     }
 
     if(data.outdoors !== undefined) {
