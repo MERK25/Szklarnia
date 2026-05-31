@@ -99,6 +99,8 @@
             display: flex; background: var(--nav-bg);
             border-radius: 14px; padding: 4px; margin-bottom: 24px;
             position: relative; z-index: 10;
+            user-select: none; /* Zapobiega zaznaczaniu tekstu przy długim kliknięciu */
+            -webkit-user-select: none;
         }
         
         .tab-btn {
@@ -114,25 +116,16 @@
         .tabs-wrapper { position: relative; width: 100%; }
 
         .tab-content {
-            opacity: 0;
-            visibility: hidden;
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 0; /* ← DODANE: zwija fizyczną wysokość elementu */
-            overflow: hidden; /* ← DODANE: odcina wystające elementy */
+            opacity: 0; visibility: hidden; position: absolute;
+            top: 0; left: 0; right: 0; height: 0; overflow: hidden;
             transform: scale(0.96) translateY(5px);
-            /* DODANE OPÓŹNIENIE (height 0s 0.35s): czeka z ucięciem wysokości do końca ładnej animacji */
             transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s, height 0s 0.35s;
         }
 
         .tab-content.active {
-            opacity: 1;
-            visibility: visible;
-            position: relative;
-            height: auto; /* ← DODANE: przywraca pełną wysokość aktywnej karcie */
-            overflow: visible; /* ← DODANE: pozwala swobodnie renderować cienie */
+            opacity: 1; visibility: visible; position: relative;
+            height: auto; overflow: visible;
             transform: scale(1) translateY(0);
-            /* Zmiana jest natychmiastowa przy aktywacji zakladki (0s) */
             transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s, height 0s 0s;
         }
 
@@ -161,7 +154,6 @@
         }
         .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
 
-        /* NOWA SIATKA POGODOWA (2x2 na mobilki) */
         .weather-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .weather-card {
             flex: 1 1 calc(50% - 8px); background: var(--glass-card); border: 1px solid var(--border-light);
@@ -170,19 +162,11 @@
         .weather-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; min-height: 26px; }
         .weather-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
 
-        /* SKELETON SCREENS ANIMACJA */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .skeleton {
             background: linear-gradient(90deg, var(--range-bg) 25%, rgba(150,150,150,0.1) 50%, var(--range-bg) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            color: transparent !important;
-            border-radius: 8px;
-            display: inline-block;
-            min-width: 40px;
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; color: transparent !important;
+            border-radius: 8px; display: inline-block; min-width: 40px;
         }
 
         h2 { font-size: 13px; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
@@ -234,6 +218,15 @@
         #pulpit-toast { text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px; }
         
         .chart-container { position: relative; height: 160px; width: 100%; margin-bottom: 10px; }
+
+        /* NOWE: Style dla Trybu Inżynierskiego */
+        .eng-mode-wrapper { display: none; margin-top: 24px; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .eng-card { border-color: rgba(255, 149, 0, 0.5); background: rgba(255, 149, 0, 0.03); }
+        .eng-title { color: var(--accent-orange); display: flex; align-items: center; gap: 6px; }
+        .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; }
+        .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
+        .btn-eng { background: rgba(255, 149, 0, 0.15); color: var(--accent-orange); }
     </style>
 </head>
 <body>
@@ -343,6 +336,23 @@
                 <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
                 <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
             </div>
+
+            <div id="eng-mode-box" class="eng-mode-wrapper">
+                <h2 class="eng-title">🔧 Diagnostyka ADC & Kalibracja</h2>
+                <div class="section-card eng-card">
+                    <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
+                    <div class="eng-data-row"><span>Surowy odczyt ADC:</span> <b id="eng-raw-adc">---</b></div>
+                    <div class="eng-data-row" style="border-bottom:none; margin-top:15px; margin-bottom:4px;">
+                        <span>Wartość AIR (Sucho):</span>
+                        <input type="number" id="calib-air" class="eng-input" value="3200">
+                    </div>
+                    <div class="eng-data-row" style="border-bottom:none;">
+                        <span>Wartość WATER (Mokro):</span>
+                        <input type="number" id="calib-water" class="eng-input" value="1500">
+                    </div>
+                    <button class="btn-test btn-eng" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz w ESP32</button>
+                </div>
+            </div>
         </div>
     </div> 
 </div>
@@ -350,7 +360,37 @@
 <script>
 let chartInstance = null;
 
-// Baza profili
+// --- NOWE: Logika aktywacji Trybu Inżynierskiego ---
+let engTimer;
+const btnSerwis = document.getElementById('btn-serwis');
+
+function startEngTimer() {
+    engTimer = setTimeout(() => {
+        haptyka([100, 50, 100]);
+        const engBox = document.getElementById('eng-mode-box');
+        const isHidden = (engBox.style.display === 'none' || engBox.style.display === '');
+        engBox.style.display = isHidden ? 'block' : 'none';
+        
+        const toast = document.getElementById('pulpit-toast');
+        toast.innerText = "🔧 Tryb inżynierski " + (isHidden ? "aktywowany" : "ukryty");
+        toast.style.opacity = "1";
+        setTimeout(() => toast.style.opacity = "0", 3000);
+    }, 3000); // 3 sekundy przytrzymania
+}
+
+function clearEngTimer() {
+    clearTimeout(engTimer);
+}
+
+// Obsługa dotyku (mobile) i myszy (desktop)
+btnSerwis.addEventListener('touchstart', startEngTimer, {passive: true});
+btnSerwis.addEventListener('touchend', clearEngTimer);
+btnSerwis.addEventListener('touchcancel', clearEngTimer);
+btnSerwis.addEventListener('mousedown', startEngTimer);
+btnSerwis.addEventListener('mouseup', clearEngTimer);
+btnSerwis.addEventListener('mouseleave', clearEngTimer);
+// ---------------------------------------------------
+
 const domyslneProfile = {
     'pomidory': { th: 40, time: 2, sleep: 4, name: 'Pomidory' },
     'ogorki': { th: 60, time: 1, sleep: 2, name: 'Ogórki' },
@@ -374,10 +414,8 @@ function wczytajProfilDoEdycji() {
     
     document.getElementById('edit-th').value = p.th;
     document.getElementById('edit-th-val').innerText = p.th + '%';
-    
     document.getElementById('edit-time').value = p.time;
     document.getElementById('edit-time-val').innerText = p.time + ' min';
-    
     document.getElementById('edit-sleep').value = p.sleep;
     document.getElementById('edit-sleep-val').innerText = p.sleep + ' h';
 }
@@ -391,7 +429,6 @@ function zapiszEdytowanyProfil() {
     profileData[id].sleep = document.getElementById('edit-sleep').value;
     
     localStorage.setItem('bazaProfili', JSON.stringify(profileData));
-    
     alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
     
     if(document.getElementById('prof-' + id).classList.contains('selected')) {
@@ -416,7 +453,6 @@ function zmienMotyw(motyw) {
         localStorage.setItem('theme', motyw);
     }
     
-    // Odśwież wykres aby zaktualizować kolory osi
     const cachedData = localStorage.getItem('lastESPData');
     if(cachedData) {
         try {
@@ -427,7 +463,9 @@ function zmienMotyw(motyw) {
 }
 
 function zmienZakladke(tab) {
-    haptyka(15);
+    if(tab === 'serwis') haptyka(15); // Zwykły klik to lekka wibracja
+    else haptyka(15);
+
     document.getElementById('btn-pulpit').classList.remove('active');
     document.getElementById('btn-serwis').classList.remove('active');
     document.getElementById('tab-pulpit').classList.remove('active');
@@ -455,7 +493,6 @@ window.onload = function() {
             renderujDane(parsed.data, parsed.timestamp, false);
         } catch(e) {}
     } else {
-        // Jeśli nie ma cache, wymuś widok skeleton do czasu pobrania
         document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     }
 
@@ -511,12 +548,19 @@ function rysujWykres(logi) {
 }
 
 function renderujDane(data, timestamp, trybDemo = false) {
-    // Usunięcie szkieletów po otrzymaniu danych
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
 
+    // Baza
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     
+    // --- NOWE: Aktualizacja Trybu Inżynierskiego ---
+    if(data.voltage !== undefined) document.getElementById("eng-voltage").innerText = data.voltage.toFixed(3) + " V";
+    if(data.raw_adc !== undefined) document.getElementById("eng-raw-adc").innerText = data.raw_adc;
+    if(data.air_val !== undefined) document.getElementById("calib-air").value = data.air_val;
+    if(data.water_val !== undefined) document.getElementById("calib-water").value = data.water_val;
+    // -----------------------------------------------
+
     // Bateria i Prognoza Zapasu
     if (data.voltage) {
         let vFloat = parseFloat(data.voltage);
@@ -529,7 +573,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
             battEl.innerText = (vFloat >= 4.4 ? "⚡ " : "") + pct + "%";
             battEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
 
-            // Prognoza (Zapas) - zakładamy że 1% = 2 godziny w uśpieniu
             let hoursLeft = pct * 2;
             let daysLeft = Math.floor(hoursLeft / 24);
             let remHours = hoursLeft % 24;
@@ -537,9 +580,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
             document.getElementById("dash-time").innerText = timeStr;
             document.getElementById("dash-time").style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
         }
-    } else {
-        document.getElementById("dash-batt").innerText = "-";
-        document.getElementById("dash-time").innerText = "-";
     }
 
     let infoCzasu = timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą";
@@ -572,7 +612,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
             
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
         });
-        
         rysujWykres(data.logs);
     }
 }
@@ -581,9 +620,6 @@ function pobierzDaneZESP32() {
     haptyka(10);
     const badge = document.getElementById('update-badge-btn');
     if(badge) badge.classList.add('syncing');
-
-    // Włączamy szkielety tylko jeśli nie mamy starych danych na ekranie (opcjonalne, ale daje lepszy UX)
-    // document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
 
     fetch('http://192.168.4.1/data')
     .then(response => response.json())
@@ -594,15 +630,10 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cachedData = localStorage.getItem('lastESPData');
         if(!cachedData) {
+            // Demo uwzględnia nowe pola raw
             const demoData = {
-                temp: "32.5", air_hum: "28", voltage: "3.95", v_status: "STABLE", water: "OK",
-                logs: [ 
-                    {moisture: 42, action: "OK"}, 
-                    {moisture: 38, action: "OK"}, 
-                    {moisture: 18, action: "ZA GORĄCO"}, 
-                    {moisture: 90, action: "RĘCZNE"}, 
-                    {moisture: 80, action: "OK"}
-                ]
+                temp: 32.5, air_hum: 28, voltage: 3.952, raw_adc: 2840, air_val: 3200, water_val: 1500, water: "OK",
+                logs: [ {moisture: 42, action: "OK"}, {moisture: 38, action: "OK"}, {moisture: 18, action: "ZA GORĄCO"}, {moisture: 90, action: "RĘCZNE"}, {moisture: 80, action: "OK"} ]
             };
             renderujDane(demoData, new Date().getTime(), true);
         } else {
@@ -618,7 +649,6 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
     haptyka([15, 50, 15]);
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected');
-
     localStorage.setItem("activeProfile", btnId);
 
     const toast = document.getElementById("pulpit-toast");
@@ -636,6 +666,23 @@ function uruchomTest() {
     fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
     .then(() => alert(`🌊 Test pompy (${sekundy}s) aktywny.`))
     .catch(() => { haptyka([50, 100, 50]); alert("❌ Błąd: Brak połączenia z serwerem ESP32."); });
+}
+
+// --- NOWE: Funkcja wysyłająca dane kalibracyjne do ESP32 ---
+function zapiszKalibracje() {
+    haptyka([20, 30, 20]);
+    const air = document.getElementById('calib-air').value;
+    const water = document.getElementById('calib-water').value;
+
+    fetch(`http://192.168.4.1/calibrate?air=${air}&water=${water}`, { mode: 'no-cors' })
+    .then(() => {
+        alert("✅ Dane kalibracyjne zostały wysłane i zapisane w ESP32.");
+        // Wymuś odświeżenie danych, by pokazać nowe %
+        pobierzDaneZESP32(); 
+    })
+    .catch(() => {
+        alert("⚠️ Tryb Offline (Demo). Nie można połączyć z ESP32.");
+    });
 }
 </script>
 </body>
