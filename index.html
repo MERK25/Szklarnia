@@ -11,9 +11,9 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
 
     <style>
-        html { background-color: #e5e5ea; }
-
+        /* ZMIENNE DLA TRYBU JASNEGO (Domyślne) */
         :root {
+            --html-bg: #e5e5ea;
             --bg-gradient: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 100%);
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-card: rgba(255, 255, 255, 0.8);
@@ -25,11 +25,34 @@
             --border-light: rgba(255, 255, 255, 0.5);
             --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
             --input-bg: #ffffff;
+            --nav-bg: rgba(0,0,0,0.06);
+            --range-bg: rgba(0,0,0,0.05);
+            --profile-sel-bg: rgba(52, 199, 89, 0.05);
         }
 
+        /* ZMIENNE DLA TRYBU CIEMNEGO (Wymuszone przez użytkownika) */
+        :root[data-theme="dark"] {
+            --html-bg: #000000;
+            --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
+            --glass-bg: rgba(28, 28, 30, 0.4);
+            --glass-card: rgba(44, 44, 46, 0.6);
+            --text-main: #ffffff;
+            --text-sub: #aeaea2;
+            --accent-green: #30d158;
+            --accent-blue: #0a84ff;
+            --accent-red: #ff453a;
+            --border-light: rgba(255, 255, 255, 0.05);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
+            --input-bg: rgba(28, 28, 30, 0.6);
+            --nav-bg: rgba(255,255,255,0.1);
+            --range-bg: rgba(255,255,255,0.1);
+            --profile-sel-bg: rgba(48, 209, 88, 0.15);
+        }
+
+        /* ZMIENNE DLA TRYBU CIEMNEGO (Auto - zależne od systemu, ignorowane jeśli wybrano jasny) */
         @media (prefers-color-scheme: dark) {
-            html { background-color: #000000; }
-            :root {
+            :root:not([data-theme="light"]) {
+                --html-bg: #000000;
                 --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
                 --glass-bg: rgba(28, 28, 30, 0.4);
                 --glass-card: rgba(44, 44, 46, 0.6);
@@ -41,8 +64,13 @@
                 --border-light: rgba(255, 255, 255, 0.05);
                 --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
                 --input-bg: rgba(28, 28, 30, 0.6);
+                --nav-bg: rgba(255,255,255,0.1);
+                --range-bg: rgba(255,255,255,0.1);
+                --profile-sel-bg: rgba(48, 209, 88, 0.15);
             }
         }
+
+        html { background-color: var(--html-bg); transition: background-color 0.3s; }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif; 
@@ -51,6 +79,7 @@
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; color: var(--text-main); 
             -webkit-font-smoothing: antialiased;
+            transition: color 0.3s, background 0.3s;
         }
 
         .wrapper {
@@ -58,14 +87,15 @@
             background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border-light); border-radius: 38px;
             padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box;
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* TABS NAWIGACJA (iOS Segmented Control) */
+        /* TABS NAWIGACJA */
         .tab-nav {
-            display: flex; background: rgba(0,0,0,0.06);
+            display: flex; background: var(--nav-bg);
             border-radius: 14px; padding: 4px; margin-bottom: 24px;
+            transition: background 0.3s;
         }
-        @media (prefers-color-scheme: dark) { .tab-nav { background: rgba(255,255,255,0.1); } }
         
         .tab-btn {
             flex: 1; padding: 10px; text-align: center; border-radius: 10px;
@@ -77,7 +107,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* PULPIT (Hero i Kafelki) */
+        /* PULPIT */
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
@@ -86,17 +116,18 @@
         .weather-card {
             flex: 1; background: var(--glass-card); border: 1px solid var(--border-light);
             border-radius: 20px; padding: 14px 6px; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: background 0.3s, border-color 0.3s;
         }
         .weather-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
         .weather-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        h2 { font-size: 13px; text-align: left; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        h2 { font-size: 13px; text-align: left; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; transition: color 0.3s; }
 
         /* WSPÓLNE KOMPONENTY */
         .section-card {
             background: var(--glass-card); border: 1px solid var(--border-light);
             border-radius: 22px; padding: 16px; margin-bottom: 16px; box-sizing: border-box;
+            transition: background 0.3s, border-color 0.3s;
         }
 
         .profile-container { display: flex; gap: 8px; margin-bottom: 15px; }
@@ -107,7 +138,7 @@
         }
         .profile-btn:active { transform: scale(0.95); opacity: 0.8; }
         .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
-        .profile-btn.selected { border-color: var(--accent-green); background: rgba(52, 199, 89, 0.05); }
+        .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
 
         .form-group { margin-bottom: 16px; }
         .form-group:last-child { margin-bottom: 0; }
@@ -116,9 +147,8 @@
         
         input[type="range"] { 
             -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; 
-            background: rgba(0,0,0,0.05); outline: none; margin: 12px 0;
+            background: var(--range-bg); outline: none; margin: 12px 0; transition: background 0.3s;
         }
-        @media (prefers-color-scheme: dark) { input[type="range"] { background: rgba(255,255,255,0.1); } }
         input[type="range"]::-webkit-slider-thumb { 
             -webkit-appearance: none; appearance: none; width: 26px; height: 26px; 
             border-radius: 50%; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
@@ -127,14 +157,13 @@
 
         .moisture-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .moisture-badge { background: var(--accent-green); color: #ffffff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; }
-        .moisture-bar-container { width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; margin-top: 12px; overflow: hidden; }
-        @media (prefers-color-scheme: dark) { .moisture-bar-container { background: rgba(255,255,255,0.05); } }
+        .moisture-bar-container { width: 100%; height: 8px; background: var(--range-bg); border-radius: 10px; margin-top: 12px; overflow: hidden; transition: background 0.3s; }
         .moisture-bar { height: 100%; width: 40%; background: var(--accent-blue); transition: width 0.3s; }
 
         .stats-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
         .stats-row:last-child { border: none; padding-bottom: 0; }
         .stats-row:first-child { padding-top: 0; }
-        .stats-val { font-weight: 700; color: var(--text-main); }
+        .stats-val { font-weight: 700; color: var(--text-main); transition: color 0.3s; }
 
         .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
@@ -150,7 +179,6 @@
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
         .btn-test:active { background: rgba(0, 122, 255, 0.2); }
 
-        /* Komunikat o zapisie na pulpicie */
         #pulpit-toast {
             text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600;
             opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px;
@@ -201,8 +229,17 @@
         <div id="pulpit-toast"></div>
     </div>
 
-
     <div id="tab-serwis" style="display: none;">
+        
+        <h2>Wygląd aplikacji</h2>
+        <div class="section-card">
+            <div class="tab-nav" style="margin-bottom:0;">
+                <div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div>
+                <div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div>
+                <div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div>
+            </div>
+        </div>
+
         <h2>Parametry nawadniania</h2>
         <div class="section-card">
             <div class="moisture-header">
@@ -256,6 +293,24 @@
 </div>
 
 <script>
+// --- ZARZĄDZANIE MOTYWEM ---
+function zmienMotyw(motyw) {
+    // Aktualizacja przycisków
+    document.getElementById('theme-light').classList.remove('active');
+    document.getElementById('theme-auto').classList.remove('active');
+    document.getElementById('theme-dark').classList.remove('active');
+    document.getElementById('theme-' + motyw).classList.add('active');
+
+    // Zastosowanie motywu i zapisanie w pamięci
+    if (motyw === 'auto') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.removeItem('theme');
+    } else {
+        document.documentElement.setAttribute('data-theme', motyw);
+        localStorage.setItem('theme', motyw);
+    }
+}
+
 // --- NAWIGACJA ZAKŁADEK ---
 function zmienZakladke(tab) {
     document.getElementById('btn-pulpit').classList.remove('active');
@@ -268,6 +323,11 @@ function zmienZakladke(tab) {
 }
 
 window.onload = function() {
+    // Wczytanie motywu
+    const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
+    zmienMotyw(zapisanyMotyw);
+
+    // Wczytanie suwaków
     if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
     if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
     if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
@@ -284,7 +344,7 @@ function pobierzDaneZESP32() {
         document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
         document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
         
-        // Przeliczenie napięcia na procent baterii (Zakładamy 3.2V = 0%, 4.2V = 100%)
+        // Bateria
         if (data.voltage) {
             let vFloat = parseFloat(data.voltage);
             if (!isNaN(vFloat)) {
@@ -298,7 +358,7 @@ function pobierzDaneZESP32() {
             }
         }
 
-        // Obsługa braku wody na Głównym Ekranie
+        // Status
         const heroIcon = document.getElementById("hero-icon");
         const heroText = document.getElementById("hero-text");
         const wStatus = document.getElementById("waterStatus");
@@ -315,11 +375,11 @@ function pobierzDaneZESP32() {
             wStatus.innerText = "✓ PEŁNY"; wStatus.style.color = "var(--accent-green)";
         }
 
-        // Zasilanie ESP w Serwisie (Volty)
+        // Serwis - Volty
         document.getElementById("voltCalc").innerText = data.voltage + " (" + data.v_status + ")";
         document.getElementById("voltCalc").style.color = (data.v_status === "LOW") ? "var(--accent-red)" : "var(--accent-green)";
 
-        // Historia logów
+        // Logi
         const logBox = document.getElementById("logBox");
         logBox.innerHTML = "";
         if(!data.logs || data.logs.length === 0) {
