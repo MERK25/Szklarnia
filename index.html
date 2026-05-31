@@ -81,46 +81,59 @@
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif; 
             background: var(--bg-gradient); 
             margin: 0; padding: 16px; 
-            display: flex; justify-content: center; align-items: center; 
+            display: flex; justify-content: center; align-items: flex-start; 
             min-height: 100vh; color: var(--text-main); 
             -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
         }
 
         .wrapper {
-            width: 100%; max-width: 410px;
+            width: 100%; max-width: 410px; margin-top: 20px;
             background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border-light); border-radius: 38px;
             padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box;
-            overflow: hidden;
+            position: relative;
         }
 
         .tab-nav {
             display: flex; background: var(--nav-bg);
             border-radius: 14px; padding: 4px; margin-bottom: 24px;
+            position: relative; z-index: 10;
         }
         
         .tab-btn {
             flex: 1; padding: 10px; text-align: center; border-radius: 10px;
             font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer;
+            transition: all 0.3s ease;
         }
         .tab-btn.active {
             background: var(--glass-card); color: var(--text-main);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* Animacja zakładek */
-        .tab-content {
-            display: none;
-            animation: fadeSlideIn 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-        }
-        .tab-content.active {
-            display: block;
+        /* --- NOWY, PROFESJONALNY SYSTEM ZAKŁADEK --- */
+        .tabs-wrapper {
+            position: relative;
+            width: 100%;
         }
 
-        @keyframes fadeSlideIn {
-            0% { opacity: 0; transform: translateY(15px); }
-            100% { opacity: 1; transform: translateY(0); }
+        .tab-content {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            transform: scale(0.96) translateY(5px);
+            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s;
         }
+
+        .tab-content.active {
+            opacity: 1;
+            visibility: visible;
+            position: relative;
+            transform: scale(1) translateY(0);
+            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s;
+        }
+        /* ------------------------------------------ */
 
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
@@ -144,18 +157,9 @@
             -webkit-backdrop-filter: blur(10px);
             transition: all 0.2s ease;
         }
-        .update-badge:active {
-            transform: scale(0.95);
-            background: var(--glass-card);
-        }
-        .sync-icon {
-            width: 12px;
-            height: 12px;
-            color: var(--accent-blue);
-        }
-        .syncing .sync-icon {
-            animation: spin 1s linear infinite;
-        }
+        .update-badge:active { transform: scale(0.95); background: var(--glass-card); }
+        .sync-icon { width: 12px; height: 12px; color: var(--accent-blue); }
+        .syncing .sync-icon { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
         @keyframes pulseAlert {
@@ -185,8 +189,9 @@
             flex: 1 1 calc(33.333% - 6px); min-width: 90px;
             background: var(--glass-card); border: 1px solid var(--border-light); 
             border-radius: 16px; padding: 14px 4px; font-size: 13px; font-weight: 600; 
-            color: var(--text-main); cursor: pointer; box-sizing: border-box;
+            color: var(--text-main); cursor: pointer; box-sizing: border-box; transition: all 0.2s ease;
         }
+        .profile-btn:active { transform: scale(0.95); }
         .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
         .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
         
@@ -199,8 +204,9 @@
         input[type="range"]::-webkit-slider-thumb { 
             -webkit-appearance: none; appearance: none; width: 26px; height: 26px; 
             border-radius: 50%; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
-            cursor: pointer; border: 0.5px solid rgba(0,0,0,0.04);
+            cursor: pointer; border: 0.5px solid rgba(0,0,0,0.04); transition: transform 0.1s;
         }
+        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
 
         .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
@@ -215,6 +221,7 @@
 
         .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
+        .btn-test:active { transform: scale(0.96); }
 
         #pulpit-toast { text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px; }
         
@@ -229,106 +236,106 @@
         <div id="btn-serwis" class="tab-btn" onclick="zmienZakladke('serwis')">⚙️ Serwis</div>
     </div>
 
-    <div id="tab-pulpit" class="tab-content active">
-        <div class="status-hero">
-            <div id="hero-icon" class="status-icon">🌿</div>
-            <div id="hero-text" class="status-text" style="color: var(--accent-green);">Wszystko w porządku</div>
-            <div class="update-badge" onclick="pobierzDaneZESP32()" id="update-badge-btn">
-                <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="23 4 23 10 17 10"></polyline>
-                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                </svg>
-                <span id="last-update-text">Sprawdzanie stanu...</span>
+    <div class="tabs-wrapper">
+        <div id="tab-pulpit" class="tab-content active">
+            <div class="status-hero">
+                <div id="hero-icon" class="status-icon">🌿</div>
+                <div id="hero-text" class="status-text" style="color: var(--accent-green);">Wszystko w porządku</div>
+                <div class="update-badge" onclick="pobierzDaneZESP32()" id="update-badge-btn">
+                    <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    <span id="last-update-text">Sprawdzanie stanu...</span>
+                </div>
             </div>
+
+            <div class="weather-grid">
+                <div class="weather-card"><div class="weather-val" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
+                <div class="weather-card"><div class="weather-val" id="dash-hum">-</div><div class="weather-lbl">Wilgot.</div></div>
+                <div class="weather-card"><div class="weather-val" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
+            </div>
+
+            <h2>Co dzisiaj rośnie?</h2>
+            <div class="profile-container">
+                <button class="profile-btn" id="prof-pomidory" onclick="aktywujProfil('pomidory')">
+                    <span class="profile-icon">🍅</span>Pomidory
+                </button>
+                <button class="profile-btn" id="prof-ogorki" onclick="aktywujProfil('ogorki')">
+                    <span class="profile-icon">🥒</span>Ogórki
+                </button>
+                <button class="profile-btn" id="prof-sadzonki" onclick="aktywujProfil('sadzonki')">
+                    <span class="profile-icon">🌱</span>Sadzonki
+                </button>
+                <button class="profile-btn" id="prof-arbuz" onclick="aktywujProfil('arbuz')">
+                    <span class="profile-icon">🍉</span>Arbuz
+                </button>
+                <button class="profile-btn" id="prof-borowka" onclick="aktywujProfil('borowka')">
+                    <span class="profile-icon">🫐</span>Borówka
+                </button>
+            </div>
+            <div id="pulpit-toast"></div>
         </div>
 
-        <div class="weather-grid">
-            <div class="weather-card"><div class="weather-val" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
-            <div class="weather-card"><div class="weather-val" id="dash-hum">-</div><div class="weather-lbl">Wilgot.</div></div>
-            <div class="weather-card"><div class="weather-val" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
-        </div>
+        <div id="tab-serwis" class="tab-content">
+            <h2>Wygląd aplikacji</h2>
+            <div class="section-card">
+                <div class="tab-nav" style="margin-bottom:0;">
+                    <div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div>
+                    <div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div>
+                    <div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div>
+                </div>
+            </div>
 
-        <h2>Co dzisiaj rośnie?</h2>
-        <div class="profile-container">
-            <button class="profile-btn" id="prof-pomidory" onclick="aktywujProfil('pomidory')">
-                <span class="profile-icon">🍅</span>Pomidory
-            </button>
-            <button class="profile-btn" id="prof-ogorki" onclick="aktywujProfil('ogorki')">
-                <span class="profile-icon">🥒</span>Ogórki
-            </button>
-            <button class="profile-btn" id="prof-sadzonki" onclick="aktywujProfil('sadzonki')">
-                <span class="profile-icon">🌱</span>Sadzonki
-            </button>
-            <button class="profile-btn" id="prof-arbuz" onclick="aktywujProfil('arbuz')">
-                <span class="profile-icon">🍉</span>Arbuz
-            </button>
-            <button class="profile-btn" id="prof-borowka" onclick="aktywujProfil('borowka')">
-                <span class="profile-icon">🫐</span>Borówka
-            </button>
-        </div>
-        <div id="pulpit-toast"></div>
-    </div>
+            <h2>Edycja Profili Upraw</h2>
+            <div class="section-card">
+                <label>Wybierz roślinę do edycji</label>
+                <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
+                    <option value="pomidory">🍅 Pomidory</option>
+                    <option value="ogorki">🥒 Ogórki</option>
+                    <option value="sadzonki">🌱 Sadzonki</option>
+                    <option value="arbuz">🍉 Arbuz</option>
+                    <option value="borowka">🫐 Borówka</option>
+                </select>
 
-    <div id="tab-serwis" class="tab-content">
-        <h2>Wygląd aplikacji</h2>
-        <div class="section-card">
-            <div class="tab-nav" style="margin-bottom:0;">
-                <div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div>
-                <div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div>
-                <div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div>
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
+                    <span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span>
+                </div>
+                <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
+
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;">
+                    <span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span>
+                </div>
+                <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
+
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;">
+                    <span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span>
+                </div>
+                <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
+
+                <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany w profilu</button>
+            </div>
+
+            <h2>Historia i Wykresy</h2>
+            <div class="section-card" style="margin-bottom:20px;">
+                <div class="chart-container">
+                    <canvas id="moistureChart"></canvas>
+                </div>
+                <div class="log-container" id="logBox">
+                    <div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div>
+                </div>
+            </div>
+
+            <h2>Test Pompy</h2>
+            <div class="section-card">
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
+                    <span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span>
+                </div>
+                <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
+                <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
             </div>
         </div>
-
-        <h2>Edycja Profili Upraw</h2>
-        <div class="section-card">
-            <label>Wybierz roślinę do edycji</label>
-            <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
-                <option value="pomidory">🍅 Pomidory</option>
-                <option value="ogorki">🥒 Ogórki</option>
-                <option value="sadzonki">🌱 Sadzonki</option>
-                <option value="arbuz">🍉 Arbuz</option>
-                <option value="borowka">🫐 Borówka</option>
-            </select>
-
-            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
-                <span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span>
-            </div>
-            <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
-
-            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;">
-                <span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span>
-            </div>
-            <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
-
-            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;">
-                <span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span>
-            </div>
-            <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
-
-            <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany w profilu</button>
-        </div>
-
-        <h2>Historia i Wykresy</h2>
-        <div class="section-card" style="margin-bottom:20px;">
-            <div class="chart-container">
-                <canvas id="moistureChart"></canvas>
-            </div>
-            <div class="log-container" id="logBox">
-                <div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div>
-            </div>
-        </div>
-
-        <h2>Test Pompy</h2>
-        <div class="section-card">
-            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
-                <span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span>
-            </div>
-            <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
-            <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
-        </div>
-    </div>
-
-</div>
+    </div> </div>
 
 <script>
 let chartInstance = null;
@@ -404,18 +411,15 @@ function zmienMotyw(motyw) {
 
 function zmienZakladke(tab) {
     haptyka(15);
+    // Wyłączenie aktywnych stanów
     document.getElementById('btn-pulpit').classList.remove('active');
     document.getElementById('btn-serwis').classList.remove('active');
-    
     document.getElementById('tab-pulpit').classList.remove('active');
     document.getElementById('tab-serwis').classList.remove('active');
 
+    // Włączenie wybranej zakładki – animacja CSS zrobi resztę
     document.getElementById('btn-' + tab).classList.add('active');
-    
-    // Używamy setTimeout, aby wymusić reset animacji CSS przy każdym kliknięciu
-    setTimeout(() => {
-        document.getElementById('tab-' + tab).classList.add('active');
-    }, 10);
+    document.getElementById('tab-' + tab).classList.add('active');
 }
 
 window.onload = function() {
