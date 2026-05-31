@@ -8,72 +8,227 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Szklarnia">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
 
     <style>
         :root {
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --text-color: #1c1c1e;
-            --text-secondary: #8e8e93;
-            --accent-color: #34c759;
-            --input-bg: #f2f2f7;
-            --border-color: #d1d1d6;
+            --bg-gradient: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-card: rgba(255, 255, 255, 0.8);
+            --text-main: #1c1c1e;
+            --text-sub: #636366;
+            --accent-green: #34c759;
+            --accent-blue: #007aff;
+            --border-light: rgba(255, 255, 255, 0.5);
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
+            --input-bg: #ffffff;
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #1c1c1e;
-                --card-bg: #2c2c2e;
-                --text-color: #ffffff;
-                --text-secondary: #aeaeb2;
-                --accent-color: #30d158;
-                --input-bg: #1c1c1e;
-                --border-color: #3a3a3c;
+                --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
+                --glass-bg: rgba(28, 28, 30, 0.4);
+                --glass-card: rgba(44, 44, 46, 0.6);
+                --text-main: #ffffff;
+                --text-sub: #aeaea2;
+                --accent-green: #30d158;
+                --accent-blue: #0a84ff;
+                --border-light: rgba(255, 255, 255, 0.05);
+                --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
+                --input-bg: rgba(28, 28, 30, 0.6);
             }
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-color); transition: 0.3s; }
-        .card { background: var(--card-bg); max-width: 400px; width: 100%; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
-        h1 { color: var(--accent-color); margin: 0 0 15px 0; font-size: 24px; font-weight: 700; }
-        h2 { font-size: 14px; text-align: left; margin: 15px 0 8px 0; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif; 
+            background: var(--bg-gradient); 
+            margin: 0; 
+            padding: 16px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            color: var(--text-main); 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Główny kontener "szklany" */
+        .wrapper {
+            width: 100%;
+            max-width: 410px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-light);
+            border-radius: 38px;
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            box-sizing: border-box;
+        }
+
+        h1 { 
+            font-size: 28px; 
+            font-weight: 800; 
+            letter-spacing: -0.5px; 
+            margin: 10px 0 20px 0; 
+            text-align: left;
+            background: linear-gradient(90deg, var(--text-main) 0%, var(--accent-green) 120%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 { 
+            font-size: 13px; 
+            text-align: left; 
+            margin: 24px 0 10px 4px; 
+            color: var(--text-sub); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            font-weight: 700;
+        }
+
+        /* Podział na eleganckie mini-karty Apple Style */
+        .section-card {
+            background: var(--glass-card);
+            border: 1px solid var(--border-light);
+            border-radius: 22px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        /* Nowoczesne przyciski profili */
+        .profile-container { display: flex; gap: 8px; margin-bottom: 5px; }
+        .profile-btn { 
+            flex: 1; 
+            background: var(--glass-card); 
+            border: 1px solid var(--border-light); 
+            border-radius: 16px; 
+            padding: 12px 6px; 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: var(--text-main); 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-soft);
+        }
+        .profile-btn:active { transform: scale(0.95); opacity: 0.8; }
+        .profile-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+
+        /* Odznaka wilgotności neonowa */
+        .moisture-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .moisture-badge { 
+            background: var(--accent-green); 
+            color: #ffffff; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            font-size: 14px; 
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3);
+        }
+
+        .moisture-bar-container { width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; margin-top: 12px; overflow: hidden; }
+        @media (prefers-color-scheme: dark) { .moisture-bar-container { background: rgba(255,255,255,0.05); } }
+        .moisture-bar { height: 100%; width: 40%; background: var(--accent-blue); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
         
-        .profile-container { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 15px; }
-        .profile-btn { flex: 1; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px 4px; font-size: 11px; font-weight: 600; color: var(--text-color); cursor: pointer; }
-        .profile-icon { font-size: 18px; display: block; margin-bottom: 2px; }
-
-        .moisture-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(52, 199, 89, 0.15); color: var(--accent-color); padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 13px; margin-bottom: 15px; }
-        .moisture-bar-container { width: 100%; height: 6px; background: var(--input-bg); border-radius: 3px; margin-top: 6px; overflow: hidden; }
-        .moisture-bar { height: 100%; width: 40%; background: #007aff; transition: width 0.3s; }
+        .form-group { margin-bottom: 16px; }
+        .form-group:last-child { margin-bottom: 0; }
+        label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px; color: var(--text-main); }
         
-        .form-group { text-align: left; margin-bottom: 14px; }
-        label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 4px; }
-        input[type="number"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-size: 15px; background: var(--input-bg); color: var(--text-color); }
-        .unit-hint { font-size: 11px; color: var(--text-secondary); margin-top: 3px; display: block; }
+        /* Pola input w stylu iOS */
+        input[type="number"] { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid var(--border-light); 
+            border-radius: 14px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            font-weight: 500;
+            background: var(--input-bg); 
+            color: var(--text-main); 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+            transition: border-color 0.2s;
+        }
+        input[type="number"]:focus { border-color: var(--accent-green); outline: none; }
+        .unit-hint { font-size: 11px; color: var(--text-sub); margin-top: 5px; display: block; }
         
-        /* Diagnostyka i Statystyki */
-        .stats-box { background: var(--input-bg); padding: 12px; border-radius: 12px; font-size: 13px; border-left: 4px solid #007aff; text-align: left; margin-bottom: 15px; }
-        .stats-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .stats-row:last-child { margin-bottom: 0; }
-        .stats-val { font-weight: 600; }
+        /* Statystyki */
+        .stats-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+        .stats-row:last-child { border: none; padding-bottom: 0; }
+        .stats-row:first-child { padding-top: 0; }
+        .stats-val { font-weight: 700; color: var(--text-main); }
 
-        /* Suwak Testowy */
-        .slider-group { background: var(--input-bg); padding: 12px; border-radius: 12px; text-align: left; margin-bottom: 15px; }
-        input[type="range"] { width: 100%; margin: 8px 0; }
+        /* Suwak */
+        input[type="range"] { 
+            -webkit-appearance: none; 
+            width: 100%; 
+            height: 8px; 
+            border-radius: 5px; 
+            background: rgba(0,0,0,0.05); 
+            outline: none; 
+            margin: 12px 0;
+        }
+        @media (prefers-color-scheme: dark) { input[type="range"] { background: rgba(255,255,255,0.1); } }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            appearance: none; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            background: #ffffff; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: pointer; 
+            border: 0.5px solid rgba(0,0,0,0.04);
+        }
 
-        /* Oś czasu logów */
-        .log-container { background: var(--input-bg); padding: 12px; border-radius: 12px; text-align: left; font-size: 12px; max-height: 120px; overflow-y: auto; }
-        .log-item { padding: 4px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
-        .log-item:last-child { border: none; }
-        .log-ok { color: var(--accent-color); font-weight: 500; }
-        .log-water { color: #007aff; font-weight: 500; }
+        /* Historia (Logi) */
+        .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
+        .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+        .log-item:last-child { border: none; padding-bottom: 0; }
+        .log-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .bg-ok { background: rgba(52, 199, 89, 0.12); color: var(--accent-green); }
+        .bg-water { background: rgba(0, 122, 255, 0.12); color: var(--accent-blue); }
 
-        .btn-save { display: block; width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; background: var(--accent-color); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2); }
-        .btn-test { display: block; width: 100%; padding: 10px; border: 2px solid #007aff; border-radius: 12px; font-size: 13px; font-weight: 600; background: transparent; color: #007aff; cursor: pointer; margin-top: 5px; }
+        /* Przyciski główne akcji */
+        .btn-save { 
+            display: block; 
+            width: 100%; 
+            padding: 16px; 
+            border: none; 
+            border-radius: 18px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            background: var(--accent-green); 
+            color: #ffffff; 
+            cursor: pointer; 
+            box-shadow: 0 6px 20px rgba(48, 209, 88, 0.25); 
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+        .btn-save:active { transform: scale(0.98); opacity: 0.9; }
+
+        .btn-test { 
+            display: block; 
+            width: 100%; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 16px; 
+            font-size: 14px; 
+            font-weight: 700; 
+            background: rgba(0, 122, 255, 0.1); 
+            color: var(--accent-blue); 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            margin-top: 8px; 
+        }
+        .btn-test:active { background: rgba(0, 122, 255, 0.2); }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>🌱 Szklarnia Panel</h1>
+<div class="wrapper">
+    <h1>Szklarnia</h1>
     
     <div class="profile-container">
         <button class="profile-btn" onclick="ustawProfil(40, 2, 4)"><span class="profile-icon">🍅</span>Pomidory</button>
@@ -81,47 +236,57 @@
         <button class="profile-btn" onclick="ustawProfil(50, 0.5, 1)"><span class="profile-icon">🌱</span>Sadzonki</button>
     </div>
 
-    <div class="moisture-badge">
-        <span>💧 Próg aktywacji:</span> <span id="badgeVal">40%</span>
-    </div>
-    
-    <div class="form-group">
-        <label>Minimalna wilgotność ziemi (%):</label>
-        <input type="number" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs(true)">
-        <div class="moisture-bar-container"><div id="moistureBar" class="moisture-bar"></div></div>
-        <span id="adviceText" class="unit-hint" style="font-weight: 500;">Wczytywanie...</span>
-    </div>
-    
-    <div class="form-group">
-        <label>Czas podlewania (minuty):</label>
-        <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1" oninput="aktualizujInterfejs(true)">
-    </div>
-    
-    <div class="form-group">
-        <label>Interwał sprawdzania (godziny):</label>
-        <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1" oninput="aktualizujInterfejs(true)">
+    <h2>Ustawienia pracy</h2>
+    <div class="section-card">
+        <div class="moisture-header">
+            <label style="margin:0;">Wilgotność aktywacji</label>
+            <span id="badgeVal" class="moisture-badge">40%</span>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+            <input type="number" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs(true)">
+            <div class="moisture-bar-container"><div id="moistureBar" class="moisture-bar"></div></div>
+            <span id="adviceText" class="unit-hint" style="font-weight: 600;">Wczytywanie...</span>
+        </div>
     </div>
 
-    <h2>📊 Diagnostyka i Szacunki</h2>
-    <div class="stats-box">
+    <div class="section-card">
+        <div class="form-group">
+            <label>Czas podlewania</label>
+            <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1" oninput="aktualizujInterfejs(true)">
+            <span class="unit-hint">Określane w minutach</span>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+            <label>Interwał badania gleby</label>
+            <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1" oninput="aktualizujInterfejs(true)">
+            <span class="unit-hint">Określane w godzinach</span>
+        </div>
+    </div>
+
+    <h2>Diagnostyka układu</h2>
+    <div class="section-card">
         <div class="stats-row"><span>Woda na cykl:</span><span class="stats-val" id="waterCalc">-</span></div>
         <div class="stats-row"><span>Pomiary na dobę:</span><span class="stats-val" id="checksCalc">-</span></div>
-        <div class="stats-row"><span>Zasilanie ESP32:</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
+        <div class="stats-row"><span>Status zasilania:</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
     </div>
 
-    <h2>🎛️ Test manualny pompy</h2>
-    <div class="slider-group">
-        <label>Czas testu: <span id="testDurationVal" style="color:#007aff; font-weight:700;">15 sekund</span></label>
-        <input type="range" id="testSlider" min="5" max="120" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + ' sekund'">
+    <h2>Sterowanie ręczne</h2>
+    <div class="section-card">
+        <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
+            <span>Czas trwania testu</span>
+            <span id="testDurationVal" style="color:var(--accent-blue);">15s</span>
+        </div>
+        <input type="range" id="testSlider" min="5" max="120" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
         <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom test pompy</button>
     </div>
 
-    <h2>📜 Historia ostatnich pomiarów</h2>
-    <div class="log-container" id="logBox">
-        <div class="log-item" style="color:var(--text-secondary)">Połącz się z "Szklarnia-Net" aby pobrać logi.</div>
+    <h2>Historia nawadniania</h2>
+    <div class="section-card" style="margin-bottom:0;">
+        <div class="log-container" id="logBox">
+            <div class="log-item" style="color:var(--text-sub); justify-content:center;">Połącz się z siecią, aby pobrać logi.</div>
+        </div>
     </div>
     
-    <button class="btn-save" style="margin-top:15px;" onclick="zapiszPrzezWiFi()">Zapisz harmonogram w ESP32</button>
+    <button class="btn-save" onclick="zapiszPrzezWiFi()">⚡ Zapisz konfigurację</button>
 </div>
 
 <script>
@@ -133,29 +298,26 @@ window.onload = function() {
     pobierzDaneZESP32();
 }
 
-// Pobieranie logów i diagnostyki z ESP32 po wejściu na stronę
 function pobierzDaneZESP32() {
     fetch('http://192.168.4.1/data')
     .then(response => response.json())
     .then(data => {
-        // Zasilanie
-        document.getElementById("voltCalc").innerText = data.voltage;
+        document.getElementById("voltCalc").innerText = data.voltage + " (" + data.v_status + ")";
         if(data.v_status === "LOW") document.getElementById("voltCalc").style.color = "#ff3b30";
-        else document.getElementById("voltCalc").style.color = "#34c759";
+        else document.getElementById("voltCalc").style.color = var(--accent-green);
 
-        // Logi historii
         const logBox = document.getElementById("logBox");
         logBox.innerHTML = "";
         if(data.logs.length === 0) {
-            logBox.innerHTML = "<div class='log-item'>Brak wpisów w historii.</div>";
+            logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów w historii.</div>";
         } else {
-            data.logs.forEach(log => {
-                let klasa = log.action === "PODLANO" ? "log-water" : "log-ok";
-                logBox.innerHTML += `<div class='log-item'><span>Pomiar #${log.id}: <b>${log.moisture}%</b></span><span class='${klasa}'>${log.action}</span></div>`;
+            data.logs.reverse().forEach(log => {
+                let statusKlasa = log.action === "PODLANO" ? "bg-water" : "bg-ok";
+                logBox.innerHTML += `<div class='log-item'><span>Pomiar <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
             });
         }
     }).catch(() => {
-        console.log("Działanie lokalne offline - brak połączenia z ESP32.");
+        console.log("Działanie w trybie offline.");
     });
 }
 
@@ -183,15 +345,15 @@ function aktualizujInterfejs(zapiszDoPamieci) {
     
     if(pct < 25) bar.style.backgroundColor = "#ff3b30";
     else if(pct > 75) bar.style.backgroundColor = "#ff9500";
-    else bar.style.backgroundColor = "#007aff";
+    else bar.style.backgroundColor = "var(--accent-blue)";
 
     const advice = document.getElementById("adviceText");
-    if(pct < 25) advice.innerText = "⚠️ Za sucho dla pomidorów!";
-    else if(pct > 75) advice.innerText = "⚠️ Ryzyko gnicia korzeni!";
-    else advice.innerText = "✓ Optymalna wilgotność gleby.";
+    if(pct < 25) { advice.innerText = "⚠️ Krytycznie sucho dla warzyw!"; advice.style.color = "#ff3b30"; }
+    else if(pct > 75) { advice.innerText = "⚠️ Zagrożenie przelaniem systemu!"; advice.style.color = "#ff9500"; }
+    else { advice.innerText = "✓ Wilgotność w pełni optymalna."; advice.style.color = "var(--accent-green)"; }
 
-    document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10} Litrów`;
-    if (hrs > 0) document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} razy / dobę`;
+    document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10}L`;
+    if (hrs > 0) document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} / dobę`;
 }
 
 function zapiszPrzezWiFi() {
@@ -200,15 +362,15 @@ function zapiszPrzezWiFi() {
     const secondsSleep = Math.round(document.getElementById("sleepInput").value * 3600);
     
     fetch(`http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`, { mode: 'no-cors' })
-    .then(() => alert("🚀 Harmonogram zapisany!"))
-    .catch(() => alert("❌ Brak połączenia z 'Szklarnia-Net'"));
+    .then(() => alert("🚀 Dane przesłane! Trwa zapis..."))
+    .catch(() => alert("❌ Brak połączenia z siecią 'Szklarnia-Net'"));
 }
 
-function uruchomTest() {
+function运行Test() {
     const sekundy = document.getElementById("testSlider").value;
     fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
-    .then(() => alert(`🌊 Test uruchomiony! Pompa włącza się na ${sekundy} sekund.`))
-    .catch(() => alert("❌ Brak połączenia z 'Szklarnia-Net'"));
+    .then(() => alert(`🌊 Test aktywny przez ${sekundy}s.`))
+    .catch(() => alert("❌ Błąd połączenia."));
 }
 </script>
 </body>
