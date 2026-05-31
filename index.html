@@ -6,7 +6,23 @@
     <title>Szklarnia Kontrola</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* [Użyj swoich dotychczasowych stylów CSS z poprzedniej wiadomości] */
+        :root { --html-bg: #e5e5ea; --bg-gradient: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 100%); --glass-bg: rgba(255, 255, 255, 0.65); --glass-card: rgba(255, 255, 255, 0.8); --text-main: #1c1c1e; --text-sub: #636366; --accent-green: #34c759; --accent-blue: #007aff; --accent-red: #ff3b30; --accent-orange: #ff9500; --accent-purple: #af52de; --border-light: rgba(255, 255, 255, 0.5); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04); --nav-bg: rgba(0,0,0,0.06); --range-bg: rgba(0,0,0,0.05); --profile-sel-bg: rgba(52, 199, 89, 0.05); }
+        html { background-color: var(--html-bg); }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-gradient); margin: 0; padding: 16px; display: flex; justify-content: center; min-height: 100vh; color: var(--text-main); }
+        .wrapper { width: 100%; max-width: 410px; background: var(--glass-bg); backdrop-filter: blur(30px); border: 1px solid var(--border-light); border-radius: 38px; padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box; }
+        .tab-nav { display: flex; background: var(--nav-bg); border-radius: 14px; padding: 4px; margin-bottom: 24px; }
+        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer; }
+        .tab-btn.active { background: var(--glass-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .status-hero { text-align: center; padding: 10px 0 20px 0; }
+        .weather-grid { display: flex; gap: 8px; margin-bottom: 24px; }
+        .weather-card { flex: 1; background: var(--glass-card); border-radius: 20px; padding: 14px 6px; text-align: center; }
+        .profile-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .profile-btn { flex: 1 1 calc(33% - 8px); background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 10px; font-size: 12px; cursor: pointer; }
+        .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
+        .section-card { background: var(--glass-card); border-radius: 22px; padding: 16px; margin-bottom: 16px; }
+        input[type="range"] { width: 100%; margin: 12px 0; }
+        .btn-save { display: block; width: 100%; padding: 16px; background: var(--accent-green); color: #fff; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; }
+        .chart-container { height: 160px; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -15,64 +31,54 @@
         <div id="btn-pulpit" class="tab-btn active" onclick="zmienZakladke('pulpit')">Pulpit</div>
         <div id="btn-serwis" class="tab-btn" onclick="zmienZakladke('serwis')">⚙️ Serwis</div>
     </div>
-    
-    <div class="tabs-wrapper">
-        <div id="tab-pulpit" class="tab-content active">
-            </div>
-        <div id="tab-serwis" class="tab-content">
-            </div>
+    <div id="tab-pulpit">
+        <div class="status-hero">
+            <div id="hero-icon" style="font-size:54px;">🌿</div>
+            <div id="hero-text" style="font-weight:800; font-size:20px;">Wszystko w porządku</div>
+        </div>
+        <div class="weather-grid">
+            <div class="weather-card"><div id="dash-temp">-</div><div>Temp</div></div>
+            <div class="weather-card"><div id="dash-hum">-</div><div>Wilgot.</div></div>
+        </div>
+        <h2>Profile</h2>
+        <div class="profile-container">
+            <button class="profile-btn" id="prof-pomidory" onclick="ustawProfilZapisz(40, 2, 4, 'prof-pomidory', 'Pomidory')">🍅Pomidory</button>
+            <button class="profile-btn" id="prof-ogorki" onclick="ustawProfilZapisz(60, 1, 2, 'prof-ogorki', 'Ogórki')">🥒Ogórki</button>
+            <button class="profile-btn" id="prof-sadzonki" onclick="ustawProfilZapisz(50, 0.5, 1, 'prof-sadzonki', 'Sadzonki')">🌱Sadzonki</button>
+            <button class="profile-btn" id="prof-arbuz" onclick="ustawProfilZapisz(55, 3, 3, 'prof-arbuz', 'Arbuz')">🍉Arbuz</button>
+            <button class="profile-btn" id="prof-borowka" onclick="ustawProfilZapisz(70, 1.5, 2, 'prof-borowka', 'Borówka')">🫐Borówka</button>
+        </div>
+    </div>
+    <div id="tab-serwis" style="display:none;">
+        <h2>Ustawienia</h2>
+        <div class="section-card">
+            <label>Wilgotność</label>
+            <input type="range" id="thInput" value="40" min="0" max="100">
+            <label>Czas (min)</label>
+            <input type="range" id="timeInput" value="2" min="0.5" max="30">
+            <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz do ESP</button>
+        </div>
     </div>
 </div>
-
 <script>
-let profileData = {};
-
-// Pobieranie bazy profili z ESP32
-async function wczytajProfile() {
-    try {
-        const response = await fetch('http://192.168.4.1/get-profiles');
-        const data = await response.json();
-        profileData = Object.keys(data).length > 0 ? data : {
-            'pomidory': { th: 40, time: 2, sleep: 4, name: 'Pomidory' },
-            'ogorki': { th: 60, time: 1, sleep: 2, name: 'Ogórki' },
-            'sadzonki': { th: 50, time: 0.5, sleep: 1, name: 'Sadzonki' },
-            'arbuz': { th: 55, time: 3, sleep: 3, name: 'Arbuz' },
-            'borowka': { th: 70, time: 1.5, sleep: 2, name: 'Borówka' }
-        };
-        wczytajProfilDoEdycji();
-    } catch (e) {
-        console.warn("Błąd pobierania profili z ESP");
-    }
+function zmienZakladke(tab) {
+    document.getElementById('tab-pulpit').style.display = (tab === 'pulpit') ? 'block' : 'none';
+    document.getElementById('tab-serwis').style.display = (tab === 'serwis') ? 'block' : 'none';
+    document.getElementById('btn-pulpit').className = (tab === 'pulpit') ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('btn-serwis').className = (tab === 'serwis') ? 'tab-btn active' : 'tab-btn';
 }
-
-// Zapisywanie bazy do ESP32
-async function zapiszEdytowanyProfil() {
-    const id = document.getElementById('edit-profile-select').value;
-    profileData[id].th = document.getElementById('edit-th').value;
-    profileData[id].time = document.getElementById('edit-time').value;
-    profileData[id].sleep = document.getElementById('edit-sleep').value;
-    
-    try {
-        await fetch('http://192.168.4.1/save-profiles', {
-            method: 'POST',
-            body: JSON.stringify(profileData)
-        });
-        alert("✅ Zapisano w pamięci szklarni!");
-    } catch(e) { alert("❌ Błąd zapisu"); }
+function ustawProfilZapisz(th, time, sleep, id, name) {
+    document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById(id).classList.add('selected');
+    document.getElementById("thInput").value = th;
+    document.getElementById("timeInput").value = time;
+    fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&sleepSec=${sleep * 3600}`, { mode: 'no-cors' });
 }
-
-function aktywujProfil(id) {
-    const p = profileData[id];
-    document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
-    document.getElementById('prof-' + id).classList.add('selected');
-    
-    // Wysyłamy komendę do podlewania
-    fetch(`http://192.168.4.1/save?thPct=${p.th}&timeSec=${p.time * 60}&sleepSec=${p.sleep * 3600}`, { mode: 'no-cors' });
-}
-
-window.onload = function() {
-    wczytajProfile();
-    // ... reszta Twoich funkcji (renderujDane, pobierzDane, itd.)
+function zapiszPrzezWiFi() {
+    const th = document.getElementById("thInput").value;
+    const time = document.getElementById("timeInput").value;
+    fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&sleepSec=14400`, { mode: 'no-cors' });
+    alert("Zapisano!");
 }
 </script>
 </body>
