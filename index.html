@@ -287,6 +287,31 @@ let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslnePro
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
 
+function zaktualizujUIZESP(th, time, sleep) {
+    document.getElementById('edit-th').value = th;
+    document.getElementById('edit-th-val').innerText = th + '%';
+    document.getElementById('edit-time').value = time;
+    document.getElementById('edit-time-val').innerText = time + ' min';
+    document.getElementById('edit-sleep').value = sleep;
+    document.getElementById('edit-sleep-val').innerText = sleep + ' h';
+
+    document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    let znalezionoProfil = false;
+    for (const [id, param] of Object.entries(profileData)) {
+        if (param.th == th && param.time == time && param.sleep == sleep) {
+            document.getElementById('prof-' + id).classList.add('selected');
+            localStorage.setItem("activeProfile", 'prof-' + id);
+            znalezionoProfil = true;
+            break;
+        }
+    }
+    
+    if (!znalezionoProfil) {
+        localStorage.removeItem("activeProfile");
+    }
+}
+
 function aktywujProfil(id) { ustawProfilZapisz(profileData[id].th, profileData[id].time, profileData[id].sleep, 'prof-' + id, profileData[id].name); }
 
 function wczytajProfilDoEdycji() {
@@ -307,7 +332,6 @@ function zapiszEdytowanyProfil() {
     if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
 }
 
-// NOWE: Logika Stopera i przeliczania kalibracji
 let stoperInterval;
 let stoperStartTime;
 let stoperRunning = false;
@@ -341,22 +365,25 @@ function toggleStoper() {
         result.innerText = `Wydajność pompy: ${lPerMin.toFixed(2)} L/min`;
         result.style.display = "block";
         
-        // Zapis automatyczny do puli ustawień
         document.getElementById('pump-flow').value = lPerMin.toFixed(2);
         zapiszParametryZbiornika();
         haptyka([50, 100, 50]);
     }
 }
 
-function wczytajParametryZbiornika() {
-    document.getElementById('tank-vol').value = localStorage.getItem('tankVol') || 200;
-    document.getElementById('pump-flow').value = localStorage.getItem('pumpFlow') || 2.0;
-}
 function zapiszParametryZbiornika() {
-    localStorage.setItem('tankVol', document.getElementById('tank-vol').value);
-    localStorage.setItem('pumpFlow', document.getElementById('pump-flow').value);
-    pobierzDaneZESP32(); 
+    haptyka(10);
+    const vol = document.getElementById('tank-vol').value;
+    const flow = document.getElementById('pump-flow').value;
+    
+    fetch(`http://192.168.4.1/tank?vol=${vol}&flow=${flow}`, { mode: 'no-cors' })
+    .then(() => {
+        alert("Zapisano parametry zbiornika na ESP32.");
+        pobierzDaneZESP32(); 
+    })
+    .catch(() => alert("⚠️ Tryb Offline (Demo)"));
 }
+
 function zresetujLicznikWody() {
     haptyka([30, 30, 30]);
     if(confirm("Czy na pewno chcesz wyzerować licznik zużytej wody?")) {
@@ -384,7 +411,6 @@ function zmienZakladke(tab) {
 
 window.onload = function() {
     wczytajProfilDoEdycji(); 
-    wczytajParametryZbiornika();
     zmienMotyw(localStorage.getItem('theme') || 'auto');
     const act = localStorage.getItem("activeProfile"); if(act && document.getElementById(act)) document.getElementById(act).classList.add('selected');
     const cachedData = localStorage.getItem('lastESPData');
@@ -436,6 +462,10 @@ function rysujWykresy(logi) {
 function renderujDane(data, timestamp, trybDemo = false) {
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
     
+    if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_sleep !== undefined) {
+        zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_sleep);
+    }
+    
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     
@@ -451,8 +481,12 @@ function renderujDane(data, timestamp, trybDemo = false) {
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
     if(data.pump_sec !== undefined) {
-        let tVol = parseFloat(localStorage.getItem('tankVol')) || 200;
-        let fRate = parseFloat(localStorage.getItem('pumpFlow')) || 2.0;
+        let tVol = data.tank_vol !== undefined ? data.tank_vol : 200; 
+        let fRate = data.pump_flow !== undefined ? data.pump_flow : 2.0;
+        
+        document.getElementById('tank-vol').value = tVol;
+        document.getElementById('pump-flow').value = fRate;
+
         let usedLiters = (data.pump_sec / 60) * fRate;
         let remLiters = Math.max(0, tVol - usedLiters);
         let pct = Math.round((remLiters / tVol) * 100);
@@ -546,7 +580,7 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
     document.getElementById(btnId).classList.add('selected'); localStorage.setItem("activeProfile", btnId);
     const toast = document.getElementById("pulpit-toast"); toast.style.opacity = "1"; toast.innerText = "⏳ Wysyłanie konfiguracji...";
     fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&sleepSec=${sleep * 3600}`, { mode: 'no-cors' })
-    .then(() => { toast.innerText = "✓ Zapisano ustawienia: " + name; })
+    .then(() => { toast.innerText = "✓ Zapisano ustawienia: " + name; pobierzDaneZESP32(); })
     .catch(() => { toast.innerText = "✓ (Demo) Ustawiono lokalnie"; setTimeout(() => toast.style.opacity = "0", 3000); });
 }
 
