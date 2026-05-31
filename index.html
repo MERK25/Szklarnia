@@ -11,7 +11,6 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
 
     <style>
-        /* ZMIENNE DLA TRYBU JASNEGO (Domyślne) */
         :root {
             --html-bg: #e5e5ea;
             --bg-gradient: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 100%);
@@ -30,7 +29,6 @@
             --profile-sel-bg: rgba(52, 199, 89, 0.05);
         }
 
-        /* ZMIENNE DLA TRYBU CIEMNEGO (Wymuszone przez użytkownika) */
         :root[data-theme="dark"] {
             --html-bg: #000000;
             --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
@@ -49,7 +47,6 @@
             --profile-sel-bg: rgba(48, 209, 88, 0.15);
         }
 
-        /* ZMIENNE DLA TRYBU CIEMNEGO (Auto - zależne od systemu, ignorowane jeśli wybrano jasny) */
         @media (prefers-color-scheme: dark) {
             :root:not([data-theme="light"]) {
                 --html-bg: #000000;
@@ -109,9 +106,21 @@
 
         /* PULPIT */
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
-        .status-icon { font-size: 54px; margin-bottom: 8px; }
+        .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        #last-update { font-size: 12px; font-weight: 500; color: var(--text-sub); margin-top: 4px; }
         
+        /* Animacja pulsowania błędu */
+        @keyframes pulseAlert {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pulse-alert {
+            animation: pulseAlert 1.2s infinite ease-in-out;
+            color: var(--accent-red);
+        }
+
         .weather-grid { display: flex; gap: 8px; margin-bottom: 24px; }
         .weather-card {
             flex: 1; background: var(--glass-card); border: 1px solid var(--border-light);
@@ -197,6 +206,7 @@
         <div class="status-hero">
             <div id="hero-icon" class="status-icon">🌿</div>
             <div id="hero-text" class="status-text" style="color: var(--accent-green);">Wszystko w porządku</div>
+            <div id="last-update">Sprawdzanie stanu...</div>
         </div>
 
         <div class="weather-grid">
@@ -293,15 +303,21 @@
 </div>
 
 <script>
+// --- FUNKCJE HAPTYCZNE (WIBRACJE) ---
+function haptyka(wzor) {
+    if ("vibrate" in navigator) {
+        navigator.vibrate(wzor);
+    }
+}
+
 // --- ZARZĄDZANIE MOTYWEM ---
 function zmienMotyw(motyw) {
-    // Aktualizacja przycisków
+    haptyka(10); // Delikatne tyknięcie
     document.getElementById('theme-light').classList.remove('active');
     document.getElementById('theme-auto').classList.remove('active');
     document.getElementById('theme-dark').classList.remove('active');
     document.getElementById('theme-' + motyw).classList.add('active');
 
-    // Zastosowanie motywu i zapisanie w pamięci
     if (motyw === 'auto') {
         document.documentElement.removeAttribute('data-theme');
         localStorage.removeItem('theme');
@@ -313,6 +329,7 @@ function zmienMotyw(motyw) {
 
 // --- NAWIGACJA ZAKŁADEK ---
 function zmienZakladke(tab) {
+    haptyka(15); // Delikatne tyknięcie
     document.getElementById('btn-pulpit').classList.remove('active');
     document.getElementById('btn-serwis').classList.remove('active');
     document.getElementById('tab-pulpit').style.display = 'none';
@@ -323,93 +340,127 @@ function zmienZakladke(tab) {
 }
 
 window.onload = function() {
-    // Wczytanie motywu
+    // 1. Wczytanie motywu
     const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
     zmienMotyw(zapisanyMotyw);
 
-    // Wczytanie suwaków
+    // 2. Wczytanie suwaków
     if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
     if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
     if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
-    
     aktualizujInterfejs(false);
+
+    // 3. SMART CACHE: Wczytanie ostatnich danych zanim ESP odpowie
+    const cachedData = localStorage.getItem('lastESPData');
+    if(cachedData) {
+        try {
+            const parsed = JSON.parse(cachedData);
+            renderujDane(parsed.data, parsed.timestamp, false);
+        } catch(e) {}
+    }
+
+    // 4. Próba pobrania nowych danych z ESP
     pobierzDaneZESP32();
+}
+
+function sformatujCzas(timestamp) {
+    const minuty = Math.floor((new Date().getTime() - timestamp) / 60000);
+    if (minuty < 1) return "przed chwilą";
+    if (minuty < 60) return `${minuty} min temu`;
+    const godziny = Math.floor(minuty / 60);
+    return `${godziny} godz. temu`;
+}
+
+function renderujDane(data, timestamp, trybDemo = false) {
+    // Pulpit - Klimat
+    document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
+    document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
+    
+    // Bateria
+    if (data.voltage) {
+        let vFloat = parseFloat(data.voltage);
+        if (!isNaN(vFloat)) {
+            let pct = Math.round(((vFloat - 3.2) / (4.2 - 3.2)) * 100);
+            if (pct > 100) pct = 100;
+            if (pct < 0) pct = 0;
+            
+            let battEl = document.getElementById("dash-batt");
+            battEl.innerText = (vFloat >= 4.4 ? "⚡ " : "") + pct + "%";
+            battEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
+        }
+    }
+
+    // Ostatnia aktualizacja (Smart Cache Info)
+    let infoCzasu = timestamp ? `Ostatnia aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą";
+    if(trybDemo) infoCzasu += " (Tryb Demo / Offline)";
+    document.getElementById("last-update").innerText = infoCzasu;
+
+    // Status z Animacją Pulsowania Błędu
+    const heroIcon = document.getElementById("hero-icon");
+    const heroText = document.getElementById("hero-text");
+    const wStatus = document.getElementById("waterStatus");
+
+    if(data.water === "EMPTY") {
+        heroIcon.innerText = "⚠️";
+        heroIcon.classList.add("pulse-alert"); // Dodanie pulsowania
+        heroText.innerText = "Dolej wody do beczki!";
+        heroText.style.color = "var(--accent-red)";
+        wStatus.innerText = "⚠️ BRAK WODY"; wStatus.style.color = "var(--accent-red)";
+        
+        if(trybDemo === false) haptyka([50, 100, 50]); // Potrójna wibracja o błędzie
+    } else {
+        heroIcon.innerText = "🌿";
+        heroIcon.classList.remove("pulse-alert"); // Usunięcie pulsowania
+        heroText.innerText = "Wszystko w porządku";
+        heroText.style.color = "var(--accent-green)";
+        wStatus.innerText = "✓ PEŁNY"; wStatus.style.color = "var(--accent-green)";
+    }
+
+    // Serwis - Volty
+    if(data.voltage) {
+        document.getElementById("voltCalc").innerText = data.voltage + (data.v_status ? ` (${data.v_status})` : "");
+        document.getElementById("voltCalc").style.color = (data.v_status === "LOW") ? "var(--accent-red)" : "var(--accent-green)";
+    }
+
+    // Logi
+    const logBox = document.getElementById("logBox");
+    logBox.innerHTML = "";
+    if(!data.logs || data.logs.length === 0) {
+        logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów.</div>";
+    } else {
+        data.logs.reverse().forEach(log => {
+            let statusKlasa = log.action === "PODLANO" ? "bg-water" : (log.action === "BRAK WODY!" ? "bg-error" : "bg-ok");
+            logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
+        });
+    }
 }
 
 function pobierzDaneZESP32() {
     fetch('http://192.168.4.1/data')
     .then(response => response.json())
     .then(data => {
-        // Pulpit - Klimat
-        document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
-        document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
-        
-        // Bateria
-        if (data.voltage) {
-            let vFloat = parseFloat(data.voltage);
-            if (!isNaN(vFloat)) {
-                let pct = Math.round(((vFloat - 3.2) / (4.2 - 3.2)) * 100);
-                if (pct > 100) pct = 100;
-                if (pct < 0) pct = 0;
-                
-                let battEl = document.getElementById("dash-batt");
-                battEl.innerText = (vFloat >= 4.4 ? "⚡ " : "") + pct + "%";
-                battEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
-            }
-        }
-
-        // Status
-        const heroIcon = document.getElementById("hero-icon");
-        const heroText = document.getElementById("hero-text");
-        const wStatus = document.getElementById("waterStatus");
-
-        if(data.water === "EMPTY") {
-            heroIcon.innerText = "⚠️";
-            heroText.innerText = "Dolej wody do beczki!";
-            heroText.style.color = "var(--accent-red)";
-            wStatus.innerText = "⚠️ BRAK WODY"; wStatus.style.color = "var(--accent-red)";
-        } else {
-            heroIcon.innerText = "🌿";
-            heroText.innerText = "Wszystko w porządku";
-            heroText.style.color = "var(--accent-green)";
-            wStatus.innerText = "✓ PEŁNY"; wStatus.style.color = "var(--accent-green)";
-        }
-
-        // Serwis - Volty
-        document.getElementById("voltCalc").innerText = data.voltage + " (" + data.v_status + ")";
-        document.getElementById("voltCalc").style.color = (data.v_status === "LOW") ? "var(--accent-red)" : "var(--accent-green)";
-
-        // Logi
-        const logBox = document.getElementById("logBox");
-        logBox.innerHTML = "";
-        if(!data.logs || data.logs.length === 0) {
-            logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów.</div>";
-        } else {
-            data.logs.reverse().forEach(log => {
-                let statusKlasa = log.action === "PODLANO" ? "bg-water" : (log.action === "BRAK WODY!" ? "bg-error" : "bg-ok");
-                logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
-            });
-        }
+        const now = new Date().getTime();
+        localStorage.setItem('lastESPData', JSON.stringify({ data: data, timestamp: now }));
+        renderujDane(data, now, false);
     }).catch(() => {
-        // --- TRYB DEMO ---
-        document.getElementById("dash-temp").innerText = "24°";
-        document.getElementById("dash-hum").innerText = "42%";
-        document.getElementById("dash-batt").innerText = "85%";
-        
-        document.getElementById("waterStatus").innerText = "✓ PEŁNY (Demo)";
-        document.getElementById("waterStatus").style.color = "var(--accent-green)";
-        
-        document.getElementById("voltCalc").innerText = "4.05V (Demo)";
-        document.getElementById("voltCalc").style.color = "var(--accent-green)";
-        
-        document.getElementById("logBox").innerHTML = `
-            <div class='log-item'><span>Wilgotność: <b>38%</b></span><span class='log-badge bg-water'>PODLANO</span></div>
-            <div class='log-item'><span>Wilgotność: <b>45%</b></span><span class='log-badge bg-ok'>OK</span></div>
-        `;
+        const cachedData = localStorage.getItem('lastESPData');
+        if(!cachedData) {
+            // Jeśli nie ma nic w pamięci (1 uruchomienie) -> Generuj Demo
+            const demoData = {
+                temp: "24.5", air_hum: "42", voltage: "4.05", v_status: "STABLE", water: "OK",
+                logs: [ {moisture: 38, action: "PODLANO"}, {moisture: 45, action: "OK"} ]
+            };
+            renderujDane(demoData, new Date().getTime(), true);
+        } else {
+            // Uaktualnij sam tekst, że jesteśmy offline, ale pokazuj stare dane
+            const parsed = JSON.parse(cachedData);
+            renderujDane(parsed.data, parsed.timestamp, true);
+        }
     });
 }
 
 function ustawProfilZapisz(th, time, sleep, btnId, name) {
+    haptyka([15, 50, 15]); // Podwójna radosna wibracja (Sukces)
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected');
 
@@ -459,6 +510,7 @@ function aktualizujInterfejs(zapiszDoPamieci) {
 }
 
 function zapiszPrzezWiFi() {
+    haptyka(15);
     const pct = document.getElementById("thInput").value;
     const secondsTime = Math.round(document.getElementById("timeInput").value * 60);
     const secondsSleep = Math.round(document.getElementById("sleepInput").value * 3600);
@@ -469,10 +521,14 @@ function zapiszPrzezWiFi() {
 }
 
 function uruchomTest() {
+    haptyka(15);
     const sekundy = document.getElementById("testSlider").value;
     fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
     .then(() => alert(`🌊 Test pompy (${sekundy}s) aktywny.`))
-    .catch(() => alert("❌ Brak połączenia lub brak wody!"));
+    .catch(() => {
+        haptyka([50, 100, 50]); // Błąd
+        alert("❌ Brak połączenia lub brak wody!");
+    });
 }
 </script>
 </body>
