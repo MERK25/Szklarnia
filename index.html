@@ -33,128 +33,148 @@
         }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-color); transition: 0.3s; }
         .card { background: var(--card-bg); max-width: 400px; width: 100%; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
-        h1 { color: var(--accent-color); margin-top: 0; font-size: 26px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        h1 { color: var(--accent-color); margin-top: 0; font-size: 26px; font-weight: 700; }
         
-        /* Wizualny podgląd wilgotności */
-        .moisture-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(52, 199, 89, 0.15); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-bottom: 25px; }
+        /* Profile Roślin */
+        .profile-container { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
+        .profile-btn { flex: 1; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 5px; font-size: 12px; font-weight: 600; color: var(--text-color); cursor: pointer; transition: 0.2s; }
+        .profile-btn:active { transform: scale(0.95); }
+        .profile-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        .moisture-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(52, 199, 89, 0.15); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-bottom: 20px; }
         .moisture-bar-container { width: 100%; height: 8px; background: var(--input-bg); border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .moisture-bar { height: 100%; width: 40%; background: #007aff; transition: width 0.3s ease; }
         
-        .form-group { text-align: left; margin-bottom: 22px; position: relative; }
-        label { font-weight: 600; font-size: 14px; color: var(--text-color); display: block; margin-bottom: 8px; }
-        input { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-color); transition: 0.2s; }
+        .form-group { text-align: left; margin-bottom: 18px; position: relative; }
+        label { font-weight: 600; font-size: 14px; color: var(--text-color); display: block; margin-bottom: 6px; }
+        input { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-color); }
         input:focus { border-color: var(--accent-color); outline: none; }
-        .unit-hint { font-size: 11px; color: var(--text-secondary); margin-top: 5px; display: block; }
+        .unit-hint { font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: block; }
         
-        /* Widget statystyk na żywo */
         .stats-box { background: var(--input-bg); padding: 15px; border-radius: 14px; margin-top: 15px; text-align: left; font-size: 13px; border-left: 4px solid #007aff; }
         .stats-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .stats-row:last-child { margin-bottom: 0; }
         .stats-val { font-weight: 600; color: var(--text-color); }
 
-        .btn-save { display: block; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; background: var(--accent-color); color: white; cursor: pointer; transition: 0.2s; margin-top: 25px; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2); }
-        .btn-save:active { transform: scale(0.98); filter: brightness(0.9); }
+        .btn-save { display: block; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; background: var(--accent-color); color: white; cursor: pointer; transition: 0.2s; margin-top: 20px; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2); }
+        
+        /* Nowy przycisk podlewania ręcznego */
+        .btn-manual { display: block; width: 100%; padding: 12px; border: 2px solid #007aff; border-radius: 14px; font-size: 14px; font-weight: 600; background: transparent; color: #007aff; cursor: pointer; transition: 0.2s; margin-top: 12px; }
+        .btn-manual:active { background: rgba(0, 122, 255, 0.1); }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1>🌱 Szklarnia Panel</h1>
+    
+    <label style="text-align: left; font-weight:600; font-size:14px; margin-bottom:8px;">Szybkie profile upraw:</label>
+    <div class="profile-container">
+        <button class="profile-btn" onclick="ustawProfil(40, 2, 4)">
+            <span class="profile-icon">🍅</span>Pomidory
+        </button>
+        <button class="profile-btn" onclick="ustawProfil(60, 1, 2)">
+            <span class="profile-icon">🥒</span>Ogórki
+        </button>
+        <button class="profile-btn" onclick="ustawProfil(50, 0.5, 1)">
+            <span class="profile-icon">🌱</span>Sadzonki
+        </button>
+    </div>
+
     <div class="moisture-badge">
         <span>💧 Próg aktywacji:</span> <span id="badgeVal">40%</span>
     </div>
     
     <div class="form-group">
         <label>Minimalna wilgotność ziemi (%):</label>
-        <input type="number" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs()">
+        <input type="number" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs(true)">
         <div class="moisture-bar-container">
             <div id="moistureBar" class="moisture-bar"></div>
         </div>
-        <span id="adviceText" class="unit-hint" style="font-weight: 500;">Optymalne ustawienie dla większości warzyw.</span>
+        <span id="adviceText" class="unit-hint" style="font-weight: 500;">Wczytywanie...</span>
     </div>
     
     <div class="form-group">
         <label>Czas podlewania (w minutach):</label>
-        <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1" oninput="aktualizujInterfejs()">
-        <span class="unit-hint">Zalecane: 1.5 - 3 minuty przy linii kroplującej.</span>
+        <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1" oninput="aktualizujInterfejs(true)">
     </div>
     
     <div class="form-group">
         <label>Interwał sprawdzania (w godzinach):</label>
-        <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1" oninput="aktualizujInterfejs()">
-        <span class="unit-hint">Co ile godzin nastąpi wybudzenie i pomiar gleby.</span>
+        <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1" oninput="aktualizujInterfejs(true)">
     </div>
 
     <div class="stats-box">
-        <div class="stats-row">
-            <span>Szacowane wylanie wody:</span>
-            <span class="stats-val" id="waterCalc">~10 Litrów</span>
-        </div>
-        <div class="stats-row">
-            <span>Pomiary na dobę:</span>
-            <span class="stats-val" id="checksCalc">6 razy</span>
-        </div>
+        <div class="stats-row"><span>Szacowane wylanie wody:</span><span class="stats-val" id="waterCalc">-</span></div>
+        <div class="stats-row"><span>Pomiary na dobę:</span><span class="stats-val" id="checksCalc">-</span></div>
     </div>
     
-    <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz ustawienia w ESP32</button>
+    <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz harmonogram w ESP32</button>
+    
+    <button class="btn-manual" onclick="podlejTeraz()">🌊 Podlej teraz ręcznie (1 min)</button>
 </div>
 
 <script>
-function aktualizujInterfejs() {
+// Funkcja wczytująca zapamiętane ustawienia z pamięci iPhone'a (localStorage)
+window.onload = function() {
+    if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
+    if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
+    if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
+    aktualizujInterfejs(false);
+}
+
+function ustawProfil(th, time, sleep) {
+    document.getElementById("thInput").value = th;
+    document.getElementById("timeInput").value = time;
+    document.getElementById("sleepInput").value = sleep;
+    aktualizujInterfejs(true);
+}
+
+function aktualizujInterfejs(zapiszDoPamieci) {
     const pct = document.getElementById("thInput").value;
     const mins = document.getElementById("timeInput").value;
     const hrs = document.getElementById("sleepInput").value;
 
-    // 1. Aktualizacja paska i odznaki wilgotności
+    if(zapiszDoPamieci) {
+        localStorage.setItem("th", pct);
+        localStorage.setItem("time", mins);
+        localStorage.setItem("sleep", hrs);
+    }
+
     document.getElementById("badgeVal").innerText = pct + "%";
     const bar = document.getElementById("moistureBar");
     bar.style.width = pct + "%";
     
-    // Zmiana koloru paska w zależności od wilgotności
-    if(pct < 25) { bar.style.backgroundColor = "#ff3b30"; } // Czerwony - za sucho
-    else if(pct > 75) { bar.style.backgroundColor = "#ff9500"; } // Pomarańczowy - błoto
-    else { bar.style.backgroundColor = "#007aff"; } // Niebieski - optymalnie
+    if(pct < 25) { bar.style.backgroundColor = "#ff3b30"; }
+    else if(pct > 75) { bar.style.backgroundColor = "#ff9500"; }
+    else { bar.style.backgroundColor = "#007aff"; }
 
-    // 2. Dynamiczne porady tekstowe
     const advice = document.getElementById("adviceText");
-    if(pct < 25) { advice.innerText = "⚠️ Uwaga! To za mało dla pomidorów, mogą zwiędnąć."; advice.style.color = "#ff3b30"; }
-    else if(pct > 75) { advice.innerText = "⚠️ Uwaga! Zbyt mokra gleba doprowadzi do gnicia korzeni."; advice.style.color = "#ff9500"; }
-    else { advice.innerText = "✓ Dobry wybór. Zapewni stabilny wzrost roślin."; advice.style.color = "#34c759"; }
+    if(pct < 25) { advice.innerText = "⚠️ Za sucho dla pomidorów!"; advice.style.color = "#ff3b30"; }
+    else if(pct > 75) { advice.innerText = "⚠️ Ryzyko gnicia korzeni!"; advice.style.color = "#ff9500"; }
+    else { advice.innerText = "✓ Optymalna wilgotność gleby."; advice.style.color = "#34c759"; }
 
-    // 3. Kalkulator wody (przyjmując średnią pompkę 12V = 5L/min)
-    const litry = Math.round(mins * 5 * 10) / 10;
-    document.getElementById("waterCalc").innerText = `~${litry} Litrów`;
-
-    // 4. Kalkulator pomiarów na dobę
+    document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10} Litrów`;
     if (hrs > 0) {
-        const razy = Math.round((24 / hrs) * 10) / 10;
-        document.getElementById("checksCalc").innerText = `${razy} razy / dobę`;
-    } else {
-        document.getElementById("checksCalc").innerText = "Ciągła praca";
+        document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} razy / dobę`;
     }
 }
 
 function zapiszPrzezWiFi() {
     const pct = document.getElementById("thInput").value;
-    const mins = document.getElementById("timeInput").value;
-    const hrs = document.getElementById("sleepInput").value;
+    const secondsTime = Math.round(document.getElementById("timeInput").value * 60);
+    const secondsSleep = Math.round(document.getElementById("sleepInput").value * 3600);
     
-    const secondsTime = Math.round(mins * 60);
-    const secondsSleep = Math.round(hrs * 3600);
-    
-    const esp32_url = `http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`;
-    
-    fetch(esp32_url, { mode: 'no-cors' })
-    .then(() => {
-        alert("🚀 Ustawienia wysłane! Szklarnia zapisała konfigurację i wraca do trybu głębokiego snu.");
-    })
-    .catch((error) => {
-        alert("❌ Błąd połączenia! Sprawdź czy połączyłeś się z Wi-Fi 'Szklarnia-Net'.");
-    });
+    fetch(`http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`, { mode: 'no-cors' })
+    .then(() => alert("🚀 Harmonogram zapisany! Szklarnia wraca do snu."))
+    .catch(() => alert("❌ Brak połączenia z 'Szklarnia-Net'"));
 }
 
-// Uruchom wyliczenia od razu po włączeniu strony
-aktualizujInterfejs();
+// NOWOŚĆ: Funkcja natychmiastowego podlewania
+function podlejTeraz() {
+    fetch(`http://192.168.4.1/manual`, { mode: 'no-cors' })
+    .then(() => alert("🌊 Sygnał wysłany! Pompa włączy się na 60 sekund, po czym układ zaśnie."))
+    .catch(() => alert("❌ Brak połączenia z 'Szklarnia-Net'"));
+}
 </script>
 </body>
 </html>
