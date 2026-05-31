@@ -9,6 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Szklarnia">
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -21,6 +23,8 @@
             --accent-green: #34c759;
             --accent-blue: #007aff;
             --accent-red: #ff3b30;
+            --accent-orange: #ff9500;
+            --accent-purple: #af52de;
             --border-light: rgba(255, 255, 255, 0.5);
             --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
             --input-bg: #ffffff;
@@ -39,6 +43,8 @@
             --accent-green: #30d158;
             --accent-blue: #0a84ff;
             --accent-red: #ff453a;
+            --accent-orange: #ff9f0a;
+            --accent-purple: #bf5af2;
             --border-light: rgba(255, 255, 255, 0.05);
             --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
             --input-bg: rgba(28, 28, 30, 0.6);
@@ -58,6 +64,8 @@
                 --accent-green: #30d158;
                 --accent-blue: #0a84ff;
                 --accent-red: #ff453a;
+                --accent-orange: #ff9f0a;
+                --accent-purple: #bf5af2;
                 --border-light: rgba(255, 255, 255, 0.05);
                 --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
                 --input-bg: rgba(28, 28, 30, 0.6);
@@ -76,7 +84,6 @@
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; color: var(--text-main); 
             -webkit-font-smoothing: antialiased;
-            transition: color 0.3s, background 0.3s;
         }
 
         .wrapper {
@@ -84,70 +91,57 @@
             background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border-light); border-radius: 38px;
             padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box;
-            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* TABS NAWIGACJA */
         .tab-nav {
             display: flex; background: var(--nav-bg);
             border-radius: 14px; padding: 4px; margin-bottom: 24px;
-            transition: background 0.3s;
         }
         
         .tab-btn {
             flex: 1; padding: 10px; text-align: center; border-radius: 10px;
-            font-size: 14px; font-weight: 600; color: var(--text-sub);
-            cursor: pointer; transition: all 0.2s;
+            font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer;
         }
         .tab-btn.active {
             background: var(--glass-card); color: var(--text-main);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* PULPIT */
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
         #last-update { font-size: 12px; font-weight: 500; color: var(--text-sub); margin-top: 4px; }
         
-        /* Animacja pulsowania błędu */
         @keyframes pulseAlert {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.15); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .pulse-alert {
-            animation: pulseAlert 1.2s infinite ease-in-out;
-            color: var(--accent-red);
-        }
+        .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
 
         .weather-grid { display: flex; gap: 8px; margin-bottom: 24px; }
         .weather-card {
             flex: 1; background: var(--glass-card); border: 1px solid var(--border-light);
             border-radius: 20px; padding: 14px 6px; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: background 0.3s, border-color 0.3s;
         }
         .weather-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
-        .weather-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .weather-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
 
-        h2 { font-size: 13px; text-align: left; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; transition: color 0.3s; }
+        h2 { font-size: 13px; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
 
-        /* WSPÓLNE KOMPONENTY */
         .section-card {
             background: var(--glass-card); border: 1px solid var(--border-light);
             border-radius: 22px; padding: 16px; margin-bottom: 16px; box-sizing: border-box;
-            transition: background 0.3s, border-color 0.3s;
         }
 
         .profile-container { display: flex; gap: 8px; margin-bottom: 15px; }
         .profile-btn { 
             flex: 1; background: var(--glass-card); border: 1px solid var(--border-light); 
             border-radius: 16px; padding: 14px 6px; font-size: 13px; font-weight: 600; 
-            color: var(--text-main); cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft);
+            color: var(--text-main); cursor: pointer;
         }
-        .profile-btn:active { transform: scale(0.95); opacity: 0.8; }
-        .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
         .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
+        .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
 
         .form-group { margin-bottom: 16px; }
         .form-group:last-child { margin-bottom: 0; }
@@ -156,7 +150,7 @@
         
         input[type="range"] { 
             -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; 
-            background: var(--range-bg); outline: none; margin: 12px 0; transition: background 0.3s;
+            background: var(--range-bg); outline: none; margin: 12px 0;
         }
         input[type="range"]::-webkit-slider-thumb { 
             -webkit-appearance: none; appearance: none; width: 26px; height: 26px; 
@@ -166,32 +160,33 @@
 
         .moisture-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .moisture-badge { background: var(--accent-green); color: #ffffff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; }
-        .moisture-bar-container { width: 100%; height: 8px; background: var(--range-bg); border-radius: 10px; margin-top: 12px; overflow: hidden; transition: background 0.3s; }
+        .moisture-bar-container { width: 100%; height: 8px; background: var(--range-bg); border-radius: 10px; margin-top: 12px; overflow: hidden; }
         .moisture-bar { height: 100%; width: 40%; background: var(--accent-blue); transition: width 0.3s; }
 
         .stats-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
         .stats-row:last-child { border: none; padding-bottom: 0; }
         .stats-row:first-child { padding-top: 0; }
-        .stats-val { font-weight: 700; color: var(--text-main); transition: color 0.3s; }
+        .stats-val { font-weight: 700; color: var(--text-main); }
 
         .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
         .log-item:last-child { border: none; padding-bottom: 0; }
+        
         .log-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
         .bg-ok { background: rgba(52, 199, 89, 0.12); color: var(--accent-green); }
         .bg-water { background: rgba(0, 122, 255, 0.12); color: var(--accent-blue); }
         .bg-error { background: rgba(255, 59, 48, 0.12); color: var(--accent-red); }
+        .bg-hot { background: rgba(255, 149, 0, 0.12); color: var(--accent-orange); }
+        .bg-manual { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
 
         .btn-save, .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-save { background: var(--accent-green); color: #ffffff; box-shadow: 0 6px 20px rgba(48, 209, 88, 0.25); margin-top: 20px; }
-        .btn-save:active { transform: scale(0.98); opacity: 0.9; }
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
-        .btn-test:active { background: rgba(0, 122, 255, 0.2); }
 
-        #pulpit-toast {
-            text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600;
-            opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px;
-        }
+        #pulpit-toast { text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px; }
+        
+        /* Obszar wykresu */
+        .chart-container { position: relative; height: 160px; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -210,18 +205,9 @@
         </div>
 
         <div class="weather-grid">
-            <div class="weather-card">
-                <div class="weather-val" id="dash-temp">-</div>
-                <div class="weather-lbl">Temp.</div>
-            </div>
-            <div class="weather-card">
-                <div class="weather-val" id="dash-hum">-</div>
-                <div class="weather-lbl">Wilgot.</div>
-            </div>
-            <div class="weather-card">
-                <div class="weather-val" id="dash-batt">-</div>
-                <div class="weather-lbl">Bateria</div>
-            </div>
+            <div class="weather-card"><div class="weather-val" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
+            <div class="weather-card"><div class="weather-val" id="dash-hum">-</div><div class="weather-lbl">Wilgot.</div></div>
+            <div class="weather-card"><div class="weather-val" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
         </div>
 
         <h2>Co dzisiaj rośnie?</h2>
@@ -240,7 +226,6 @@
     </div>
 
     <div id="tab-serwis" style="display: none;">
-        
         <h2>Wygląd aplikacji</h2>
         <div class="section-card">
             <div class="tab-nav" style="margin-bottom:0;">
@@ -253,8 +238,7 @@
         <h2>Parametry nawadniania</h2>
         <div class="section-card">
             <div class="moisture-header">
-                <label style="margin:0;">Wilgotność aktywacji</label>
-                <span id="badgeVal" class="moisture-badge">40%</span>
+                <label style="margin:0;">Wilgotność aktywacji</label><span id="badgeVal" class="moisture-badge">40%</span>
             </div>
             <div class="form-group" style="margin-bottom:0;">
                 <input type="range" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs(true)">
@@ -275,14 +259,11 @@
             <input type="range" id="sleepInput" value="4" min="1" max="24" step="1" oninput="aktualizujInterfejs(true)">
         </div>
 
-        <h2>Diagnostyka & Logi</h2>
-        <div class="section-card">
-            <div class="stats-row"><span>🚰 Poziom wody:</span><span class="stats-val" id="waterStatus">Brak danych</span></div>
-            <div class="stats-row"><span>Woda na cykl:</span><span class="stats-val" id="waterCalc">-</span></div>
-            <div class="stats-row"><span>⚡ Zasilanie (Volty):</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
-        </div>
-
+        <h2>Historia i Wykresy</h2>
         <div class="section-card" style="margin-bottom:20px;">
+            <div class="chart-container">
+                <canvas id="moistureChart"></canvas>
+            </div>
             <div class="log-container" id="logBox">
                 <div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div>
             </div>
@@ -303,16 +284,12 @@
 </div>
 
 <script>
-// --- FUNKCJE HAPTYCZNE (WIBRACJE) ---
-function haptyka(wzor) {
-    if ("vibrate" in navigator) {
-        navigator.vibrate(wzor);
-    }
-}
+let chartInstance = null; // Zmienna globalna dla wykresu
 
-// --- ZARZĄDZANIE MOTYWEM ---
+function haptyka(wzor) { if ("vibrate" in navigator) navigator.vibrate(wzor); }
+
 function zmienMotyw(motyw) {
-    haptyka(10); // Delikatne tyknięcie
+    haptyka(10);
     document.getElementById('theme-light').classList.remove('active');
     document.getElementById('theme-auto').classList.remove('active');
     document.getElementById('theme-dark').classList.remove('active');
@@ -327,9 +304,8 @@ function zmienMotyw(motyw) {
     }
 }
 
-// --- NAWIGACJA ZAKŁADEK ---
 function zmienZakladke(tab) {
-    haptyka(15); // Delikatne tyknięcie
+    haptyka(15);
     document.getElementById('btn-pulpit').classList.remove('active');
     document.getElementById('btn-serwis').classList.remove('active');
     document.getElementById('tab-pulpit').style.display = 'none';
@@ -340,17 +316,14 @@ function zmienZakladke(tab) {
 }
 
 window.onload = function() {
-    // 1. Wczytanie motywu
     const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
     zmienMotyw(zapisanyMotyw);
 
-    // 2. Wczytanie suwaków
     if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
     if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
     if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
     aktualizujInterfejs(false);
 
-    // 3. SMART CACHE: Wczytanie ostatnich danych zanim ESP odpowie
     const cachedData = localStorage.getItem('lastESPData');
     if(cachedData) {
         try {
@@ -359,7 +332,6 @@ window.onload = function() {
         } catch(e) {}
     }
 
-    // 4. Próba pobrania nowych danych z ESP
     pobierzDaneZESP32();
 }
 
@@ -371,67 +343,99 @@ function sformatujCzas(timestamp) {
     return `${godziny} godz. temu`;
 }
 
+function rysujWykres(logi) {
+    const ctx = document.getElementById('moistureChart').getContext('2d');
+    
+    // Odwracamy logi by na wykresie najstarsze były po lewej, nowe po prawej
+    const daneOdwrocone = [...logi].reverse(); 
+    
+    const etykiety = daneOdwrocone.map((_, i) => `T-${logi.length - i}`);
+    const punkty = daneOdwrocone.map(log => log.moisture);
+
+    if(chartInstance) chartInstance.destroy();
+
+    // Kolory adaptacyjne
+    const kolorLinii = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim() || '#007aff';
+    const kolorTekstu = getComputedStyle(document.documentElement).getPropertyValue('--text-sub').trim() || '#636366';
+
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: etykiety,
+            datasets: [{
+                label: 'Wilgotność gleby (%)',
+                data: punkty,
+                borderColor: kolorLinii,
+                backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                borderWidth: 2,
+                pointBackgroundColor: kolorLinii,
+                pointRadius: 4,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { min: 0, max: 100, ticks: { color: kolorTekstu, stepSize: 25 }, grid: { color: 'rgba(150,150,150,0.1)' } },
+                x: { ticks: { color: kolorTekstu }, grid: { display: false } }
+            }
+        }
+    });
+}
+
 function renderujDane(data, timestamp, trybDemo = false) {
-    // Pulpit - Klimat
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     
-    // Bateria
     if (data.voltage) {
         let vFloat = parseFloat(data.voltage);
         if (!isNaN(vFloat)) {
             let pct = Math.round(((vFloat - 3.2) / (4.2 - 3.2)) * 100);
             if (pct > 100) pct = 100;
             if (pct < 0) pct = 0;
-            
             let battEl = document.getElementById("dash-batt");
             battEl.innerText = (vFloat >= 4.4 ? "⚡ " : "") + pct + "%";
             battEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
         }
     }
 
-    // Ostatnia aktualizacja (Smart Cache Info)
-    let infoCzasu = timestamp ? `Ostatnia aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą";
-    if(trybDemo) infoCzasu += " (Tryb Demo / Offline)";
+    let infoCzasu = timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą";
+    if(trybDemo) infoCzasu += " (Tryb Demo)";
     document.getElementById("last-update").innerText = infoCzasu;
 
-    // Status z Animacją Pulsowania Błędu
     const heroIcon = document.getElementById("hero-icon");
     const heroText = document.getElementById("hero-text");
-    const wStatus = document.getElementById("waterStatus");
 
     if(data.water === "EMPTY") {
-        heroIcon.innerText = "⚠️";
-        heroIcon.classList.add("pulse-alert"); // Dodanie pulsowania
-        heroText.innerText = "Dolej wody do beczki!";
-        heroText.style.color = "var(--accent-red)";
-        wStatus.innerText = "⚠️ BRAK WODY"; wStatus.style.color = "var(--accent-red)";
-        
-        if(trybDemo === false) haptyka([50, 100, 50]); // Potrójna wibracja o błędzie
+        heroIcon.innerText = "⚠️"; heroIcon.classList.add("pulse-alert");
+        heroText.innerText = "Dolej wody do beczki!"; heroText.style.color = "var(--accent-red)";
+        if(trybDemo === false) haptyka([50, 100, 50]);
     } else {
-        heroIcon.innerText = "🌿";
-        heroIcon.classList.remove("pulse-alert"); // Usunięcie pulsowania
-        heroText.innerText = "Wszystko w porządku";
-        heroText.style.color = "var(--accent-green)";
-        wStatus.innerText = "✓ PEŁNY"; wStatus.style.color = "var(--accent-green)";
+        heroIcon.innerText = "🌿"; heroIcon.classList.remove("pulse-alert");
+        heroText.innerText = "Wszystko w porządku"; heroText.style.color = "var(--accent-green)";
     }
 
-    // Serwis - Volty
-    if(data.voltage) {
-        document.getElementById("voltCalc").innerText = data.voltage + (data.v_status ? ` (${data.v_status})` : "");
-        document.getElementById("voltCalc").style.color = (data.v_status === "LOW") ? "var(--accent-red)" : "var(--accent-green)";
-    }
-
-    // Logi
     const logBox = document.getElementById("logBox");
     logBox.innerHTML = "";
     if(!data.logs || data.logs.length === 0) {
         logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów.</div>";
     } else {
-        data.logs.reverse().forEach(log => {
-            let statusKlasa = log.action === "PODLANO" ? "bg-water" : (log.action === "BRAK WODY!" ? "bg-error" : "bg-ok");
+        // Generowanie tabeli logów
+        [...data.logs].reverse().forEach(log => {
+            let statusKlasa = "bg-ok";
+            if(log.action === "PODLANO") statusKlasa = "bg-water";
+            if(log.action === "BRAK WODY!") statusKlasa = "bg-error";
+            if(log.action === "ZA GORĄCO") statusKlasa = "bg-hot";
+            if(log.action === "RĘCZNE") statusKlasa = "bg-manual";
+            
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
         });
+        
+        // Rysowanie wykresu
+        rysujWykres(data.logs);
     }
 }
 
@@ -445,14 +449,18 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cachedData = localStorage.getItem('lastESPData');
         if(!cachedData) {
-            // Jeśli nie ma nic w pamięci (1 uruchomienie) -> Generuj Demo
             const demoData = {
-                temp: "24.5", air_hum: "42", voltage: "4.05", v_status: "STABLE", water: "OK",
-                logs: [ {moisture: 38, action: "PODLANO"}, {moisture: 45, action: "OK"} ]
+                temp: "32.5", air_hum: "28", voltage: "3.95", v_status: "STABLE", water: "OK",
+                logs: [ 
+                    {moisture: 42, action: "OK"}, 
+                    {moisture: 38, action: "OK"}, 
+                    {moisture: 18, action: "ZA GORĄCO"}, 
+                    {moisture: 90, action: "RĘCZNE"}, 
+                    {moisture: 80, action: "OK"}
+                ]
             };
             renderujDane(demoData, new Date().getTime(), true);
         } else {
-            // Uaktualnij sam tekst, że jesteśmy offline, ale pokazuj stare dane
             const parsed = JSON.parse(cachedData);
             renderujDane(parsed.data, parsed.timestamp, true);
         }
@@ -460,7 +468,7 @@ function pobierzDaneZESP32() {
 }
 
 function ustawProfilZapisz(th, time, sleep, btnId, name) {
-    haptyka([15, 50, 15]); // Podwójna radosna wibracja (Sukces)
+    haptyka([15, 50, 15]);
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected');
 
@@ -471,14 +479,11 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
 
     const toast = document.getElementById("pulpit-toast");
     toast.style.opacity = "1";
-    toast.innerText = "⏳ Wysyłanie konfiguracji dla: " + name;
+    toast.innerText = "⏳ Wysyłanie konfiguracji: " + name;
 
     fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&sleepSec=${sleep * 3600}`, { mode: 'no-cors' })
-    .then(() => { toast.innerText = "✓ Zapisano ustawienia dla: " + name; })
-    .catch(() => { 
-        toast.innerText = "✓ (Demo) Ustawiono lokalnie: " + name; 
-        setTimeout(() => toast.style.opacity = "0", 3000);
-    });
+    .then(() => { toast.innerText = "✓ Zapisano ustawienia: " + name; })
+    .catch(() => { toast.innerText = "✓ (Demo) Ustawiono lokalnie"; setTimeout(() => toast.style.opacity = "0", 3000); });
 }
 
 function aktualizujInterfejs(zapiszDoPamieci) {
@@ -486,9 +491,7 @@ function aktualizujInterfejs(zapiszDoPamieci) {
     const mins = document.getElementById("timeInput").value;
     const hrs = document.getElementById("sleepInput").value;
 
-    if(zapiszDoPamieci) {
-        localStorage.setItem("th", pct); localStorage.setItem("time", mins); localStorage.setItem("sleep", hrs);
-    }
+    if(zapiszDoPamieci) { localStorage.setItem("th", pct); localStorage.setItem("time", mins); localStorage.setItem("sleep", hrs); }
 
     document.getElementById("badgeVal").innerText = pct + "%";
     document.getElementById("timeVal").innerText = mins + " min";
@@ -498,15 +501,9 @@ function aktualizujInterfejs(zapiszDoPamieci) {
     bar.style.width = pct + "%";
     
     const advice = document.getElementById("adviceText");
-    if(pct < 25) { 
-        bar.style.backgroundColor = "var(--accent-red)"; advice.innerText = "⚠️ Zbyt sucho"; advice.style.color = "var(--accent-red)"; 
-    } else if(pct > 75) { 
-        bar.style.backgroundColor = "#ff9500"; advice.innerText = "⚠️ Zbyt mokro"; advice.style.color = "#ff9500"; 
-    } else { 
-        bar.style.backgroundColor = "var(--accent-blue)"; advice.innerText = "✓ Optymalnie"; advice.style.color = "var(--accent-green)"; 
-    }
-
-    document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10}L`;
+    if(pct < 25) { bar.style.backgroundColor = "var(--accent-red)"; advice.innerText = "⚠️ Zbyt sucho"; advice.style.color = "var(--accent-red)"; } 
+    else if(pct > 75) { bar.style.backgroundColor = "#ff9500"; advice.innerText = "⚠️ Zbyt mokro"; advice.style.color = "#ff9500"; } 
+    else { bar.style.backgroundColor = "var(--accent-blue)"; advice.innerText = "✓ Optymalnie"; advice.style.color = "var(--accent-green)"; }
 }
 
 function zapiszPrzezWiFi() {
@@ -517,7 +514,7 @@ function zapiszPrzezWiFi() {
     
     fetch(`http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`, { mode: 'no-cors' })
     .then(() => alert("🚀 Zapisano parametry!"))
-    .catch(() => alert("❌ Brak połączenia (lub tryb demo)."));
+    .catch(() => alert("❌ Brak połączenia."));
 }
 
 function uruchomTest() {
@@ -525,10 +522,7 @@ function uruchomTest() {
     const sekundy = document.getElementById("testSlider").value;
     fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
     .then(() => alert(`🌊 Test pompy (${sekundy}s) aktywny.`))
-    .catch(() => {
-        haptyka([50, 100, 50]); // Błąd
-        alert("❌ Brak połączenia lub brak wody!");
-    });
+    .catch(() => { haptyka([50, 100, 50]); alert("❌ Błąd: Brak wody lub zasilania."); });
 }
 </script>
 </body>
