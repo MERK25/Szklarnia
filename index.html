@@ -34,12 +34,20 @@
         html { background-color: var(--html-bg); transition: background-color 0.3s; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-gradient); margin: 0; padding: 16px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; color: var(--text-main); -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         .wrapper { width: 100%; max-width: 410px; margin-top: 20px; background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border-light); border-radius: 38px; padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box; position: relative; }
+        
+        /* Segmented Controls (Zakładki w stylu iOS) */
         .tab-nav { display: flex; background: var(--nav-bg); border-radius: 14px; padding: 4px; margin-bottom: 24px; position: relative; z-index: 10; user-select: none; -webkit-user-select: none; }
         .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: all 0.3s ease; }
         .tab-btn.active { background: var(--glass-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        
         .tabs-wrapper { position: relative; width: 100%; }
         .tab-content { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; right: 0; height: 0; overflow: hidden; transform: scale(0.96) translateY(5px); transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s, height 0s 0.35s; }
         .tab-content.active { opacity: 1; visibility: visible; position: relative; height: auto; overflow: visible; transform: scale(1) translateY(0); transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s, height 0s 0s; }
+
+        /* Podzakładki dla sekcji Ustawienia */
+        .sub-content { display: none; animation: fadeIn 0.4s ease; }
+        .sub-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
@@ -95,13 +103,9 @@
         #pulpit-toast { text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px; }
         .chart-container { position: relative; height: 160px; width: 100%; margin-bottom: 10px; }
 
-        .eng-mode-wrapper { display: none; margin-top: 24px; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .eng-card { border-color: rgba(255, 149, 0, 0.5); background: rgba(255, 149, 0, 0.03); }
         .eng-title { color: var(--accent-orange); display: flex; align-items: center; gap: 6px; font-size: 15px; margin-bottom: 12px; font-weight: 800; }
         .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; align-items: center; }
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
-        .btn-eng { background: rgba(255, 149, 0, 0.15); color: var(--accent-orange); }
         .file-input { display: block; width: 100%; padding: 8px; font-size: 12px; color: var(--text-sub); border: 1px dashed var(--border-light); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
         .progress-container { width: 100%; background: var(--range-bg); border-radius: 8px; margin-top: 10px; overflow: hidden; display: none; height: 8px; }
         .progress-bar { height: 100%; background: var(--accent-orange); width: 0%; transition: width 0.2s ease; }
@@ -112,7 +116,7 @@
 <div class="wrapper">
     <div class="tab-nav">
         <div id="btn-pulpit" class="tab-btn active" onclick="zmienZakladke('pulpit')">Pulpit</div>
-        <div id="btn-serwis" class="tab-btn" onclick="zmienZakladke('serwis')">⚙️ Serwis</div>
+        <div id="btn-ustawienia" class="tab-btn" onclick="zmienZakladke('ustawienia')">⚙️ Ustawienia</div>
     </div>
 
     <div class="tabs-wrapper">
@@ -140,7 +144,11 @@
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
                 
-                <div class="weather-card full-width"><div class="weather-val skeleton" id="dash-water-meter">-</div><div class="weather-lbl">Estymacja wody w zbiorniku</div></div>
+                <div class="weather-card full-width" style="padding-bottom: 8px;">
+                    <div class="weather-val skeleton" id="dash-water-meter">-</div>
+                    <div class="weather-lbl">Estymacja wody w zbiorniku</div>
+                    <button class="btn-test" onclick="zresetujLicznikWody()" style="margin-top: 10px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); font-size: 13px; padding: 10px;">💦 Zresetuj stan po napełnieniu beczki</button>
+                </div>
             </div>
 
             <h2 id="plants-title">Co dzisiaj rośnie?</h2>
@@ -154,99 +162,110 @@
             <div id="pulpit-toast"></div>
         </div>
 
-        <div id="tab-serwis" class="tab-content">
+        <div id="tab-ustawienia" class="tab-content">
             
-            <h2>Edycja Profili Upraw</h2>
-            <div class="section-card">
-                <label>Wybierz roślinę do edycji</label>
-                <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
-                    <option value="pomidory">🍅 Pomidory</option><option value="ogorki">🥒 Ogórki</option>
-                    <option value="sadzonki">🌱 Sadzonki</option><option value="arbuz">🍉 Arbuz</option><option value="borowka">🫐 Borówka</option>
-                </select>
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span></div>
-                <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span></div>
-                <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span></div>
-                <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
-                <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany</button>
+            <div class="tab-nav" style="margin-bottom: 20px;">
+                <div id="btn-sub-ogolne" class="tab-btn active" onclick="zmienPodzakladke('ogolne')">Ogólne</div>
+                <div id="btn-sub-zaawansowane" class="tab-btn" onclick="zmienPodzakladke('zaawansowane')">Zaawansowane</div>
             </div>
 
-            <h2>Lokalizacja Systemu</h2>
-            <div class="section-card">
-                <div class="tab-nav" style="margin-bottom:0;">
-                    <div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div>
-                    <div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Na zewnątrz</div>
+            <div id="sub-ogolne" class="sub-content active">
+                <h2>Edycja Profili Upraw</h2>
+                <div class="section-card">
+                    <label>Wybierz roślinę do edycji</label>
+                    <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
+                        <option value="pomidory">🍅 Pomidory</option><option value="ogorki">🥒 Ogórki</option>
+                        <option value="sadzonki">🌱 Sadzonki</option><option value="arbuz">🍉 Arbuz</option><option value="borowka">🫐 Borówka</option>
+                    </select>
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span></div>
+                    <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span></div>
+                    <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span></div>
+                    <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
+                    <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany</button>
                 </div>
-            </div>
 
-            <h2>Wygląd aplikacji</h2>
-            <div class="section-card">
-                <div class="tab-nav" style="margin-bottom:0;">
-                    <div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div>
-                    <div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div>
-                    <div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div>
+                <h2>Lokalizacja Systemu</h2>
+                <div class="section-card">
+                    <div class="tab-nav" style="margin-bottom:0;">
+                        <div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div>
+                        <div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Na zewnątrz</div>
+                    </div>
                 </div>
-            </div>
 
-            <h2>Parametry Zbiornika Wody</h2>
-            <div class="section-card">
-                <label>Pojemność całkowita (L)</label>
-                <input type="number" id="tank-vol" class="text-input" value="200" onchange="zapiszParametryZbiornika()">
-                <label>Wydajność pompy (L/min)</label>
-                <input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
-                <button class="btn-test" onclick="zresetujLicznikWody()" style="margin-top: 10px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue);">💧 Zresetuj po dolaniu wody do pełna</button>
-            </div>
+                <h2>Wygląd aplikacji</h2>
+                <div class="section-card">
+                    <div class="tab-nav" style="margin-bottom:0;">
+                        <div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div>
+                        <div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div>
+                        <div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div>
+                    </div>
+                </div>
 
-            <h2>Asystent Kalibracji Pompy</h2>
-            <div class="section-card">
-                <p style="font-size: 12px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Włóż wąż do naczynia z miarką 1 litr. Włącz pompę zewnętrznym zasilaniem lub w panelu poniżej i jednocześnie uruchom ten stoper. Zatrzymaj stoper, gdy woda dobije dokładnie do 1 litra.</p>
-                <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums;" id="stopwatch-display">00.0s</div>
-                <button class="btn-test" id="btn-stoper" onclick="toggleStoper()" style="padding: 16px; font-size: 16px;">⏱ Start Stopera</button>
-                <p id="stoper-result" style="display:none; color: var(--accent-green); text-align:center; font-weight:800; margin-top: 15px;"></p>
-            </div>
+                <h2>Parametry Zbiornika Wody</h2>
+                <div class="section-card">
+                    <label>Pojemność całkowita (L)</label>
+                    <input type="number" id="tank-vol" class="text-input" value="220" onchange="zapiszParametryZbiornika()">
+                    <label>Wydajność pompy (L/min)</label>
+                    <input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
+                </div>
 
-            <h2>Test Pompy</h2>
-            <div class="section-card">
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
-                <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
-                <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
-            </div>
+                <h2>Historia i Analityka</h2>
+                <div class="section-card" style="margin-bottom:20px;">
+                    <h3 style="font-size: 12px; margin-top: 0; color: var(--text-sub);">Poziom nawodnienia (%)</h3>
+                    <div class="chart-container"><canvas id="moistureChart"></canvas></div>
+                    
+                    <h3 style="font-size: 12px; margin-top: 15px; color: var(--text-sub);">Kondycja Zasilania (V)</h3>
+                    <div class="chart-container"><canvas id="batteryChart"></canvas></div>
 
-            <h2>Historia i Analityka</h2>
-            <div class="section-card" style="margin-bottom:20px;">
-                <h3 style="font-size: 12px; margin-top: 0; color: var(--text-sub);">Poziom nawodnienia (%)</h3>
-                <div class="chart-container"><canvas id="moistureChart"></canvas></div>
+                    <div class="log-container" id="logBox" style="margin-top: 15px;"><div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div></div>
+                </div>
                 
-                <h3 style="font-size: 12px; margin-top: 15px; color: var(--text-sub);">Kondycja Zasilania (V)</h3>
-                <div class="chart-container"><canvas id="batteryChart"></canvas></div>
-
-                <div class="log-container" id="logBox" style="margin-top: 15px;"><div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div></div>
-                <button class="btn-test" onclick="eksportujCSV()" style="margin-top: 15px; background: rgba(52, 199, 89, 0.1); color: var(--accent-green);">📥 Pobierz zaawansowany raport (.csv)</button>
-            </div>
-            
-            <h2>Zarządzanie Energią</h2>
-            <div class="section-card">
-                <button class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red);">❄️ Włącz tryb zimowania</button>
+                <h2>Zarządzanie Energią</h2>
+                <div class="section-card">
+                    <button class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red);">❄️ Włącz tryb zimowania</button>
+                </div>
             </div>
 
-            <div id="eng-mode-box" class="eng-mode-wrapper">
-                <div class="section-card eng-card">
-                    <h3 class="eng-title">🔧 Diagnostyka ADC & Kalibracja</h3>
+            <div id="sub-zaawansowane" class="sub-content">
+                <h2>Asystent Kalibracji Pompy</h2>
+                <div class="section-card">
+                    <p style="font-size: 12px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Włóż wąż do naczynia z miarką 1 litr. Włącz pompę zewnętrznym zasilaniem lub uruchom test poniżej i jednocześnie włącz ten stoper. Zatrzymaj stoper, gdy woda dobije dokładnie do 1 litra.</p>
+                    <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums;" id="stopwatch-display">00.0s</div>
+                    <button class="btn-test" id="btn-stoper" onclick="toggleStoper()" style="padding: 16px; font-size: 16px;">⏱ Start Stopera</button>
+                    <p id="stoper-result" style="display:none; color: var(--accent-green); text-align:center; font-weight:800; margin-top: 15px;"></p>
+                </div>
+
+                <h2>Test Pompy</h2>
+                <div class="section-card">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
+                    <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
+                    <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
+                </div>
+
+                <h2>Diagnostyka i Kalibracja ADC</h2>
+                <div class="section-card">
                     <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
                     <div class="eng-data-row"><span>Surowy odczyt ADC:</span> <b id="eng-raw-adc">---</b></div>
                     <div class="eng-data-row" style="border-bottom:none; margin-top:15px; margin-bottom:4px;"><span>Wartość AIR (Sucho):</span><input type="number" id="calib-air" class="eng-input" value="3200"></div>
                     <div class="eng-data-row" style="border-bottom:none;"><span>Wartość WATER (Mokro):</span><input type="number" id="calib-water" class="eng-input" value="1500"></div>
-                    <button class="btn-test btn-eng" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz kalibrację</button>
+                    <button class="btn-test" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz kalibrację gleby</button>
                 </div>
 
-                <div class="section-card eng-card" style="margin-top: 16px;">
-                    <h3 class="eng-title">🚀 Aktualizacja Firmware (OTA)</h3>
+                <h2>Aktualizacja Firmware (OTA)</h2>
+                <div class="section-card">
                     <label style="font-size: 12px; color: var(--text-sub); display:block; margin-bottom: 6px;">Wybierz skompilowany plik .bin</label>
                     <input type="file" id="ota-file" accept=".bin" class="file-input">
-                    <button class="btn-test btn-eng" onclick="wgrywajOTA()">⚡ Wgraj aktualizację</button>
+                    <button class="btn-test" onclick="wgrywajOTA()" style="color: var(--accent-orange); background: rgba(255, 149, 0, 0.1);">⚡ Wgraj aktualizację</button>
                     <div id="ota-progress-container" class="progress-container"><div id="ota-progress-bar" class="progress-bar"></div></div>
                     <div id="ota-status" style="font-size: 12px; font-weight: 600; text-align: center; margin-top: 8px; color: var(--accent-orange);"></div>
+                </div>
+
+                <h2>Eksport Danych</h2>
+                <div class="section-card">
+                    <p style="font-size: 12px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Pobierz pełną historię podlewani i napięcia do pliku Excel (CSV).</p>
+                    <button class="btn-test" onclick="eksportujCSV()" style="background: rgba(52, 199, 89, 0.1); color: var(--accent-green);">📥 Pobierz zaawansowany raport (.csv)</button>
                 </div>
             </div>
         </div>
@@ -256,27 +275,6 @@
 <script>
 let chartInstance = null;
 let batteryChartInstance = null;
-let engTimer;
-const btnSerwis = document.getElementById('btn-serwis');
-
-function startEngTimer() {
-    engTimer = setTimeout(() => {
-        haptyka([100, 50, 100]);
-        const engBox = document.getElementById('eng-mode-box');
-        const isHidden = (engBox.style.display === 'none' || engBox.style.display === '');
-        engBox.style.display = isHidden ? 'block' : 'none';
-        const toast = document.getElementById('pulpit-toast');
-        toast.innerText = "🔧 Tryb inżynierski " + (isHidden ? "aktywowany" : "ukryty");
-        toast.style.opacity = "1"; setTimeout(() => toast.style.opacity = "0", 3000);
-    }, 3000); 
-}
-function clearEngTimer() { clearTimeout(engTimer); }
-btnSerwis.addEventListener('touchstart', startEngTimer, {passive: true});
-btnSerwis.addEventListener('touchend', clearEngTimer);
-btnSerwis.addEventListener('touchcancel', clearEngTimer);
-btnSerwis.addEventListener('mousedown', startEngTimer);
-btnSerwis.addEventListener('mouseup', clearEngTimer);
-btnSerwis.addEventListener('mouseleave', clearEngTimer);
 
 const domyslneProfile = {
     'pomidory': { th: 40, time: 3, sleep: 6, name: 'Pomidory' }, 'ogorki': { th: 65, time: 1.5, sleep: 3, name: 'Ogórki' },
@@ -405,8 +403,22 @@ function zmienMotyw(motyw) {
 
 function zmienZakladke(tab) {
     haptyka(15);
-    ['pulpit', 'serwis'].forEach(t => { document.getElementById('btn-' + t).classList.remove('active'); document.getElementById('tab-' + t).classList.remove('active'); });
-    document.getElementById('btn-' + tab).classList.add('active'); document.getElementById('tab-' + tab).classList.add('active');
+    ['pulpit', 'ustawienia'].forEach(t => { 
+        document.getElementById('btn-' + t).classList.remove('active'); 
+        document.getElementById('tab-' + t).classList.remove('active'); 
+    });
+    document.getElementById('btn-' + tab).classList.add('active'); 
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function zmienPodzakladke(tab) {
+    haptyka(10);
+    ['ogolne', 'zaawansowane'].forEach(t => {
+        document.getElementById('btn-sub-' + t).classList.remove('active');
+        document.getElementById('sub-' + t).classList.remove('active');
+    });
+    document.getElementById('btn-sub-' + tab).classList.add('active');
+    document.getElementById('sub-' + tab).classList.add('active');
 }
 
 window.onload = function() {
@@ -481,7 +493,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
     if(data.pump_sec !== undefined) {
-        let tVol = data.tank_vol !== undefined ? data.tank_vol : 200; 
+        let tVol = data.tank_vol !== undefined ? data.tank_vol : 220; 
         let fRate = data.pump_flow !== undefined ? data.pump_flow : 2.0;
         
         document.getElementById('tank-vol').value = tVol;
@@ -533,11 +545,9 @@ function renderujDane(data, timestamp, trybDemo = false) {
         hIcon.innerText = "🔥"; hIcon.classList.add("pulse-alert");
         hText.innerText = "AWARIA SYSTEMU POMP!"; hText.style.color = "var(--accent-red)";
         unlockBtn.style.display = "block"; pContainer.style.display = "none"; pTitle.style.display = "none";
-        if(!trybDemo) haptyka([200, 100, 200, 100, 200]);
     } else if(data.water === "EMPTY") {
         hIcon.innerText = "⚠️"; hIcon.classList.add("pulse-alert");
         hText.innerText = "Dolej wody do beczki!"; hText.style.color = "var(--accent-red)";
-        if(!trybDemo) haptyka([50, 100, 50]);
     } else if(data.hibernated === 1) {
         hIcon.innerText = "❄️"; hIcon.classList.remove("pulse-alert");
         hText.innerText = "System zhibernowany"; hText.style.color = "var(--accent-blue)";
