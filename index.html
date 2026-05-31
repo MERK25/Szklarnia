@@ -82,14 +82,14 @@
         .status-icon { font-size: 54px; margin-bottom: 8px; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
         
-        .weather-grid { display: flex; gap: 12px; margin-bottom: 24px; }
+        .weather-grid { display: flex; gap: 8px; margin-bottom: 24px; }
         .weather-card {
             flex: 1; background: var(--glass-card); border: 1px solid var(--border-light);
-            border-radius: 20px; padding: 16px 10px; text-align: center;
+            border-radius: 20px; padding: 14px 6px; text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
-        .weather-val { font-size: 24px; font-weight: 800; margin-bottom: 2px; }
-        .weather-lbl { font-size: 12px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .weather-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+        .weather-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         h2 { font-size: 13px; text-align: left; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
 
@@ -174,11 +174,15 @@
         <div class="weather-grid">
             <div class="weather-card">
                 <div class="weather-val" id="dash-temp">-</div>
-                <div class="weather-lbl">Temperatura</div>
+                <div class="weather-lbl">Temp.</div>
             </div>
             <div class="weather-card">
                 <div class="weather-val" id="dash-hum">-</div>
-                <div class="weather-lbl">Wilgotność</div>
+                <div class="weather-lbl">Wilgot.</div>
+            </div>
+            <div class="weather-card">
+                <div class="weather-val" id="dash-batt">-</div>
+                <div class="weather-lbl">Bateria</div>
             </div>
         </div>
 
@@ -228,7 +232,7 @@
         <div class="section-card">
             <div class="stats-row"><span>🚰 Poziom wody:</span><span class="stats-val" id="waterStatus">Brak danych</span></div>
             <div class="stats-row"><span>Woda na cykl:</span><span class="stats-val" id="waterCalc">-</span></div>
-            <div class="stats-row"><span>🔋 Zasilanie (ESP):</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
+            <div class="stats-row"><span>⚡ Zasilanie (Volty):</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
         </div>
 
         <div class="section-card" style="margin-bottom:20px;">
@@ -276,11 +280,25 @@ function pobierzDaneZESP32() {
     fetch('http://192.168.4.1/data')
     .then(response => response.json())
     .then(data => {
-        // Pulpit
+        // Pulpit - Klimat
         document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
         document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
         
-        // Obsługa braku wody na Głównym Ekranie!
+        // Przeliczenie napięcia na procent baterii (Zakładamy 3.2V = 0%, 4.2V = 100%)
+        if (data.voltage) {
+            let vFloat = parseFloat(data.voltage);
+            if (!isNaN(vFloat)) {
+                let pct = Math.round(((vFloat - 3.2) / (4.2 - 3.2)) * 100);
+                if (pct > 100) pct = 100;
+                if (pct < 0) pct = 0;
+                
+                let battEl = document.getElementById("dash-batt");
+                battEl.innerText = (vFloat >= 4.4 ? "⚡ " : "") + pct + "%";
+                battEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
+            }
+        }
+
+        // Obsługa braku wody na Głównym Ekranie
         const heroIcon = document.getElementById("hero-icon");
         const heroText = document.getElementById("hero-text");
         const wStatus = document.getElementById("waterStatus");
@@ -297,7 +315,7 @@ function pobierzDaneZESP32() {
             wStatus.innerText = "✓ PEŁNY"; wStatus.style.color = "var(--accent-green)";
         }
 
-        // Zasilanie ESP
+        // Zasilanie ESP w Serwisie (Volty)
         document.getElementById("voltCalc").innerText = data.voltage + " (" + data.v_status + ")";
         document.getElementById("voltCalc").style.color = (data.v_status === "LOW") ? "var(--accent-red)" : "var(--accent-green)";
 
@@ -316,10 +334,13 @@ function pobierzDaneZESP32() {
         // --- TRYB DEMO ---
         document.getElementById("dash-temp").innerText = "24°";
         document.getElementById("dash-hum").innerText = "42%";
+        document.getElementById("dash-batt").innerText = "85%";
         
         document.getElementById("waterStatus").innerText = "✓ PEŁNY (Demo)";
         document.getElementById("waterStatus").style.color = "var(--accent-green)";
-        document.getElementById("voltCalc").innerText = "4.20V (Demo)";
+        
+        document.getElementById("voltCalc").innerText = "4.05V (Demo)";
+        document.getElementById("voltCalc").style.color = "var(--accent-green)";
         
         document.getElementById("logBox").innerHTML = `
             <div class='log-item'><span>Wilgotność: <b>38%</b></span><span class='log-badge bg-water'>PODLANO</span></div>
@@ -329,17 +350,14 @@ function pobierzDaneZESP32() {
 }
 
 function ustawProfilZapisz(th, time, sleep, btnId, name) {
-    // Odznacz wszystkie przyciski i zaznacz kliknięty
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected');
 
-    // Ustaw ukryte suwaki
     document.getElementById("thInput").value = th;
     document.getElementById("timeInput").value = time;
     document.getElementById("sleepInput").value = sleep;
     aktualizujInterfejs(true);
 
-    // Automatyczny zapis po wybraniu z przyjaznym komunikatem
     const toast = document.getElementById("pulpit-toast");
     toast.style.opacity = "1";
     toast.innerText = "⏳ Wysyłanie konfiguracji dla: " + name;
