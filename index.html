@@ -11,7 +11,6 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
 
     <style>
-        /* Tło pod odbiciem przewijania */
         html {
             background-color: #e5e5ea; 
         }
@@ -24,6 +23,7 @@
             --text-sub: #636366;
             --accent-green: #34c759;
             --accent-blue: #007aff;
+            --accent-red: #ff3b30;
             --border-light: rgba(255, 255, 255, 0.5);
             --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
             --input-bg: #ffffff;
@@ -42,6 +42,7 @@
                 --text-sub: #aeaea2;
                 --accent-green: #30d158;
                 --accent-blue: #0a84ff;
+                --accent-red: #ff453a;
                 --border-light: rgba(255, 255, 255, 0.05);
                 --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
                 --input-bg: rgba(28, 28, 30, 0.6);
@@ -163,7 +164,6 @@
         .stats-row:first-child { padding-top: 0; }
         .stats-val { font-weight: 700; color: var(--text-main); }
 
-        /* Suwaki */
         input[type="range"] { 
             -webkit-appearance: none; 
             width: 100%; 
@@ -190,8 +190,11 @@
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
         .log-item:last-child { border: none; padding-bottom: 0; }
         .log-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        
+        /* Kolory odznak logów */
         .bg-ok { background: rgba(52, 199, 89, 0.12); color: var(--accent-green); }
         .bg-water { background: rgba(0, 122, 255, 0.12); color: var(--accent-blue); }
+        .bg-error { background: rgba(255, 59, 48, 0.12); color: var(--accent-red); }
 
         .btn-save { 
             display: block; 
@@ -266,9 +269,13 @@
 
     <h2>Diagnostyka układu</h2>
     <div class="section-card">
+        <div class="stats-row"><span>🌡️ Temperatura:</span><span class="stats-val" id="tempCalc">- °C</span></div>
+        <div class="stats-row"><span>💧 Wilgotność pow.:</span><span class="stats-val" id="humCalc">- %</span></div>
+        <div class="stats-row"><span>🚰 Poziom wody:</span><span class="stats-val" id="waterStatus">Brak danych</span></div>
+        <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 8px 0;">
         <div class="stats-row"><span>Woda na cykl:</span><span class="stats-val" id="waterCalc">-</span></div>
         <div class="stats-row"><span>Pomiary na dobę:</span><span class="stats-val" id="checksCalc">-</span></div>
-        <div class="stats-row"><span>Status zasilania:</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
+        <div class="stats-row"><span>🔋 Zasilanie (ESP):</span><span class="stats-val" id="voltCalc">Brak danych</span></div>
     </div>
 
     <h2>Sterowanie ręczne</h2>
@@ -312,100 +319,4 @@ window.onload = function() {
     }
     
     aktualizujInterfejs(false);
-    pobierzDaneZESP32();
-}
-
-function pobierzDaneZESP32() {
-    fetch('http://192.168.4.1/data')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById("voltCalc").innerText = data.voltage + " (" + data.v_status + ")";
-        if(data.v_status === "LOW") {
-            document.getElementById("voltCalc").style.color = "#ff3b30";
-        } else {
-            document.getElementById("voltCalc").style.color = "#34c759";
-        }
-
-        const logBox = document.getElementById("logBox");
-        logBox.innerHTML = "";
-        if(!data.logs || data.logs.length === 0) {
-            logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów w historii.</div>";
-        } else {
-            data.logs.reverse().forEach(log => {
-                let statusKlasa = log.action === "PODLANO" ? "bg-water" : "bg-ok";
-                logBox.innerHTML += `<div class='log-item'><span>Pomiar <b>${log.moisture}%</b></span><span class='log-badge ${statusKlasa}'>${log.action}</span></div>`;
-            });
-        }
-    }).catch(() => {
-        document.getElementById("voltCalc").innerText = "Offline (Tryb Demo)";
-        document.getElementById("voltCalc").style.color = "#ff9500";
-    });
-}
-
-function ustawProfil(th, time, sleep) {
-    document.getElementById("thInput").value = th;
-    document.getElementById("timeInput").value = time;
-    document.getElementById("sleepInput").value = sleep;
-    aktualizujInterfejs(true);
-}
-
-function aktualizujInterfejs(zapiszDoPamieci) {
-    const pct = document.getElementById("thInput").value;
-    const mins = document.getElementById("timeInput").value;
-    const hrs = document.getElementById("sleepInput").value;
-
-    if(zapiszDoPamieci) {
-        localStorage.setItem("th", pct);
-        localStorage.setItem("time", mins);
-        localStorage.setItem("sleep", hrs);
-    }
-
-    document.getElementById("badgeVal").innerText = pct + "%";
-    
-    const bar = document.getElementById("moistureBar");
-    bar.style.width = pct + "%";
-    
-    const advice = document.getElementById("adviceText");
-    if(pct < 25) { 
-        bar.style.backgroundColor = "#ff3b30"; 
-        advice.innerText = "⚠️ Krytycznie sucho dla warzyw!"; 
-        advice.style.color = "#ff3b30"; 
-    }
-    else if(pct > 75) { 
-        bar.style.backgroundColor = "#ff9500"; 
-        advice.innerText = "⚠️ Zagrożenie przelaniem systemu!"; 
-        advice.style.color = "#ff9500"; 
-    }
-    else { 
-        bar.style.backgroundColor = "#007aff"; 
-        advice.innerText = "✓ Wilgotność w pełni optymalna."; 
-        advice.style.color = "#34c759"; 
-    }
-
-    document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10}L`;
-    if (hrs > 0) {
-        document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} / dobę`;
-    } else {
-        document.getElementById("checksCalc").innerText = "0 / dobę";
-    }
-}
-
-function zapiszPrzezWiFi() {
-    const pct = document.getElementById("thInput").value;
-    const secondsTime = Math.round(document.getElementById("timeInput").value * 60);
-    const secondsSleep = Math.round(document.getElementById("sleepInput").value * 3600);
-    
-    fetch(`http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`, { mode: 'no-cors' })
-    .then(() => alert("🚀 Dane przesłane! Trwa zapis..."))
-    .catch(() => alert("❌ Brak połączenia z siecią 'Szklarnia-Net'"));
-}
-
-function uruchomTest() {
-    const sekundy = document.getElementById("testSlider").value;
-    fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
-    .then(() => alert(`🌊 Test aktywny przez ${sekundy}s.`))
-    .catch(() => alert("❌ Błąd połączenia."));
-}
-</script>
-</body>
-</html>
+    pobierz
