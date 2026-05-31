@@ -156,6 +156,22 @@
 
         <div id="tab-serwis" class="tab-content">
             
+            <h2>Edycja Profili Upraw</h2>
+            <div class="section-card">
+                <label>Wybierz roślinę do edycji</label>
+                <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
+                    <option value="pomidory">🍅 Pomidory</option><option value="ogorki">🥒 Ogórki</option>
+                    <option value="sadzonki">🌱 Sadzonki</option><option value="arbuz">🍉 Arbuz</option><option value="borowka">🫐 Borówka</option>
+                </select>
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span></div>
+                <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span></div>
+                <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span></div>
+                <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
+                <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany</button>
+            </div>
+
             <h2>Lokalizacja Systemu</h2>
             <div class="section-card">
                 <div class="tab-nav" style="margin-bottom:0;">
@@ -195,22 +211,6 @@
                 <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
                 <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
                 <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
-            </div>
-
-            <h2>Edycja Profili Upraw</h2>
-            <div class="section-card">
-                <label>Wybierz roślinę do edycji</label>
-                <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
-                    <option value="pomidory">🍅 Pomidory</option><option value="ogorki">🥒 Ogórki</option>
-                    <option value="sadzonki">🌱 Sadzonki</option><option value="arbuz">🍉 Arbuz</option><option value="borowka">🫐 Borówka</option>
-                </select>
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span></div>
-                <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span></div>
-                <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span></div>
-                <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
-                <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany</button>
             </div>
 
             <h2>Historia i Analityka</h2>
