@@ -4,69 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Szklarnia Kontrola</title>
-
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Szklarnia">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Szklarnia">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Szklarnia">
-    
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/tworzenie-ikon/ikona/main/apple-touch-icon.png">
 
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f2f2f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; max-width: 380px; width: 100%; padding: 30px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); text-align: center; box-sizing: border-box; }
-        h1 { color: #34c759; margin-top: 0; font-size: 24px; font-weight: 700; }
-        .btn-save { display: block; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; background: #34c759; color: white; cursor: pointer; transition: 0.2s; margin-top: 25px; }
-        .btn-save:active { background: #248a3d; }
-        .form-group { text-align: left; margin-bottom: 18px; }
-        label { font-weight: 500; font-size: 14px; color: #8e8e93; display: block; margin-bottom: 6px; }
-        input { width: 100%; padding: 14px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 16px; background: #f2f2f7; color: #000; }
-        input:focus { border-color: #34c759; outline: none; }
-        .unit-hint { font-size: 11px; color: #a9a9a9; margin-top: 4px; display: block; }
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-color: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --accent-color: #34c759;
+            --input-bg: #f2f2f7;
+            --border-color: #d1d1d6;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1c1c1e;
+                --card-bg: #2c2c2e;
+                --text-color: #ffffff;
+                --text-secondary: #aeaeb2;
+                --accent-color: #30d158;
+                --input-bg: #1c1c1e;
+                --border-color: #3a3a3c;
+            }
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-color); transition: 0.3s; }
+        .card { background: var(--card-bg); max-width: 400px; width: 100%; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        h1 { color: var(--accent-color); margin-top: 0; font-size: 26px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* Wizualny podgląd wilgotności */
+        .moisture-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(52, 199, 89, 0.15); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-bottom: 25px; }
+        .moisture-bar-container { width: 100%; height: 8px; background: var(--input-bg); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .moisture-bar { height: 100%; width: 40%; background: #007aff; transition: width 0.3s ease; }
+        
+        .form-group { text-align: left; margin-bottom: 22px; position: relative; }
+        label { font-weight: 600; font-size: 14px; color: var(--text-color); display: block; margin-bottom: 8px; }
+        input { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-color); transition: 0.2s; }
+        input:focus { border-color: var(--accent-color); outline: none; }
+        .unit-hint { font-size: 11px; color: var(--text-secondary); margin-top: 5px; display: block; }
+        
+        /* Widget statystyk na żywo */
+        .stats-box { background: var(--input-bg); padding: 15px; border-radius: 14px; margin-top: 15px; text-align: left; font-size: 13px; border-left: 4px solid #007aff; }
+        .stats-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .stats-row:last-child { margin-bottom: 0; }
+        .stats-val { font-weight: 600; color: var(--text-color); }
+
+        .btn-save { display: block; width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; background: var(--accent-color); color: white; cursor: pointer; transition: 0.2s; margin-top: 25px; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2); }
+        .btn-save:active { transform: scale(0.98); filter: brightness(0.9); }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1>🌱 Szklarnia Panel</h1>
-    <p style="font-size: 13px; color: #8e8e93; margin-bottom: 25px;">Połącz się z siecią "Szklarnia-Net"</p>
+    <div class="moisture-badge">
+        <span>💧 Próg aktywacji:</span> <span id="badgeVal">40%</span>
+    </div>
     
     <div class="form-group">
         <label>Minimalna wilgotność ziemi (%):</label>
-        <input type="number" id="thInput" value="40" min="0" max="100">
-        <span class="unit-hint">Poniżej tej wartości (%) włączy się podlewanie</span>
+        <input type="number" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs()">
+        <div class="moisture-bar-container">
+            <div id="moistureBar" class="moisture-bar"></div>
+        </div>
+        <span id="adviceText" class="unit-hint" style="font-weight: 500;">Optymalne ustawienie dla większości warzyw.</span>
     </div>
     
     <div class="form-group">
         <label>Czas podlewania (w minutach):</label>
-        <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1">
-        <span class="unit-hint">Możesz wpisać ułamek, np. 0.5 minuty to 30 sekund</span>
+        <input type="number" id="timeInput" value="2" min="0.1" max="60" step="0.1" oninput="aktualizujInterfejs()">
+        <span class="unit-hint">Zalecane: 1.5 - 3 minuty przy linii kroplującej.</span>
     </div>
     
     <div class="form-group">
         <label>Interwał sprawdzania (w godzinach):</label>
-        <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1">
-        <span class="unit-hint">Co ile godzin szklarnia ma sprawdzać stan gleby</span>
+        <input type="number" id="sleepInput" value="4" min="0.1" max="168" step="0.1" oninput="aktualizujInterfejs()">
+        <span class="unit-hint">Co ile godzin nastąpi wybudzenie i pomiar gleby.</span>
+    </div>
+
+    <div class="stats-box">
+        <div class="stats-row">
+            <span>Szacowane wylanie wody:</span>
+            <span class="stats-val" id="waterCalc">~10 Litrów</span>
+        </div>
+        <div class="stats-row">
+            <span>Pomiary na dobę:</span>
+            <span class="stats-val" id="checksCalc">6 razy</span>
+        </div>
     </div>
     
-    <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz ustawienia</button>
+    <button class="btn-save" onclick="zapiszPrzezWiFi()">Zapisz ustawienia w ESP32</button>
 </div>
 
 <script>
+function aktualizujInterfejs() {
+    const pct = document.getElementById("thInput").value;
+    const mins = document.getElementById("timeInput").value;
+    const hrs = document.getElementById("sleepInput").value;
+
+    // 1. Aktualizacja paska i odznaki wilgotności
+    document.getElementById("badgeVal").innerText = pct + "%";
+    const bar = document.getElementById("moistureBar");
+    bar.style.width = pct + "%";
+    
+    // Zmiana koloru paska w zależności od wilgotności
+    if(pct < 25) { bar.style.backgroundColor = "#ff3b30"; } // Czerwony - za sucho
+    else if(pct > 75) { bar.style.backgroundColor = "#ff9500"; } // Pomarańczowy - błoto
+    else { bar.style.backgroundColor = "#007aff"; } // Niebieski - optymalnie
+
+    // 2. Dynamiczne porady tekstowe
+    const advice = document.getElementById("adviceText");
+    if(pct < 25) { advice.innerText = "⚠️ Uwaga! To za mało dla pomidorów, mogą zwiędnąć."; advice.style.color = "#ff3b30"; }
+    else if(pct > 75) { advice.innerText = "⚠️ Uwaga! Zbyt mokra gleba doprowadzi do gnicia korzeni."; advice.style.color = "#ff9500"; }
+    else { advice.innerText = "✓ Dobry wybór. Zapewni stabilny wzrost roślin."; advice.style.color = "#34c759"; }
+
+    // 3. Kalkulator wody (przyjmując średnią pompkę 12V = 5L/min)
+    const litry = Math.round(mins * 5 * 10) / 10;
+    document.getElementById("waterCalc").innerText = `~${litry} Litrów`;
+
+    // 4. Kalkulator pomiarów na dobę
+    if (hrs > 0) {
+        const razy = Math.round((24 / hrs) * 10) / 10;
+        document.getElementById("checksCalc").innerText = `${razy} razy / dobę`;
+    } else {
+        document.getElementById("checksCalc").innerText = "Ciągła praca";
+    }
+}
+
 function zapiszPrzezWiFi() {
     const pct = document.getElementById("thInput").value;
     const mins = document.getElementById("timeInput").value;
     const hrs = document.getElementById("sleepInput").value;
     
-    // Konwersja w JavaScript przed wysłaniem:
-    // 1. Minuty na sekundy
     const secondsTime = Math.round(mins * 60);
-    // 2. Godziny na sekundy
     const secondsSleep = Math.round(hrs * 3600);
     
-    // Przekazujemy procenty (pct), sekundy podlewania i sekundy snu
-    const esp32_url
+    const esp32_url = `http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`;
+    
+    fetch(esp32_url, { mode: 'no-cors' })
+    .then(() => {
+        alert("🚀 Ustawienia wysłane! Szklarnia zapisała konfigurację i wraca do trybu głębokiego snu.");
+    })
+    .catch((error) => {
+        alert("❌ Błąd połączenia! Sprawdź czy połączyłeś się z Wi-Fi 'Szklarnia-Net'.");
+    });
+}
+
+// Uruchom wyliczenia od razu po włączeniu strony
+aktualizujInterfejs();
+</script>
+</body>
+</html>
