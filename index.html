@@ -114,16 +114,26 @@
         .tabs-wrapper { position: relative; width: 100%; }
 
         .tab-content {
-            opacity: 0; visibility: hidden; position: absolute;
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
             top: 0; left: 0; right: 0;
+            height: 0; /* ← DODANE: zwija fizyczną wysokość elementu */
+            overflow: hidden; /* ← DODANE: odcina wystające elementy */
             transform: scale(0.96) translateY(5px);
-            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s;
+            /* DODANE OPÓŹNIENIE (height 0s 0.35s): czeka z ucięciem wysokości do końca ładnej animacji */
+            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s, height 0s 0.35s;
         }
 
         .tab-content.active {
-            opacity: 1; visibility: visible; position: relative;
+            opacity: 1;
+            visibility: visible;
+            position: relative;
+            height: auto; /* ← DODANE: przywraca pełną wysokość aktywnej karcie */
+            overflow: visible; /* ← DODANE: pozwala swobodnie renderować cienie */
             transform: scale(1) translateY(0);
-            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s;
+            /* Zmiana jest natychmiastowa przy aktywacji zakladki (0s) */
+            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s, height 0s 0s;
         }
 
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
