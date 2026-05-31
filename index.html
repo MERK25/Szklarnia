@@ -111,50 +111,32 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* --- NOWY, PROFESJONALNY SYSTEM ZAKŁADEK --- */
-        .tabs-wrapper {
-            position: relative;
-            width: 100%;
-        }
+        .tabs-wrapper { position: relative; width: 100%; }
 
         .tab-content {
-            opacity: 0;
-            visibility: hidden;
-            position: absolute;
+            opacity: 0; visibility: hidden; position: absolute;
             top: 0; left: 0; right: 0;
             transform: scale(0.96) translateY(5px);
             transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s;
         }
 
         .tab-content.active {
-            opacity: 1;
-            visibility: visible;
-            position: relative;
+            opacity: 1; visibility: visible; position: relative;
             transform: scale(1) translateY(0);
             transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s;
         }
-        /* ------------------------------------------ */
 
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
         
         .update-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 14px;
-            padding: 6px 14px;
-            background: var(--nav-bg);
-            border: 0.5px solid var(--border-light);
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-sub);
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 14px; padding: 6px 14px;
+            background: var(--nav-bg); border: 0.5px solid var(--border-light);
+            border-radius: 20px; font-size: 11px; font-weight: 600;
+            color: var(--text-sub); cursor: pointer;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             transition: all 0.2s ease;
         }
         .update-badge:active { transform: scale(0.95); background: var(--glass-card); }
@@ -169,13 +151,29 @@
         }
         .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
 
-        .weather-grid { display: flex; gap: 8px; margin-bottom: 24px; }
+        /* NOWA SIATKA POGODOWA (2x2 na mobilki) */
+        .weather-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .weather-card {
-            flex: 1; background: var(--glass-card); border: 1px solid var(--border-light);
-            border-radius: 20px; padding: 14px 6px; text-align: center;
+            flex: 1 1 calc(50% - 8px); background: var(--glass-card); border: 1px solid var(--border-light);
+            border-radius: 20px; padding: 14px 6px; text-align: center; box-sizing: border-box;
         }
-        .weather-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+        .weather-val { font-size: 22px; font-weight: 800; margin-bottom: 2px; min-height: 26px; }
         .weather-lbl { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
+
+        /* SKELETON SCREENS ANIMACJA */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, var(--range-bg) 25%, rgba(150,150,150,0.1) 50%, var(--range-bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            color: transparent !important;
+            border-radius: 8px;
+            display: inline-block;
+            min-width: 40px;
+        }
 
         h2 { font-size: 13px; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
 
@@ -251,9 +249,10 @@
             </div>
 
             <div class="weather-grid">
-                <div class="weather-card"><div class="weather-val" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
-                <div class="weather-card"><div class="weather-val" id="dash-hum">-</div><div class="weather-lbl">Wilgot.</div></div>
-                <div class="weather-card"><div class="weather-val" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-hum">-</div><div class="weather-lbl">Wilgot.</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
             </div>
 
             <h2>Co dzisiaj rośnie?</h2>
@@ -335,7 +334,8 @@
                 <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
             </div>
         </div>
-    </div> </div>
+    </div> 
+</div>
 
 <script>
 let chartInstance = null;
@@ -349,7 +349,6 @@ const domyslneProfile = {
     'borowka': { th: 70, time: 1.5, sleep: 2, name: 'Borówka' }
 };
 
-// Ładowanie zapisanych profili lub ustawienie domyślnych
 let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslneProfile;
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
@@ -385,7 +384,6 @@ function zapiszEdytowanyProfil() {
     
     alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
     
-    // Jeśli ten profil jest aktualnie wybrany na pulpicie, odśwież wartości wysyłane do ESP
     if(document.getElementById('prof-' + id).classList.contains('selected')) {
         aktywujProfil(id);
     }
@@ -407,17 +405,24 @@ function zmienMotyw(motyw) {
         document.documentElement.setAttribute('data-theme', motyw);
         localStorage.setItem('theme', motyw);
     }
+    
+    // Odśwież wykres aby zaktualizować kolory osi
+    const cachedData = localStorage.getItem('lastESPData');
+    if(cachedData) {
+        try {
+            const parsed = JSON.parse(cachedData);
+            if(parsed.data && parsed.data.logs) rysujWykres(parsed.data.logs);
+        } catch(e) {}
+    }
 }
 
 function zmienZakladke(tab) {
     haptyka(15);
-    // Wyłączenie aktywnych stanów
     document.getElementById('btn-pulpit').classList.remove('active');
     document.getElementById('btn-serwis').classList.remove('active');
     document.getElementById('tab-pulpit').classList.remove('active');
     document.getElementById('tab-serwis').classList.remove('active');
 
-    // Włączenie wybranej zakładki – animacja CSS zrobi resztę
     document.getElementById('btn-' + tab).classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
 }
@@ -428,7 +433,6 @@ window.onload = function() {
     const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
     zmienMotyw(zapisanyMotyw);
 
-    // Przywracanie zaznaczenia ostatnio używanego profilu
     const activeProfile = localStorage.getItem("activeProfile");
     if(activeProfile && document.getElementById(activeProfile)) {
         document.getElementById(activeProfile).classList.add('selected');
@@ -440,6 +444,9 @@ window.onload = function() {
             const parsed = JSON.parse(cachedData);
             renderujDane(parsed.data, parsed.timestamp, false);
         } catch(e) {}
+    } else {
+        // Jeśli nie ma cache, wymuś widok skeleton do czasu pobrania
+        document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     }
 
     pobierzDaneZESP32();
@@ -455,7 +462,6 @@ function sformatujCzas(timestamp) {
 
 function rysujWykres(logi) {
     const ctx = document.getElementById('moistureChart').getContext('2d');
-    
     const daneOdwrocone = [...logi].reverse(); 
     
     const etykiety = daneOdwrocone.map((_, i) => `T-${logi.length - i}`);
@@ -495,19 +501,35 @@ function rysujWykres(logi) {
 }
 
 function renderujDane(data, timestamp, trybDemo = false) {
+    // Usunięcie szkieletów po otrzymaniu danych
+    document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
+
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     
+    // Bateria i Prognoza Zapasu
     if (data.voltage) {
         let vFloat = parseFloat(data.voltage);
         if (!isNaN(vFloat)) {
             let pct = Math.round(((vFloat - 3.2) / (4.2 - 3.2)) * 100);
             if (pct > 100) pct = 100;
             if (pct < 0) pct = 0;
+            
             let battEl = document.getElementById("dash-batt");
             battEl.innerText = (vFloat >= 4.4 ? "⚡ " : "") + pct + "%";
             battEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
+
+            // Prognoza (Zapas) - zakładamy że 1% = 2 godziny w uśpieniu
+            let hoursLeft = pct * 2;
+            let daysLeft = Math.floor(hoursLeft / 24);
+            let remHours = hoursLeft % 24;
+            let timeStr = daysLeft > 0 ? `${daysLeft}d ${remHours}h` : `${hoursLeft}h`;
+            document.getElementById("dash-time").innerText = timeStr;
+            document.getElementById("dash-time").style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
         }
+    } else {
+        document.getElementById("dash-batt").innerText = "-";
+        document.getElementById("dash-time").innerText = "-";
     }
 
     let infoCzasu = timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą";
@@ -549,6 +571,9 @@ function pobierzDaneZESP32() {
     haptyka(10);
     const badge = document.getElementById('update-badge-btn');
     if(badge) badge.classList.add('syncing');
+
+    // Włączamy szkielety tylko jeśli nie mamy starych danych na ekranie (opcjonalne, ale daje lepszy UX)
+    // document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
 
     fetch('http://192.168.4.1/data')
     .then(response => response.json())
@@ -600,7 +625,7 @@ function uruchomTest() {
     const sekundy = document.getElementById("testSlider").value;
     fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
     .then(() => alert(`🌊 Test pompy (${sekundy}s) aktywny.`))
-    .catch(() => { haptyka([50, 100, 50]); alert("❌ Błąd: Brak wody lub zasilania."); });
+    .catch(() => { haptyka([50, 100, 50]); alert("❌ Błąd: Brak połączenia z serwerem ESP32."); });
 }
 </script>
 </body>
