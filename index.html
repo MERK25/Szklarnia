@@ -366,7 +366,7 @@ function zapiszPrzezWiFi() {
     .catch(() => alert("❌ Brak połączenia z siecią 'Szklarnia-Net'"));
 }
 
-function运行Test() {
+function uruchomTest() {
     const sekundy = document.getElementById("testSlider").value;
     fetch(`http://192.168.4.1/test?sec=${sekundy}`, { mode: 'no-cors' })
     .then(() => alert(`🌊 Test aktywny przez ${sekundy}s.`))
