@@ -86,6 +86,7 @@
         .bg-error { background: rgba(255, 59, 48, 0.12); color: var(--accent-red); }
         .bg-warn { background: rgba(255, 149, 0, 0.12); color: var(--accent-orange); }
         .bg-manual { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
+        .bg-sleep { background: rgba(88, 86, 214, 0.12); color: #5856d6; }
 
         .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
@@ -161,7 +162,6 @@
                     <div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div>
                     <div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Na zewnątrz</div>
                 </div>
-                <p style="font-size: 11px; color: var(--text-sub); margin-top: 10px; line-height: 1.4; text-align: center;">Określa czy system ma uwzględniać prognozę burz (barometr).</p>
             </div>
 
             <h2>Wygląd aplikacji</h2>
@@ -180,6 +180,21 @@
                 <label>Wydajność pompy (L/min)</label>
                 <input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
                 <button class="btn-test" onclick="zresetujLicznikWody()" style="margin-top: 10px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue);">💧 Zresetuj po dolaniu wody do pełna</button>
+            </div>
+
+            <h2>Asystent Kalibracji Pompy</h2>
+            <div class="section-card">
+                <p style="font-size: 12px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Włóż wąż do naczynia z miarką 1 litr. Włącz pompę zewnętrznym zasilaniem lub w panelu poniżej i jednocześnie uruchom ten stoper. Zatrzymaj stoper, gdy woda dobije dokładnie do 1 litra.</p>
+                <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums;" id="stopwatch-display">00.0s</div>
+                <button class="btn-test" id="btn-stoper" onclick="toggleStoper()" style="padding: 16px; font-size: 16px;">⏱ Start Stopera</button>
+                <p id="stoper-result" style="display:none; color: var(--accent-green); text-align:center; font-weight:800; margin-top: 15px;"></p>
+            </div>
+
+            <h2>Test Pompy</h2>
+            <div class="section-card">
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
+                <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
+                <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
             </div>
 
             <h2>Edycja Profili Upraw</h2>
@@ -209,18 +224,10 @@
                 <div class="log-container" id="logBox" style="margin-top: 15px;"><div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div></div>
                 <button class="btn-test" onclick="eksportujCSV()" style="margin-top: 15px; background: rgba(52, 199, 89, 0.1); color: var(--accent-green);">📥 Pobierz zaawansowany raport (.csv)</button>
             </div>
-
-            <h2>Test Pompy</h2>
-            <div class="section-card">
-                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
-                <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
-                <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
-            </div>
             
             <h2>Zarządzanie Energią</h2>
             <div class="section-card">
                 <button class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red);">❄️ Włącz tryb zimowania</button>
-                <p style="font-size: 11px; color: var(--text-sub); margin-top: 8px; line-height: 1.4;">Zatrzymuje wybudzenia czasowe. Wymaga fizycznego wciśnięcia przycisku na module w celu wybudzenia.</p>
             </div>
 
             <div id="eng-mode-box" class="eng-mode-wrapper">
@@ -300,7 +307,47 @@ function zapiszEdytowanyProfil() {
     if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
 }
 
-// NOWE: Funkcje dla wodomierza
+// NOWE: Logika Stopera i przeliczania kalibracji
+let stoperInterval;
+let stoperStartTime;
+let stoperRunning = false;
+
+function toggleStoper() {
+    const btn = document.getElementById('btn-stoper');
+    const display = document.getElementById('stopwatch-display');
+    const result = document.getElementById('stoper-result');
+
+    if(!stoperRunning) {
+        stoperStartTime = Date.now();
+        stoperRunning = true;
+        btn.innerText = "🛑 Zatrzymaj (Mam pełny 1 Litr)";
+        btn.style.background = "var(--accent-red)";
+        btn.style.color = "white";
+        result.style.display = "none";
+        stoperInterval = setInterval(() => {
+            let elapsed = (Date.now() - stoperStartTime) / 1000;
+            display.innerText = elapsed.toFixed(1) + "s";
+        }, 100);
+        haptyka(15);
+    } else {
+        clearInterval(stoperInterval);
+        stoperRunning = false;
+        btn.innerText = "⏱ Start Stopera";
+        btn.style.background = "var(--accent-blue)";
+        
+        let finalTime = (Date.now() - stoperStartTime) / 1000;
+        let lPerMin = 60 / finalTime;
+        
+        result.innerText = `Wydajność pompy: ${lPerMin.toFixed(2)} L/min`;
+        result.style.display = "block";
+        
+        // Zapis automatyczny do puli ustawień
+        document.getElementById('pump-flow').value = lPerMin.toFixed(2);
+        zapiszParametryZbiornika();
+        haptyka([50, 100, 50]);
+    }
+}
+
 function wczytajParametryZbiornika() {
     document.getElementById('tank-vol').value = localStorage.getItem('tankVol') || 200;
     document.getElementById('pump-flow').value = localStorage.getItem('pumpFlow') || 2.0;
@@ -308,7 +355,7 @@ function wczytajParametryZbiornika() {
 function zapiszParametryZbiornika() {
     localStorage.setItem('tankVol', document.getElementById('tank-vol').value);
     localStorage.setItem('pumpFlow', document.getElementById('pump-flow').value);
-    pobierzDaneZESP32(); // Odśwież, żeby przeliczyło na nowo wodomierz
+    pobierzDaneZESP32(); 
 }
 function zresetujLicznikWody() {
     haptyka([30, 30, 30]);
@@ -403,7 +450,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
-    // NOWE: Przeliczanie Wodomierza
     if(data.pump_sec !== undefined) {
         let tVol = parseFloat(localStorage.getItem('tankVol')) || 200;
         let fRate = parseFloat(localStorage.getItem('pumpFlow')) || 2.0;
@@ -446,7 +492,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     unlockBtn.style.display = "none"; pContainer.style.display = "flex"; pTitle.style.display = "block";
 
-    // NOWE: Obsługa alertu Auto-Survival
     if(data.survival === 1) {
         hIcon.innerText = "🔋"; hIcon.classList.add("pulse-alert");
         hText.innerText = "Tryb przetrwania (Słaba Bateria)"; hText.style.color = "var(--accent-orange)";
@@ -474,7 +519,9 @@ function renderujDane(data, timestamp, trybDemo = false) {
         [...data.logs].reverse().forEach(log => {
             let cls = "bg-ok";
             if(log.action === "PODLANO") cls = "bg-water"; if(log.action === "BRAK WODY!" || log.action === "AWARIA POMPY!") cls = "bg-error";
-            if(log.action === "ZA GORĄCO" || log.action === "BLOKADA (SŁOŃCE)" || log.action === "BLOKADA (BURZA)" || log.action === "TRYB SURVIVAL") cls = "bg-warn"; if(log.action === "RĘCZNE") cls = "bg-manual";
+            if(log.action === "ZA GORĄCO" || log.action === "BLOKADA (SŁOŃCE)" || log.action === "BLOKADA (BURZA)" || log.action === "TRYB SURVIVAL") cls = "bg-warn"; 
+            if(log.action === "RĘCZNE") cls = "bg-manual";
+            if(log.action === "NOCNY SEN") cls = "bg-sleep";
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${cls}'>${log.action}</span></div>`;
         });
         rysujWykresy(data.logs);
