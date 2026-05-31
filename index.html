@@ -110,7 +110,38 @@
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        #last-update { font-size: 12px; font-weight: 500; color: var(--text-sub); margin-top: 4px; }
+        
+        .update-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 14px;
+            padding: 6px 14px;
+            background: var(--nav-bg);
+            border: 0.5px solid var(--border-light);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+        .update-badge:active {
+            transform: scale(0.95);
+            background: var(--glass-card);
+        }
+        .sync-icon {
+            width: 12px;
+            height: 12px;
+            color: var(--accent-blue);
+        }
+        .syncing .sync-icon {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
         
         @keyframes pulseAlert {
             0% { transform: scale(1); opacity: 1; }
@@ -187,7 +218,13 @@
         <div class="status-hero">
             <div id="hero-icon" class="status-icon">🌿</div>
             <div id="hero-text" class="status-text" style="color: var(--accent-green);">Wszystko w porządku</div>
-            <div id="last-update">Sprawdzanie stanu...</div>
+            <div class="update-badge" onclick="pobierzDaneZESP32()" id="update-badge-btn">
+                <svg class="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                <span id="last-update-text">Sprawdzanie stanu...</span>
+            </div>
         </div>
 
         <div class="weather-grid">
@@ -450,8 +487,8 @@ function renderujDane(data, timestamp, trybDemo = false) {
     }
 
     let infoCzasu = timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą";
-    if(trybDemo) infoCzasu += " (Tryb Demo)";
-    document.getElementById("last-update").innerText = infoCzasu;
+    if(trybDemo) infoCzasu += " (Demo)";
+    document.getElementById("last-update-text").innerText = infoCzasu;
 
     const heroIcon = document.getElementById("hero-icon");
     const heroText = document.getElementById("hero-text");
@@ -485,6 +522,10 @@ function renderujDane(data, timestamp, trybDemo = false) {
 }
 
 function pobierzDaneZESP32() {
+    haptyka(10);
+    const badge = document.getElementById('update-badge-btn');
+    if(badge) badge.classList.add('syncing');
+
     fetch('http://192.168.4.1/data')
     .then(response => response.json())
     .then(data => {
@@ -509,6 +550,8 @@ function pobierzDaneZESP32() {
             const parsed = JSON.parse(cachedData);
             renderujDane(parsed.data, parsed.timestamp, true);
         }
+    }).finally(() => {
+        if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); 
     });
 }
 
@@ -517,7 +560,6 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected');
 
-    // Zapamiętanie ostatnio użytego profilu
     localStorage.setItem("activeProfile", btnId);
 
     const toast = document.getElementById("pulpit-toast");
