@@ -143,11 +143,8 @@
         }
         .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
         .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group:last-child { margin-bottom: 0; }
+        
         label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px; }
-        .unit-hint { font-size: 11px; color: var(--text-sub); margin-top: 5px; display: block; }
         
         input[type="range"] { 
             -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; 
@@ -158,16 +155,6 @@
             border-radius: 50%; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
             cursor: pointer; border: 0.5px solid rgba(0,0,0,0.04);
         }
-
-        .moisture-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .moisture-badge { background: var(--accent-green); color: #ffffff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; }
-        .moisture-bar-container { width: 100%; height: 8px; background: var(--range-bg); border-radius: 10px; margin-top: 12px; overflow: hidden; }
-        .moisture-bar { height: 100%; width: 40%; background: var(--accent-blue); transition: width 0.3s; }
-
-        .stats-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
-        .stats-row:last-child { border: none; padding-bottom: 0; }
-        .stats-row:first-child { padding-top: 0; }
-        .stats-val { font-weight: 700; color: var(--text-main); }
 
         .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
@@ -180,13 +167,11 @@
         .bg-hot { background: rgba(255, 149, 0, 0.12); color: var(--accent-orange); }
         .bg-manual { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
 
-        .btn-save, .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-save { background: var(--accent-green); color: #ffffff; box-shadow: 0 6px 20px rgba(48, 209, 88, 0.25); margin-top: 20px; }
+        .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
 
         #pulpit-toast { text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px; }
         
-        /* Obszar wykresu */
         .chart-container { position: relative; height: 160px; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
@@ -271,30 +256,6 @@
             <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany w profilu</button>
         </div>
 
-        <h2>Parametry nawadniania (Aktywne)</h2>
-        <div class="section-card">
-            <div class="moisture-header">
-                <label style="margin:0;">Wilgotność aktywacji</label><span id="badgeVal" class="moisture-badge">40%</span>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-                <input type="range" id="thInput" value="40" min="0" max="100" oninput="aktualizujInterfejs(true)">
-                <div class="moisture-bar-container"><div id="moistureBar" class="moisture-bar"></div></div>
-                <span id="adviceText" class="unit-hint" style="font-weight: 600;">Wczytywanie...</span>
-            </div>
-        </div>
-
-        <div class="section-card">
-            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
-                <span>Czas podlewania</span><span id="timeVal" style="color:var(--accent-blue);">2 min</span>
-            </div>
-            <input type="range" id="timeInput" value="2" min="0.5" max="30" step="0.5" oninput="aktualizujInterfejs(true)">
-            
-            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:20px;">
-                <span>Interwał usypiania</span><span id="sleepVal" style="color:var(--accent-blue);">4 h</span>
-            </div>
-            <input type="range" id="sleepInput" value="4" min="1" max="24" step="1" oninput="aktualizujInterfejs(true)">
-        </div>
-
         <h2>Historia i Wykresy</h2>
         <div class="section-card" style="margin-bottom:20px;">
             <div class="chart-container">
@@ -313,8 +274,6 @@
             <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
             <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom</button>
         </div>
-        
-        <button class="btn-save" onclick="zapiszPrzezWiFi()">⚡ Zapisz aktywne do ESP32</button>
     </div>
 
 </div>
@@ -333,7 +292,6 @@ const domyslneProfile = {
 
 // Ładowanie zapisanych profili lub ustawienie domyślnych
 let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslneProfile;
-// Dodanie nowych roślin, jeśli ktoś aktualizuje z wcześniejszej wersji bez nich
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
 
@@ -404,15 +362,16 @@ function zmienZakladke(tab) {
 }
 
 window.onload = function() {
-    wczytajProfilDoEdycji(); // Inicjalizacja formularza edycji
+    wczytajProfilDoEdycji(); 
 
     const zapisanyMotyw = localStorage.getItem('theme') || 'auto';
     zmienMotyw(zapisanyMotyw);
 
-    if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
-    if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
-    if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
-    aktualizujInterfejs(false);
+    // Przywracanie zaznaczenia ostatnio używanego profilu
+    const activeProfile = localStorage.getItem("activeProfile");
+    if(activeProfile && document.getElementById(activeProfile)) {
+        document.getElementById(activeProfile).classList.add('selected');
+    }
 
     const cachedData = localStorage.getItem('lastESPData');
     if(cachedData) {
@@ -558,10 +517,8 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected');
 
-    document.getElementById("thInput").value = th;
-    document.getElementById("timeInput").value = time;
-    document.getElementById("sleepInput").value = sleep;
-    aktualizujInterfejs(true);
+    // Zapamiętanie ostatnio użytego profilu
+    localStorage.setItem("activeProfile", btnId);
 
     const toast = document.getElementById("pulpit-toast");
     toast.style.opacity = "1";
@@ -570,37 +527,6 @@ function ustawProfilZapisz(th, time, sleep, btnId, name) {
     fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&sleepSec=${sleep * 3600}`, { mode: 'no-cors' })
     .then(() => { toast.innerText = "✓ Zapisano ustawienia: " + name; })
     .catch(() => { toast.innerText = "✓ (Demo) Ustawiono lokalnie"; setTimeout(() => toast.style.opacity = "0", 3000); });
-}
-
-function aktualizujInterfejs(zapiszDoPamieci) {
-    const pct = document.getElementById("thInput").value;
-    const mins = document.getElementById("timeInput").value;
-    const hrs = document.getElementById("sleepInput").value;
-
-    if(zapiszDoPamieci) { localStorage.setItem("th", pct); localStorage.setItem("time", mins); localStorage.setItem("sleep", hrs); }
-
-    document.getElementById("badgeVal").innerText = pct + "%";
-    document.getElementById("timeVal").innerText = mins + " min";
-    document.getElementById("sleepVal").innerText = hrs + " h";
-    
-    const bar = document.getElementById("moistureBar");
-    bar.style.width = pct + "%";
-    
-    const advice = document.getElementById("adviceText");
-    if(pct < 25) { bar.style.backgroundColor = "var(--accent-red)"; advice.innerText = "⚠️ Zbyt sucho"; advice.style.color = "var(--accent-red)"; } 
-    else if(pct > 75) { bar.style.backgroundColor = "#ff9500"; advice.innerText = "⚠️ Zbyt mokro"; advice.style.color = "#ff9500"; } 
-    else { bar.style.backgroundColor = "var(--accent-blue)"; advice.innerText = "✓ Optymalnie"; advice.style.color = "var(--accent-green)"; }
-}
-
-function zapiszPrzezWiFi() {
-    haptyka(15);
-    const pct = document.getElementById("thInput").value;
-    const secondsTime = Math.round(document.getElementById("timeInput").value * 60);
-    const secondsSleep = Math.round(document.getElementById("sleepInput").value * 3600);
-    
-    fetch(`http://192.168.4.1/save?thPct=${pct}&timeSec=${secondsTime}&sleepSec=${secondsSleep}`, { mode: 'no-cors' })
-    .then(() => alert("🚀 Zapisano parametry!"))
-    .catch(() => alert("❌ Brak połączenia."));
 }
 
 function uruchomTest() {
