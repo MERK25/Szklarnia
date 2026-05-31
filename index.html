@@ -291,10 +291,29 @@
 
 <script>
 window.onload = function() {
-    if(localStorage.getItem("th")) document.getElementById("thInput").value = localStorage.getItem("th");
-    if(localStorage.getItem("time")) document.getElementById("timeInput").value = localStorage.getItem("time");
-    if(localStorage.getItem("sleep")) document.getElementById("sleepInput").value = localStorage.getItem("sleep");
+    // 1. Sprawdź, czy są zapisane dane w przeglądarce, jeśli nie - ustaw domyślne 40%
+    if(localStorage.getItem("th")) {
+        document.getElementById("thInput").value = localStorage.getItem("th");
+    } else {
+        document.getElementById("thInput").value = 40;
+    }
+    
+    if(localStorage.getItem("time")) {
+        document.getElementById("timeInput").value = localStorage.getItem("time");
+    } else {
+        document.getElementById("timeInput").value = 2;
+    }
+    
+    if(localStorage.getItem("sleep")) {
+        document.getElementById("sleepInput").value = localStorage.getItem("sleep");
+    } else {
+        document.getElementById("sleepInput").value = 4;
+    }
+    
+    // 2. WYMUSZONY REFRESH INTERFEJSU - to naprawia problem "Wczytywanie..."
     aktualizujInterfejs(false);
+    
+    // 3. Dopiero teraz próbujemy pobrać dane z ESP32 (jeśli go nie ma, interfejs i tak działa)
     pobierzDaneZESP32();
 }
 
@@ -303,12 +322,15 @@ function pobierzDaneZESP32() {
     .then(response => response.json())
     .then(data => {
         document.getElementById("voltCalc").innerText = data.voltage + " (" + data.v_status + ")";
-        if(data.v_status === "LOW") document.getElementById("voltCalc").style.color = "#ff3b30";
-        else document.getElementById("voltCalc").style.color = var(--accent-green);
+        if(data.v_status === "LOW") {
+            document.getElementById("voltCalc").style.color = "#ff3b30";
+        } else {
+            document.getElementById("voltCalc").style.color = "#34c759";
+        }
 
         const logBox = document.getElementById("logBox");
         logBox.innerHTML = "";
-        if(data.logs.length === 0) {
+        if(!data.logs || data.logs.length === 0) {
             logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów w historii.</div>";
         } else {
             data.logs.reverse().forEach(log => {
@@ -317,7 +339,10 @@ function pobierzDaneZESP32() {
             });
         }
     }).catch(() => {
-        console.log("Działanie w trybie offline.");
+        console.log("Działanie w trybie offline. Brak ESP32.");
+        // Opcjonalnie: możemy wpisać status do diagnostyki, żeby było widać, że strona żyje
+        document.getElementById("voltCalc").innerText = "Offline (Tryb Demo)";
+        document.getElementById("voltCalc").style.color = "#ff9500";
     });
 }
 
@@ -339,21 +364,38 @@ function aktualizujInterfejs(zapiszDoPamieci) {
         localStorage.setItem("sleep", hrs);
     }
 
+    // Aktualizacja procentu w prawym górnym rogu karty
     document.getElementById("badgeVal").innerText = pct + "%";
+    
+    // Aktualizacja szerokości paska
     const bar = document.getElementById("moistureBar");
     bar.style.width = pct + "%";
     
-    if(pct < 25) bar.style.backgroundColor = "#ff3b30";
-    else if(pct > 75) bar.style.backgroundColor = "#ff9500";
-    else bar.style.backgroundColor = "var(--accent-blue)";
-
+    // Logika zmiany kolorów paska i napisów ostrzegawczych
     const advice = document.getElementById("adviceText");
-    if(pct < 25) { advice.innerText = "⚠️ Krytycznie sucho dla warzyw!"; advice.style.color = "#ff3b30"; }
-    else if(pct > 75) { advice.innerText = "⚠️ Zagrożenie przelaniem systemu!"; advice.style.color = "#ff9500"; }
-    else { advice.innerText = "✓ Wilgotność w pełni optymalna."; advice.style.color = "var(--accent-green)"; }
+    if(pct < 25) { 
+        bar.style.backgroundColor = "#ff3b30"; // Czerwony
+        advice.innerText = "⚠️ Krytycznie sucho dla warzyw!"; 
+        advice.style.color = "#ff3b30"; 
+    }
+    else if(pct > 75) { 
+        bar.style.backgroundColor = "#ff9500"; // Pomarańczowy
+        advice.innerText = "⚠️ Zagrożenie przelaniem systemu!"; 
+        advice.style.color = "#ff9500"; 
+    }
+    else { 
+        bar.style.backgroundColor = "#007aff"; // Niebieski (optymalny)
+        advice.innerText = "✓ Wilgotność w pełni optymalna."; 
+        advice.style.color = "#34c759"; 
+    }
 
+    // Przeliczenia diagnostyczne na żywo
     document.getElementById("waterCalc").innerText = `~${Math.round(mins * 5 * 10) / 10}L`;
-    if (hrs > 0) document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} / dobę`;
+    if (hrs > 0) {
+        document.getElementById("checksCalc").innerText = `${Math.round((24 / hrs) * 10) / 10} / dobę`;
+    } else {
+        document.getElementById("checksCalc").innerText = "0 / dobę";
+    }
 }
 
 function zapiszPrzezWiFi() {
