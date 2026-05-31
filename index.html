@@ -260,11 +260,15 @@ btnSerwis.addEventListener('mousedown', startEngTimer);
 btnSerwis.addEventListener('mouseup', clearEngTimer);
 btnSerwis.addEventListener('mouseleave', clearEngTimer);
 
+// Zoptymalizowana baza profili agrotechnicznych (Off-grid)
 const domyslneProfile = {
-    'pomidory': { th: 40, time: 2, sleep: 4, name: 'Pomidory' }, 'ogorki': { th: 60, time: 1, sleep: 2, name: 'Ogórki' },
-    'sadzonki': { th: 50, time: 0.5, sleep: 1, name: 'Sadzonki' }, 'arbuz': { th: 55, time: 3, sleep: 3, name: 'Arbuz' }, 'borowka': { th: 70, time: 1.5, sleep: 2, name: 'Borówka' }
+    'pomidory': { th: 40, time: 3, sleep: 6, name: 'Pomidory' },
+    'ogorki':   { th: 65, time: 1.5, sleep: 3, name: 'Ogórki' },
+    'sadzonki': { th: 55, time: 0.5, sleep: 2, name: 'Sadzonki' },
+    'arbuz':    { th: 45, time: 4, sleep: 6, name: 'Arbuz' },
+    'borowka':  { th: 70, time: 1, sleep: 3, name: 'Borówka' }
 };
-
+    
 let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslneProfile;
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
