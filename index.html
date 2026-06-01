@@ -34,7 +34,7 @@
         .wrapper { width: 100%; max-width: 410px; margin-top: 20px; background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border-light); border-radius: 38px; padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box; position: relative; }
         
         .tab-nav { display: flex; background: var(--nav-bg); border-radius: 14px; padding: 4px; margin-bottom: 24px; position: relative; z-index: 10; user-select: none; -webkit-user-select: none; }
-        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: transition: all 0.3s ease; }
+        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: all 0.3s ease; }
         .tab-btn.active { background: var(--glass-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         
         .tabs-wrapper { position: relative; width: 100%; }
@@ -102,7 +102,7 @@
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
 
         /* =========================================
-           ANIMACJA WODY (NOWA, REALISTYCZNA)
+           Oryginalna animacja wody z pierwszego kodu
            ========================================= */
         .water-module {
             background: var(--glass-card);
@@ -118,58 +118,49 @@
         .tank-mask {
             position: relative;
             width: 100%;
-            height: 110px;
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 18px;
+            height: 140px;
+            background: var(--range-bg);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
             isolation: isolate; 
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
 
-        #water-level {
+        #water-height-controller {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 53%; /* Wymuszone na 53% w celach testowych */
-            transition: height 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            z-index: 1;
+            bottom: -800px; /* Baza - całkowicie pusty zbiornik */
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            transform: translateX(-50%);
+            transition: bottom 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Dolna część wody pod falami */
-        .water-base {
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(10, 132, 255, 0.3);
-        }
-
-        /* Magia fal: ogromne koła osadzone poniżej lustra wody */
+        /* Fale kręcące się na wierzchu poziomu wody */
         .wave {
             position: absolute;
-            bottom: 100%; /* Siedzimy idealnie na krawędzi poziomu wody */
-            left: 50%;
-            width: 400px;
-            height: 400px;
-            margin-left: -200px; 
-            margin-bottom: -385px; /* Wystaje tylko 15px falującej krawędzi */
-            border-radius: 40%;
-            animation: spinWave 5s linear infinite;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #5ac8fa 0%, var(--accent-blue) 100%);
+            border-radius: 38%;
+            bottom: 0;
+            left: 0;
+            animation: spinWave 6s linear infinite;
+        }
+        .wave:nth-child(2) {
+            opacity: 0.5;
+            border-radius: 42%;
+            animation-duration: 8s;
+            animation-direction: reverse;
         }
         
-        .wave1 { background: rgba(90, 200, 250, 0.5); border-radius: 40%; }
-        .wave2 { background: rgba(10, 132, 255, 0.4); animation-duration: 7s; animation-direction: reverse; border-radius: 42%; margin-bottom: -388px; }
-        .wave3 { background: rgba(0, 122, 255, 0.3); animation-duration: 10s; border-radius: 45%; margin-bottom: -382px; }
-        
-        /* Czerwone kolory podczas braku wody */
-        .tank-mask.alert .water-base { background: rgba(255, 59, 48, 0.3); }
-        .tank-mask.alert .wave1 { background: rgba(255, 149, 0, 0.4); }
-        .tank-mask.alert .wave2 { background: rgba(255, 59, 48, 0.3); }
-        .tank-mask.alert .wave3 { background: rgba(255, 69, 58, 0.2); }
+        .tank-mask.alert .wave {
+            background: linear-gradient(180deg, #ff6b22 0%, var(--accent-red) 100%);
+        }
 
         @keyframes spinWave {
-            0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
@@ -183,7 +174,7 @@
             z-index: 10;
             pointer-events: none;
             color: var(--text-main);
-            text-shadow: 0 1px 8px rgba(255,255,255,0.9);
+            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
         }
 
         .btn-water-reset {
@@ -229,16 +220,14 @@
                 <div class="weather-lbl" style="text-align: center; margin-bottom: -4px;">Woda w zbiorniku</div>
                 
                 <div class="tank-mask" id="tank-mask">
-                    <div id="water-level" style="height: 53%;">
-                        <div class="water-base"></div>
-                        <div class="wave wave1"></div>
-                        <div class="wave wave2"></div>
-                        <div class="wave wave3"></div>
+                    <div id="water-height-controller">
+                        <div class="wave"></div>
+                        <div class="wave"></div>
                     </div>
                     
                     <div class="tank-text-overlay">
-                        <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">53%</span>
-                        <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">116 / 220 L</span>
+                        <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">--%</span>
+                        <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">-- / -- L</span>
                     </div>
                 </div>
 
@@ -642,7 +631,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
-    // --- LOGIKA I ANIMACJA POZIOMU WODY ---
+    // --- ORYGINALNA LOGIKA I ANIMACJA POZIOMU WODY ---
     if(data.pump_sec !== undefined) {
         let tVol = data.tank_vol !== undefined ? data.tank_vol : 220; 
         let fRate = data.pump_flow !== undefined ? data.pump_flow : 2.0;
@@ -652,12 +641,15 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
         let usedLiters = (data.pump_sec / 60) * fRate;
         let remLiters = Math.max(0, tVol - usedLiters);
+        let pct = Math.round((remLiters / tVol) * 100);
+        if (pct < 0) pct = 0;
+        if (pct > 100) pct = 100;
         
-        // WYMUSZONE 53% W CELACH TESTOWYCH:
-        let pct = 53; 
-        remLiters = (pct / 100) * tVol;
+        let minBottom = -800;
+        let maxBottom = -660;
+        let calculatedBottom = minBottom + ((maxBottom - minBottom) * (pct / 100));
         
-        document.getElementById("water-level").style.height = pct + "%";
+        document.getElementById("water-height-controller").style.bottom = calculatedBottom + "px";
         document.getElementById("dash-water-pct").innerText = pct + "%";
         document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
         
