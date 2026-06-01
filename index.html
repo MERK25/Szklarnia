@@ -118,7 +118,7 @@
         .tank-mask {
             position: relative;
             width: 100%;
-            height: 140px;
+            height: 100px;
             background: var(--range-bg);
             border-radius: 20px;
             overflow: hidden;
@@ -666,7 +666,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
         if (pct > 100) pct = 100;
         
         let minBottom = -800;
-        let maxBottom = -660;
+        let maxBottom = -700; // Skorygowany maxBottom dla mniejszego zbiornika
         let calculatedBottom = minBottom + ((maxBottom - minBottom) * (pct / 100));
         
         document.getElementById("water-height-controller").style.bottom = calculatedBottom + "px";
