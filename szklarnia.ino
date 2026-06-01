@@ -25,7 +25,7 @@
 #define ONE_WIRE_BUS 4
 #define TRIG_PIN 5
 #define ECHO_PIN 18
-#define VENT_PIN 19 // NOWOŚĆ: PIN siłownika okna / wentylatora
+#define VENT_PIN 19 
 
 const float TEMP_LIMIT = 30.0;
 const float TEMP_VENT_CLOSE = 25.0;
@@ -45,21 +45,48 @@ RTC_DATA_ATTR float voltageAtSunset = 0.0, voltageAtSunrise = 0.0;
 RTC_DATA_ATTR int battWarning = 0;
 RTC_DATA_ATTR bool wasNight = false;
 
-// HARDWARE CONFIG
 int hasUs, hasDs, hasBme, hasLight, hasVent;
-
 int dryThresholdPct, wateringTimeSec, aggrMode, airValue, waterValue, usMax, usMin, maxLight;
 float tempOffset;
 
 unsigned long configStartTime;
 bool inConfigMode = false;
-bool shouldGoToSleep = false;
 bool isUpdating = false;
-unsigned long sleepDelayTimer = 0;
 
-// TRYB SERWISOWY
-bool isServiceMode = false;
-unsigned long serviceStartTime = 0;
+// --- ZABEZPIECZENIA WSPÓŁBIEŻNOŚCI (Volatile Flags) ---
+volatile bool flag_saveConfig = false;
+volatile int tmp_th, tmp_time, tmp_aggr;
+
+volatile bool flag_saveTank = false;
+volatile int tmp_vol;
+volatile float tmp_flow;
+
+volatile bool flag_saveCalib = false;
+volatile int tmp_air, tmp_water;
+
+volatile bool flag_saveExtras = false;
+volatile float tmp_tOff;
+volatile int tmp_usMax, tmp_usMin, tmp_lMax;
+
+volatile bool flag_saveLocation = false;
+volatile int tmp_outdoors;
+
+volatile bool flag_testPump = false;
+volatile int tmp_testSec;
+volatile bool tmp_testForce;
+
+volatile bool flag_drainPump = false;
+volatile bool flag_resetFault = false;
+volatile bool flag_resetWater = false;
+volatile bool flag_hibernate = false;
+
+volatile bool flag_hwConfig = false;
+volatile int tmp_hwUs, tmp_hwDs, tmp_hwBme, tmp_hwLight, tmp_hwVent;
+
+volatile bool isServiceMode = false;
+volatile unsigned long serviceStartTime = 0;
+volatile unsigned long sleepDelayTimer = 0;
+volatile bool shouldGoToSleep = false;
 
 const char* ssid = "Szklarnia-Net";
 const char* password = "pomidory123";
@@ -71,6 +98,12 @@ float getInternalVoltage() {
   return ((vCode / 4095.0) * 3.3 * 2.0 < 1.0) ? 5.01 : (vCode / 4095.0) * 3.3 * 2.0;
 }
 
+// Bezpieczna funkcja zdejmująca NaN (Not-a-Number)
+float safeFloat(float val) {
+  if (isnan(val) || isinf(val)) return 0.0;
+  return val;
+}
+
 void saveLog(int moisture, int action, float voltage, float temp, float hum) {
   if(logCount >= 7) {
     for(int i = 1; i < 7; i++) {
@@ -80,8 +113,8 @@ void saveLog(int moisture, int action, float voltage, float temp, float hum) {
     logCount = 6;
   }
   logMoisture[logCount] = moisture; logAction[logCount] = action;
-  logVoltage[logCount] = (int)(voltage * 100); 
-  logTemp[logCount] = (int)(temp * 10); logHum[logCount] = (int)hum;
+  logVoltage[logCount] = (int)(safeFloat(voltage) * 100); 
+  logTemp[logCount] = (int)(safeFloat(temp) * 10); logHum[logCount] = (int)(safeFloat(hum));
   logCount++;
 }
 
@@ -118,37 +151,27 @@ void setup() {
   
   digitalWrite(RELAY_PIN, LOW);
 
-  // Wczytywanie konfiguracji sprzętowej
   preferences.begin("hw", true);
-  hasUs = preferences.getInt("hasUs", 1);
-  hasDs = preferences.getInt("hasDs", 1);
-  hasBme = preferences.getInt("hasBme", 1);
-  hasLight = preferences.getInt("hasLight", 1);
+  hasUs = preferences.getInt("hasUs", 1); hasDs = preferences.getInt("hasDs", 1);
+  hasBme = preferences.getInt("hasBme", 1); hasLight = preferences.getInt("hasLight", 1);
   hasVent = preferences.getInt("hasVent", 0);
   preferences.end();
 
   if(hasVent) { pinMode(VENT_PIN, OUTPUT); }
-
   if(hasBme) bmeStatus = bme.begin(0x76);
   if(hasDs) waterSensor.begin();
   
   preferences.begin("garden", true);
-  dryThresholdPct = preferences.getInt("th", 40);
-  wateringTimeSec = preferences.getInt("time", 120);
-  aggrMode = preferences.getInt("aggr", 1); 
-  airValue = preferences.getInt("airVal", 3200);
-  waterValue = preferences.getInt("waterVal", 1500);
-  tempOffset = preferences.getFloat("tOffset", 0.0);
-  usMax = preferences.getInt("usMax", 90);
-  usMin = preferences.getInt("usMin", 15);
+  dryThresholdPct = preferences.getInt("th", 40); wateringTimeSec = preferences.getInt("time", 120);
+  aggrMode = preferences.getInt("aggr", 1); airValue = preferences.getInt("airVal", 3200);
+  waterValue = preferences.getInt("waterVal", 1500); tempOffset = preferences.getFloat("tOffset", 0.0);
+  usMax = preferences.getInt("usMax", 90); usMin = preferences.getInt("usMin", 15);
   maxLight = preferences.getInt("maxLight", 4095);
   preferences.end();
   
   preferences.begin("sys", true);
-  int isHibernated = preferences.getInt("hib", 0);
-  int failCount = preferences.getInt("fail", 0);
-  int checkSoak = preferences.getInt("soak", 0); 
-  int isOutdoors = preferences.getInt("outdoors", 0);
+  int isHibernated = preferences.getInt("hib", 0); int failCount = preferences.getInt("fail", 0);
+  int checkSoak = preferences.getInt("soak", 0); int isOutdoors = preferences.getInt("outdoors", 0);
   float lastPressure = preferences.getFloat("lastP", 0.0);
   preferences.end();
 
@@ -175,17 +198,17 @@ void setup() {
       if(!isServiceMode) configStartTime = millis(); 
       digitalWrite(SENSOR_VCC_PIN, HIGH); delay(1000); esp_task_wdt_reset();
       
-      float v = getInternalVoltage();
-      float temp = (hasBme && bmeStatus) ? bme.readTemperature() : 0.0;
-      float hum = (hasBme && bmeStatus) ? bme.readHumidity() : 0.0;
-      float pressure = (hasBme && bmeStatus) ? (bme.readPressure() / 100.0F) : 0.0;
+      float v = safeFloat(getInternalVoltage());
+      float temp = (hasBme && bmeStatus) ? safeFloat(bme.readTemperature()) : 0.0;
+      float hum = (hasBme && bmeStatus) ? safeFloat(bme.readHumidity()) : 0.0;
+      float pressure = (hasBme && bmeStatus) ? safeFloat(bme.readPressure() / 100.0F) : 0.0;
       int rawMoisture = analogRead(SOIL_PIN);
       int rawLight = hasLight ? analogRead(LIGHT_PIN) : 0; 
       
       float waterTemp = 0.0;
       if(hasDs) {
           waterSensor.requestTemperatures();
-          waterTemp = waterSensor.getTempCByIndex(0) + tempOffset;
+          waterTemp = safeFloat(waterSensor.getTempCByIndex(0)) + safeFloat(tempOffset);
           if(waterTemp == DEVICE_DISCONNECTED_C || waterTemp < -50.0) waterTemp = 0.0;
       }
       
@@ -215,12 +238,10 @@ void setup() {
       doc["temp"] = temp; doc["air_hum"] = hum; doc["pressure"] = pressure;
       doc["water"] = (digitalRead(FLOAT_PIN) == HIGH ? "EMPTY" : "OK");
       
-      // Diagnostyka serwisowa
       doc["service_mode"] = isServiceMode ? 1 : 0;
       doc["free_heap"] = ESP.getFreeHeap();
       doc["vent_state"] = hasVent ? digitalRead(VENT_PIN) : 0;
 
-      // Konfiguracja sprzętu dla frontendu
       JsonObject hw = doc["hw"].to<JsonObject>();
       hw["us"] = hasUs; hw["ds"] = hasDs; hw["bme"] = hasBme; hw["light"] = hasLight; hw["vent"] = hasVent;
 
@@ -242,14 +263,13 @@ void setup() {
     });
 
     server.on("/hwConfig", HTTP_GET, [](AsyncWebServerRequest *request){
-      preferences.begin("hw", false);
-      if(request->hasParam("us")) { hasUs = request->getParam("us")->value().toInt(); preferences.putInt("hasUs", hasUs); }
-      if(request->hasParam("ds")) { hasDs = request->getParam("ds")->value().toInt(); preferences.putInt("hasDs", hasDs); }
-      if(request->hasParam("bme")) { hasBme = request->getParam("bme")->value().toInt(); preferences.putInt("hasBme", hasBme); }
-      if(request->hasParam("light")) { hasLight = request->getParam("light")->value().toInt(); preferences.putInt("hasLight", hasLight); }
-      if(request->hasParam("vent")) { hasVent = request->getParam("vent")->value().toInt(); preferences.putInt("hasVent", hasVent); }
-      preferences.end();
-      if(hasVent) pinMode(VENT_PIN, OUTPUT); else digitalWrite(VENT_PIN, LOW);
+      if(!isServiceMode) configStartTime = millis();
+      if(request->hasParam("us")) tmp_hwUs = request->getParam("us")->value().toInt(); else tmp_hwUs = hasUs;
+      if(request->hasParam("ds")) tmp_hwDs = request->getParam("ds")->value().toInt(); else tmp_hwDs = hasDs;
+      if(request->hasParam("bme")) tmp_hwBme = request->getParam("bme")->value().toInt(); else tmp_hwBme = hasBme;
+      if(request->hasParam("light")) tmp_hwLight = request->getParam("light")->value().toInt(); else tmp_hwLight = hasLight;
+      if(request->hasParam("vent")) tmp_hwVent = request->getParam("vent")->value().toInt(); else tmp_hwVent = hasVent;
+      flag_hwConfig = true;
       request->send(200, "text/plain", "OK");
     });
 
@@ -264,11 +284,10 @@ void setup() {
     server.on("/save", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("thPct") && request->hasParam("timeSec") && request->hasParam("aggr")) {
-        preferences.begin("garden", false);
-        preferences.putInt("th", request->getParam("thPct")->value().toInt());
-        preferences.putInt("time", request->getParam("timeSec")->value().toInt());
-        preferences.putInt("aggr", request->getParam("aggr")->value().toInt());
-        preferences.end();
+        tmp_th = request->getParam("thPct")->value().toInt();
+        tmp_time = request->getParam("timeSec")->value().toInt();
+        tmp_aggr = request->getParam("aggr")->value().toInt();
+        flag_saveConfig = true;
         request->send(200, "text/plain", "OK");
       } else request->send(400);
     });
@@ -276,67 +295,57 @@ void setup() {
     server.on("/tank", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("vol") && request->hasParam("flow")) {
-        preferences.begin("garden", false);
-        preferences.putInt("tVol", request->getParam("vol")->value().toInt());
-        preferences.putFloat("pFlow", request->getParam("flow")->value().toFloat());
-        preferences.end();
+        tmp_vol = request->getParam("vol")->value().toInt();
+        tmp_flow = request->getParam("flow")->value().toFloat();
+        flag_saveTank = true;
         request->send(200, "text/plain", "OK");
       } else request->send(400);
     });
 
     server.on("/calibrate", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
-      preferences.begin("garden", false);
-      if(request->hasParam("air")) preferences.putInt("airVal", request->getParam("air")->value().toInt());
-      if(request->hasParam("water")) preferences.putInt("waterVal", request->getParam("water")->value().toInt());
-      preferences.end();
+      if(request->hasParam("air")) tmp_air = request->getParam("air")->value().toInt(); else tmp_air = airValue;
+      if(request->hasParam("water")) tmp_water = request->getParam("water")->value().toInt(); else tmp_water = waterValue;
+      flag_saveCalib = true;
       request->send(200, "text/plain", "OK");
     });
 
     server.on("/calibrateExtras", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
-      preferences.begin("garden", false);
-      if(request->hasParam("tOff")) preferences.putFloat("tOffset", request->getParam("tOff")->value().toFloat());
-      if(request->hasParam("usMax")) preferences.putInt("usMax", request->getParam("usMax")->value().toInt());
-      if(request->hasParam("usMin")) preferences.putInt("usMin", request->getParam("usMin")->value().toInt());
-      if(request->hasParam("lMax")) preferences.putInt("maxLight", request->getParam("lMax")->value().toInt());
-      preferences.end();
+      if(request->hasParam("tOff")) tmp_tOff = request->getParam("tOff")->value().toFloat(); else tmp_tOff = tempOffset;
+      if(request->hasParam("usMax")) tmp_usMax = request->getParam("usMax")->value().toInt(); else tmp_usMax = usMax;
+      if(request->hasParam("usMin")) tmp_usMin = request->getParam("usMin")->value().toInt(); else tmp_usMin = usMin;
+      if(request->hasParam("lMax")) tmp_lMax = request->getParam("lMax")->value().toInt(); else tmp_lMax = maxLight;
+      flag_saveExtras = true;
       request->send(200, "text/plain", "OK");
     });
 
     server.on("/location", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("outdoors")) {
-        preferences.begin("sys", false); preferences.putInt("outdoors", request->getParam("outdoors")->value().toInt()); preferences.end();
+        tmp_outdoors = request->getParam("outdoors")->value().toInt();
+        flag_saveLocation = true;
         request->send(200, "text/plain", "OK");
       } else request->send(400);
     });
 
     server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
-      
       bool force = false;
       if(request->hasParam("force") && request->getParam("force")->value().toInt() == 1) force = true;
-
       if(digitalRead(FLOAT_PIN) == HIGH && !force) request->send(403, "text/plain", "Brak Wody!");
       else if(request->hasParam("sec")) {
-        int tSec = request->getParam("sec")->value().toInt();
-        digitalWrite(RELAY_PIN, HIGH);
-        // Bezpieczny asynchroniczny delay z watchdogiem
-        for(int i=0; i<tSec; i++) { delay(1000); esp_task_wdt_reset(); }
-        digitalWrite(RELAY_PIN, LOW);
-        addPumpSeconds(tSec); 
+        tmp_testSec = request->getParam("sec")->value().toInt();
+        tmp_testForce = force;
+        flag_testPump = true;
         request->send(200, "text/plain", "OK");
       }
     });
 
     server.on("/drain", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
-      if(digitalRead(FLOAT_PIN) == HIGH) { request->send(200, "text/plain", "ALREADY_EMPTY"); return; }
-      int drainedSec = 0; digitalWrite(RELAY_PIN, HIGH);
-      while (digitalRead(FLOAT_PIN) == LOW && drainedSec < 120) { delay(1000); drainedSec++; esp_task_wdt_reset(); }
-      digitalWrite(RELAY_PIN, LOW); addPumpSeconds(drainedSec);
-      request->send(200, "text/plain", "DRAINED");
+      if(digitalRead(FLOAT_PIN) == HIGH) request->send(200, "text/plain", "ALREADY_EMPTY");
+      else { flag_drainPump = true; request->send(200, "text/plain", "DRAINED"); }
     });
 
     server.on("/sync", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -354,19 +363,18 @@ void setup() {
 
     server.on("/resetFault", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
-      preferences.begin("sys", false); preferences.putInt("fail", 0); preferences.end();
+      flag_resetFault = true;
       request->send(200, "text/plain", "OK");
     });
     
     server.on("/resetWater", HTTP_GET, [](AsyncWebServerRequest *request){
       if(!isServiceMode) configStartTime = millis();
-      preferences.begin("sys", false); preferences.putInt("pumpSec", 0); preferences.end();
+      flag_resetWater = true;
       request->send(200, "text/plain", "OK");
     });
 
     server.on("/hibernate", HTTP_GET, [](AsyncWebServerRequest *request){
-      preferences.begin("sys", false); preferences.putInt("hib", 1); preferences.end();
-      shouldGoToSleep = true; sleepDelayTimer = millis(); 
+      flag_hibernate = true;
       request->send(200, "text/plain", "HIBERNATING");
     });
 
@@ -387,20 +395,18 @@ void setup() {
     if (digitalRead(FLOAT_PIN) == LOW && failCount < 3) {
       digitalWrite(RELAY_PIN, HIGH); delay(actualWateringSec * 1000); digitalWrite(RELAY_PIN, LOW);
       addPumpSeconds(actualWateringSec);
-      float t = (hasBme && bmeStatus) ? bme.readTemperature() : 0;
-      float h = (hasBme && bmeStatus) ? bme.readHumidity() : 0;
+      float t = (hasBme && bmeStatus) ? safeFloat(bme.readTemperature()) : 0;
+      float h = (hasBme && bmeStatus) ? safeFloat(bme.readHumidity()) : 0;
       saveLog(100, 4, currentV, t, h);
     }
     SystemGoToSleep(14400); 
   } 
   else {
-    // Normalne wybudzenie
-    float currentPressure = (hasBme && bmeStatus) ? (bme.readPressure() / 100.0F) : 0.0;
-    float currentTemp = (hasBme && bmeStatus) ? bme.readTemperature() : 0.0;
-    float currentHum = (hasBme && bmeStatus) ? bme.readHumidity() : 0.0;
+    float currentPressure = (hasBme && bmeStatus) ? safeFloat(bme.readPressure() / 100.0F) : 0.0;
+    float currentTemp = (hasBme && bmeStatus) ? safeFloat(bme.readTemperature()) : 0.0;
+    float currentHum = (hasBme && bmeStatus) ? safeFloat(bme.readHumidity()) : 0.0;
     if (hasBme && currentPressure > 500) { preferences.begin("sys", false); preferences.putFloat("lastP", currentPressure); preferences.end(); }
 
-    // WENTYLACJA - Automatyczne sterowanie oknem
     if(hasVent) {
       if(currentTemp > TEMP_LIMIT) digitalWrite(VENT_PIN, HIGH);
       else if (currentTemp < TEMP_VENT_CLOSE) digitalWrite(VENT_PIN, LOW);
@@ -426,7 +432,7 @@ void setup() {
     
     float waterTemp = 0.0;
     if(hasDs) {
-       waterSensor.requestTemperatures(); waterTemp = waterSensor.getTempCByIndex(0) + tempOffset;
+       waterSensor.requestTemperatures(); waterTemp = safeFloat(waterSensor.getTempCByIndex(0)) + safeFloat(tempOffset);
     }
     digitalWrite(SENSOR_VCC_PIN, LOW);
 
@@ -445,8 +451,8 @@ void setup() {
     if (failCount > 0) calculatedSleepSec = 21600; 
     if (hasLight && rawLight > 2500 && timeIsSet) sunSecondsToday += calculatedSleepSec;
     
-    float svp = 0.61078 * exp((17.27 * currentTemp) / (currentTemp + 237.3));
-    float avp = svp * (currentHum / 100.0);
+    float svp = safeFloat(0.61078 * exp((17.27 * currentTemp) / (currentTemp + 237.3)));
+    float avp = safeFloat(svp * (currentHum / 100.0));
     float currentVPD = svp - avp;
     bool isSauna = (hasBme && currentVPD < 0.4 && currentVPD > 0.0);
 
@@ -494,16 +500,86 @@ void setup() {
 
 void loop() {
   esp_task_wdt_reset();
+  
   if (inConfigMode) {
+    // --- LINIOWA (JEDNOWĄTKOWA) EGZEKUCJA ZADAŃ Z KOLEJKI ---
+    if (flag_saveConfig) {
+      preferences.begin("garden", false);
+      preferences.putInt("th", tmp_th); preferences.putInt("time", tmp_time); preferences.putInt("aggr", tmp_aggr);
+      preferences.end();
+      dryThresholdPct = tmp_th; wateringTimeSec = tmp_time; aggrMode = tmp_aggr;
+      flag_saveConfig = false;
+    }
+    if (flag_saveTank) {
+      preferences.begin("garden", false);
+      preferences.putInt("tVol", tmp_vol); preferences.putFloat("pFlow", tmp_flow);
+      preferences.end();
+      flag_saveTank = false;
+    }
+    if (flag_saveCalib) {
+      preferences.begin("garden", false);
+      preferences.putInt("airVal", tmp_air); preferences.putInt("waterVal", tmp_water);
+      preferences.end();
+      airValue = tmp_air; waterValue = tmp_water;
+      flag_saveCalib = false;
+    }
+    if (flag_saveExtras) {
+      preferences.begin("garden", false);
+      preferences.putFloat("tOffset", tmp_tOff); preferences.putInt("usMax", tmp_usMax);
+      preferences.putInt("usMin", tmp_usMin); preferences.putInt("maxLight", tmp_lMax);
+      preferences.end();
+      tempOffset = tmp_tOff; usMax = tmp_usMax; usMin = tmp_usMin; maxLight = tmp_lMax;
+      flag_saveExtras = false;
+    }
+    if (flag_saveLocation) {
+      preferences.begin("sys", false); preferences.putInt("outdoors", tmp_outdoors); preferences.end();
+      flag_saveLocation = false;
+    }
+    if (flag_hwConfig) {
+      preferences.begin("hw", false);
+      preferences.putInt("hasUs", tmp_hwUs); preferences.putInt("hasDs", tmp_hwDs);
+      preferences.putInt("hasBme", tmp_hwBme); preferences.putInt("hasLight", tmp_hwLight);
+      preferences.putInt("hasVent", tmp_hwVent);
+      preferences.end();
+      hasUs = tmp_hwUs; hasDs = tmp_hwDs; hasBme = tmp_hwBme; hasLight = tmp_hwLight; hasVent = tmp_hwVent;
+      if(hasVent) pinMode(VENT_PIN, OUTPUT); else digitalWrite(VENT_PIN, LOW);
+      flag_hwConfig = false;
+    }
+    if (flag_testPump) {
+      digitalWrite(RELAY_PIN, HIGH);
+      for(int i=0; i<tmp_testSec; i++) { delay(1000); esp_task_wdt_reset(); }
+      digitalWrite(RELAY_PIN, LOW);
+      addPumpSeconds(tmp_testSec);
+      flag_testPump = false;
+    }
+    if (flag_drainPump) {
+      int drainedSec = 0; digitalWrite(RELAY_PIN, HIGH);
+      while (digitalRead(FLOAT_PIN) == LOW && drainedSec < 120) { delay(1000); drainedSec++; esp_task_wdt_reset(); }
+      digitalWrite(RELAY_PIN, LOW); addPumpSeconds(drainedSec);
+      flag_drainPump = false;
+    }
+    if (flag_resetFault) {
+      preferences.begin("sys", false); preferences.putInt("fail", 0); preferences.end();
+      flag_resetFault = false;
+    }
+    if (flag_resetWater) {
+      preferences.begin("sys", false); preferences.putInt("pumpSec", 0); preferences.end();
+      flag_resetWater = false;
+    }
+    if (flag_hibernate) {
+      preferences.begin("sys", false); preferences.putInt("hib", 1); preferences.end();
+      flag_hibernate = false;
+      shouldGoToSleep = true; sleepDelayTimer = millis(); 
+    }
+
+    // --- ZARZĄDZANIE CZASEM PRACY ---
     if (isServiceMode) {
-       // KAGANIEC: Po 60 minutach wymusza uśpienie
        if (millis() - serviceStartTime > 3600000) { 
            isServiceMode = false;
            SystemGoToSleep(14400); 
        }
     } else {
        if (shouldGoToSleep && !isUpdating && (millis() - sleepDelayTimer > 1500)) SystemGoToSleep(14400);
-       // TIMEOUT: Po 5 minutach bezczynności
        if (!isUpdating && (millis() - configStartTime > 300000)) SystemGoToSleep(14400); 
     }
   }
