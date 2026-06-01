@@ -334,37 +334,59 @@
             </div>
 
             <div id="sub-zaawansowane" class="sub-content">
-                <h2>Asystent Kalibracji Pompy</h2>
+
+                <h2>Asystent Kalibracji Sensorów (Krok po kroku)</h2>
+                
                 <div class="section-card">
-                    <p style="font-size: 12px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Włóż wąż do naczynia z miarką 1 litr. Włącz pompę zewnętrznym zasilaniem lub uruchom test poniżej i jednocześnie włącz ten stoper. Zatrzymaj stoper, gdy woda dobije dokładnie do 1 litra.</p>
+                    <h3 style="margin-top:0; font-size:14px;">🌱 Wilgotność Gleby</h3>
+                    <div class="eng-data-row"><span>Odczyt z czujnika:</span> <b id="live-soil-val">---</b></div>
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                        <button class="btn-test" onclick="zapiszGlebe('air')" style="flex:1; padding:10px; font-size:12px; background:rgba(255,149,0,0.1); color:var(--accent-orange);">Ustaw jako SUCHO</button>
+                        <button class="btn-test" onclick="zapiszGlebe('water')" style="flex:1; padding:10px; font-size:12px; background:rgba(0,122,255,0.1); color:var(--accent-blue);">Ustaw jako MOKRO</button>
+                    </div>
+                    <p style="font-size:10px; color:var(--text-sub); margin:8px 0 0 0; line-height:1.4;">Wskazówka: Wyciągnij z ziemi na sucho i kliknij pomarańczowy. Włóż do szklanki z wodą i kliknij niebieski.</p>
+                </div>
+
+                <div class="section-card">
+                    <h3 style="margin-top:0; font-size:14px;">🛢️ Poziom Wody w Beczce</h3>
+                    <div class="eng-data-row"><span>Odległość tafli od wieka:</span> <b id="live-us-val">--- cm</b></div>
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                        <button class="btn-test" onclick="zapiszWode('empty')" style="flex:1; padding:10px; font-size:12px; background:rgba(255,59,48,0.1); color:var(--accent-red);">Ustaw BECZKA PUSTA</button>
+                        <button class="btn-test" onclick="zapiszWode('full')" style="flex:1; padding:10px; font-size:12px; background:rgba(52,199,89,0.1); color:var(--accent-green);">Ustaw BECZKA PEŁNA</button>
+                    </div>
+                    <p style="font-size:10px; color:var(--text-sub); margin:8px 0 0 0; line-height:1.4;">Zalej beczkę na 100% i kliknij zielony. Gdy wyschnie do dna, kliknij czerwony.</p>
+                </div>
+
+                <div class="section-card">
+                    <h3 style="margin-top:0; font-size:14px;">☀️ Światłomierz</h3>
+                    <div class="eng-data-row"><span>Surowe natężenie:</span> <b id="live-light-val">---</b></div>
+                    <button class="btn-test" onclick="zapiszSwiatlo()" style="margin-top:10px; background:rgba(255,149,0,0.1); color:var(--accent-orange);">Ustaw jako PEŁNE SŁOŃCE (100%)</button>
+                    <p style="font-size:10px; color:var(--text-sub); margin:8px 0 0 0; line-height:1.4;">Wystaw na mocne, bezpośrednie słońce w południe i kliknij przycisk.</p>
+                </div>
+
+                <div class="section-card">
+                    <h3 style="margin-top:0; font-size:14px;">🌡️ Korekta Temperatury Wody</h3>
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-size:13px; font-weight:600;">Wpisz różnicę (np. -1.5):</span>
+                        <input type="number" id="calib-tOff" class="eng-input" value="0.0" step="0.1" style="width:70px;">
+                    </div>
+                    <button class="btn-test" onclick="zapiszKorekteTemp()" style="margin-top:10px;">💾 Zapisz korektę</button>
+                </div>
+
+                <h2>Wydajność Pompy (Miarka)</h2>
+                <div class="section-card">
+                    <p style="font-size: 12px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Włóż wąż do naczynia 1 litr. Włącz ten stoper. Zatrzymaj go, gdy woda dobije dokładnie do 1 litra.</p>
                     <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums;" id="stopwatch-display">00.0s</div>
                     <button class="btn-test" id="btn-stoper" onclick="toggleStoper()" style="padding: 16px; font-size: 16px;">⏱ Start Stopera</button>
                     <p id="stoper-result" style="display:none; color: var(--accent-green); text-align:center; font-weight:800; margin-top: 15px;"></p>
                 </div>
 
-                <h2>Test Pompy</h2>
-                <div class="section-card">
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Czas trwania testu</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
-                    <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
-                    <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
-                </div>
-
-                <h2>Diagnostyka i Kalibracja ADC</h2>
+                <h2>Diagnostyka Ręczna</h2>
                 <div class="section-card">
                     <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
-                    <div class="eng-data-row"><span>Surowy odczyt wilgotności:</span> <b id="eng-raw-adc">---</b></div>
-                    <div class="eng-data-row" style="border-bottom:none; margin-top:15px; margin-bottom:4px;"><span>Wartość AIR (Sucho):</span><input type="number" id="calib-air" class="eng-input" value="3200"></div>
-                    <div class="eng-data-row" style="border-bottom:none;"><span>Wartość WATER (Mokro):</span><input type="number" id="calib-water" class="eng-input" value="1500"></div>
-                    <button class="btn-test" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz kalibrację gleby</button>
-                </div>
-
-                <h2>Kalibracja Zaawansowanych Sensorów</h2>
-                <div class="section-card">
-                    <div class="eng-data-row"><span>Offset temp. wody:</span><input type="number" id="calib-tOff" class="eng-input" value="0.0" step="0.1"></div>
-                    <div class="eng-data-row"><span>Odległość do dna (cm):</span><input type="number" id="calib-usDno" class="eng-input" value="90"></div>
-                    <div class="eng-data-row"><span>Max Światło (ADC):</span><input type="number" id="calib-lMax" class="eng-input" value="4095"></div>
-                    <button class="btn-test" onclick="zapiszKalibracjeExtras()" style="margin-top: 15px;">📡 Zapisz kalibrację sensorów</button>
-                    <button class="btn-test" onclick="ustawAktualneSwiatlo()" style="background: rgba(255, 149, 0, 0.1); margin-top: 8px;">☀️ Ustaw jako "Pełne Słońce"</button>
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Test Pompy</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
+                    <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
+                    <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
                 </div>
 
                 <h2>Aktualizacja Firmware (OTA)</h2>
@@ -400,6 +422,11 @@ try {
 
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
+
+// --- Zmienne na żywo dla asystenta kalibracji ---
+let liveSoil = 0;
+let liveUs = 0;
+let liveLight = 0;
 
 function aktualizujEtykieteAgresywnosci(val) {
     const etykiety = ["Oszczędny", "Zbalansowany", "Precyzyjny"];
@@ -446,6 +473,36 @@ function zapiszEdytowanyProfil() {
     localStorage.setItem('bazaProfili', JSON.stringify(profileData));
     alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
     if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
+}
+
+// --- LOGIKA KALIBRACJI Z WYKORZYSTANIEM DANYCH LIVE ---
+function zapiszGlebe(typ) {
+    haptyka(15);
+    let url = `http://192.168.4.1/calibrate?`;
+    if (typ === 'air') url += `air=${liveSoil}`;
+    if (typ === 'water') url += `water=${liveSoil}`;
+    fetch(url, { mode: 'no-cors' }).then(() => { alert("✅ Zapisano wartość kalibracji gleby!"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
+}
+
+function zapiszWode(typ) {
+    haptyka(15);
+    let url = `http://192.168.4.1/calibrateExtras?`;
+    if (typ === 'empty') url += `usMax=${liveUs}`;
+    if (typ === 'full') url += `usMin=${liveUs}`;
+    fetch(url, { mode: 'no-cors' }).then(() => { alert("✅ Zapisano nowy poziom dla beczki!"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
+}
+
+function zapiszSwiatlo() {
+    haptyka(15);
+    fetch(`http://192.168.4.1/calibrateExtras?lMax=${liveLight}`, { mode: 'no-cors' })
+    .then(() => { alert("✅ Skalibrowano na 100% słońca!"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
+}
+
+function zapiszKorekteTemp() {
+    haptyka(15);
+    const tOff = document.getElementById('calib-tOff').value;
+    fetch(`http://192.168.4.1/calibrateExtras?tOff=${tOff}`, { mode: 'no-cors' })
+    .then(() => { alert("✅ Zapisano przesunięcie temperatury"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
 }
 
 let stoperInterval;
@@ -686,6 +743,17 @@ function rysujWykresy(logi) {
 function renderujDane(data, timestamp, trybDemo = false) {
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
     
+    // AKTUALIZACJA ZMIENNYCH LIVE DLA ASYSTENTA KALIBRACJI
+    liveSoil = data.raw_adc;
+    liveUs = data.us_dist;
+    liveLight = data.raw_light;
+
+    document.getElementById('live-soil-val').innerText = liveSoil || "---";
+    document.getElementById('live-us-val').innerText = (liveUs !== undefined) ? liveUs + " cm" : "--- cm";
+    document.getElementById('live-light-val').innerText = liveLight || "---";
+
+    if(data.t_off !== undefined) document.getElementById("calib-tOff").value = data.t_off;
+
     if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_aggr !== undefined) {
         zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_aggr);
     }
@@ -736,7 +804,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
         let activeProfileEl = document.querySelector('.profile-btn.selected');
         let dailyEstimateStr = "Brak danych";
         if (activeProfileEl && data.cfg_time) {
-            let wateringsPerDay = (data.cfg_aggr == 2) ? 4 : (data.cfg_aggr == 1 ? 3 : 2); // Przybliżona ilość podlań dla szacunku
+            let wateringsPerDay = (data.cfg_aggr == 2) ? 4 : (data.cfg_aggr == 1 ? 3 : 2); 
             let litersPerDay = wateringsPerDay * (data.cfg_time * fRate);
             if (litersPerDay > 0) {
                 let daysLeft = Math.floor(remLiters / litersPerDay);
@@ -763,10 +831,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
     }
 
     if(data.voltage !== undefined) document.getElementById("eng-voltage").innerText = data.voltage.toFixed(3) + " V";
-    if(data.raw_adc !== undefined) document.getElementById("eng-raw-adc").innerText = data.raw_adc;
-    if(data.air_val !== undefined) document.getElementById("calib-air").value = data.air_val;
-    if(data.water_val !== undefined) document.getElementById("calib-water").value = data.water_val;
-    if(data.us_max !== undefined) document.getElementById("calib-usDno").value = data.us_max;
 
     if (data.voltage) {
         let vFloat = parseFloat(data.voltage);
@@ -836,7 +900,7 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
         const demoSun = wyliczZegarAstronomiczny();
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, us_max: 90, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
+        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, us_max: 90, us_dist: 45, raw_adc: 2100, raw_light: 3500, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
@@ -858,24 +922,6 @@ function ustawLokalizacje(isOutdoors) {
 }
 
 function uruchomTest() { haptyka(15); const sec = document.getElementById("testSlider").value; fetch(`http://192.168.4.1/test?sec=${sec}`, { mode: 'no-cors' }).then(() => alert(`🌊 Test pompy (${sec}s) aktywny.`)).catch(() => alert("❌ Tryb offline.")); }
-function zapiszKalibracje() { haptyka([20, 30, 20]); fetch(`http://192.168.4.1/calibrate?air=${document.getElementById('calib-air').value}&water=${document.getElementById('calib-water').value}`, { mode: 'no-cors' }).then(() => { alert("✅ Zapisano kalibrację"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-
-function zapiszKalibracjeExtras() {
-    haptyka(10);
-    const tOff = document.getElementById('calib-tOff').value;
-    const usDno = document.getElementById('calib-usDno').value;
-    const lMax = document.getElementById('calib-lMax').value;
-    fetch(`http://192.168.4.1/calibrateExtras?tOff=${tOff}&usDno=${usDno}&lMax=${lMax}`, { mode: 'no-cors' })
-    .then(() => { alert("✅ Zapisano kalibrację sensorów"); pobierzDaneZESP32(); })
-    .catch(() => alert("⚠️ Tryb Offline"));
-}
-
-function ustawAktualneSwiatlo() {
-    haptyka(10);
-    const rawLight = document.getElementById('eng-raw-adc').innerText; 
-    document.getElementById('calib-lMax').value = rawLight;
-    alert("Zaktualizowano wartość Max Światła na: " + rawLight + ". Kliknij Zapisz.");
-}
 
 function eksportujCSV() {
     haptyka(15); const cached = localStorage.getItem('lastESPData'); if(!cached) return alert("Brak danych.");
