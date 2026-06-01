@@ -51,9 +51,7 @@
         .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
         @keyframes pulseAlert { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* Service Mode Banner */
-        .service-banner { background: var(--accent-orange); color: #fff; text-align: center; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 14px; margin-bottom: 20px; display: none; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3); animation: bannerPulse 2s infinite; }
-        @keyframes bannerPulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        .service-banner { background: var(--accent-orange); color: #fff; text-align: center; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 14px; margin-bottom: 20px; display: none; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3); }
 
         .weather-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .weather-card { flex: 1 1 calc(33.333% - 8px); min-width: 90px; background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 20px; padding: 12px 4px; text-align: center; box-sizing: border-box; }
@@ -64,7 +62,7 @@
         .skeleton { background: linear-gradient(90deg, var(--range-bg) 25%, rgba(150,150,150,0.1) 50%, var(--range-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: transparent !important; border-radius: 8px; display: inline-block; min-width: 40px; }
 
         h2 { font-size: 13px; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
-        .section-card { background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 22px; padding: 16px; margin-bottom: 16px; box-sizing: border-box; }
+        .section-card { background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 22px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-soft); box-sizing: border-box; }
         
         .profile-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .profile-btn { flex: 1 1 calc(33.333% - 6px); min-width: 90px; background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 14px 4px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; box-sizing: border-box; transition: all 0.2s ease; }
@@ -91,8 +89,7 @@
         .bg-cold { background: rgba(50, 173, 230, 0.12); color: var(--accent-cyan); }
         .bg-sauna { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
 
-        .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
+        .btn-test { display: block; width: 100%; padding: 12px; border: none; border-radius: 18px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
         .btn-test:active { transform: scale(0.96); }
 
         .chart-container { position: relative; height: 100px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.02); border-radius: 12px; overflow: hidden; padding: 5px; box-sizing: border-box; }
@@ -101,7 +98,6 @@
         .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; align-items: center; }
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
 
-        /* Przełączniki sprzętowe (Toggles) */
         .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; font-weight: 600; }
         .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -157,18 +153,16 @@
                         <span id="dash-water-est" style="font-size: 10px; font-weight: 700; color: var(--text-main); opacity: 0.75; margin-top: 4px;">Szacowanie...</span>
                     </div>
                 </div>
-                <button class="btn-test" onclick="zresetujLicznikWody()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue);">💦 Zresetuj stan po napełnieniu beczki</button>
+                <button id="btn-reset-water" class="btn-test" onclick="zresetujLicznikWody()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); width:100%">💦 Zresetuj stan po napełnieniu beczki</button>
             </div>
 
             <div class="weather-grid">
                 <div class="weather-card" id="ui-bme-temp"><div class="weather-val skeleton" id="dash-temp">-</div><div class="weather-lbl">Powietrze</div></div>
                 <div class="weather-card" id="ui-bme-hum"><div class="weather-val skeleton" id="dash-hum">-</div><div class="weather-lbl">Wilgotność</div></div>
                 <div class="weather-card" id="ui-ds-temp"><div class="weather-val skeleton" id="dash-water-temp">-</div><div class="weather-lbl">Temp. Wody</div></div>
-
-                <div class="weather-card" id="ui-light"><div class="weather-val skeleton" id="dash-sun">-</div><div class="weather-lbl">Godz Słońca</div></div>
+                <div class="weather-card" id="ui-light"><div class="weather-val skeleton" id="dash-sun">-</div><div class="weather-lbl">God Słońca</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
                 <div class="weather-card" id="ui-bme-pres"><div class="weather-val skeleton" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
-                
                 <div class="weather-card" id="ui-vent" style="display:none;"><div class="weather-val skeleton" id="dash-vent">-</div><div class="weather-lbl">Wentylacja</div></div>
             </div>
 
@@ -180,6 +174,7 @@
                 <button class="profile-btn" id="prof-arbuz" onclick="aktywujProfil('arbuz')"><span class="profile-icon">🍉</span>Arbuz</button>
                 <button class="profile-btn" id="prof-borowka" onclick="aktywujProfil('borowka')"><span class="profile-icon">🫐</span>Borówka</button>
             </div>
+            <div id="pulpit-toast" style="opacity:0; text-align:center; transition:0.3s; font-weight:600; color:var(--accent-green)"></div>
         </div>
 
         <div id="tab-ustawienia" class="tab-content">
@@ -191,7 +186,7 @@
             <div id="sub-ogolne" class="sub-content active">
                 <h2>Edycja Profili Upraw</h2>
                 <div class="section-card">
-                    <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--glass-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none; -webkit-appearance: none;">
+                    <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none;">
                         <option value="pomidory">🍅 Pomidory</option><option value="ogorki">🥒 Ogórki</option>
                         <option value="sadzonki">🌱 Sadzonki</option><option value="arbuz">🍉 Arbuz</option><option value="borowka">🫐 Borówka</option>
                     </select>
@@ -201,7 +196,7 @@
                     <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
                     <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Agresywność Podlewania</span><span id="edit-aggr-val" style="color:var(--accent-blue);">Zbalansowany</span></div>
                     <input type="range" id="edit-aggr" min="0" max="2" step="1" value="1" oninput="aktualizujEtykieteAgresywnosci(this.value)">
-                    <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany</button>
+                    <button id="btn-save-profile" class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px; width:100%">💾 Zapisz zmiany</button>
                 </div>
 
                 <h2>Lokalizacja i Wygląd</h2>
@@ -223,106 +218,75 @@
                     <div class="chart-container"><canvas id="moistureChart"></canvas></div>
                     <div class="chart-container" id="chart-temp-box"><canvas id="tempChart"></canvas></div>
                     <div class="log-container" id="logBox" style="margin-top: 15px;"><div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div></div>
-                    <button class="btn-test" onclick="eksportujCSV()" style="background: rgba(52, 199, 89, 0.1); color: var(--accent-green); margin-top:15px;">📥 Pobierz raport Excel (.csv)</button>
+                    <button class="btn-test" onclick="eksportujCSV()" style="background: rgba(52, 199, 89, 0.1); color: var(--accent-green); margin-top:15px; width:100%">📥 Pobierz raport Excel (.csv)</button>
                 </div>
                 
                 <h2>Zimowanie Szklarni</h2>
                 <div class="section-card">
-                    <button class="btn-test" onclick="wypompujWode()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-bottom: 12px;">❄️ Wypompuj resztki wody z węży</button>
-                    <button class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red);">💤 Włącz tryb uśpienia na zimę</button>
+                    <button id="btn-wypompuj" class="btn-test" onclick="wypompujWode()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-bottom: 12px; width:100%">❄️ Wypompuj resztki wody z węży</button>
+                    <button id="btn-hibernuj" class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red); width:100%">💤 Włącz tryb uśpienia na zimę</button>
                 </div>
             </div>
 
             <div id="sub-zaawansowane" class="sub-content">
-
                 <h2>🛠 Tryb Serwisowy</h2>
                 <div class="section-card">
                     <p style="font-size: 12px; color: var(--text-sub); margin-top: 0;">Zapobiega uśpieniu procesora i odświeża dane z czujników co 2 sekundy przez 60 minut.</p>
-                    <button id="btn-service-mode" class="btn-test" onclick="toggleServiceMode()" style="background: var(--accent-orange); color: white;">Włącz Tryb Serwisowy</button>
+                    <button id="btn-service-mode" class="btn-test" onclick="toggleServiceMode()" style="background: var(--accent-orange); color: white; width:100%">Włącz Tryb Serwisowy</button>
                     
                     <div id="service-tools" style="display:none; margin-top:15px; border-top: 1px dashed var(--border-light); padding-top:15px;">
                         <div class="eng-data-row"><span>Wolna Pamięć (RAM):</span> <b id="diag-heap">--- KB</b></div>
-                        <button class="btn-test" onclick="forcePumpRun()" style="background: var(--accent-red); color: white; margin-top: 15px;">⚠️ Wymuś 5s pompy (Ignoruj Pływak)</button>
+                        <button id="btn-force-pump" class="btn-test" onclick="forcePumpRun()" style="background: var(--accent-red); color: white; margin-top: 15px; width:100%">⚠️ Wymuś 5s pompy (Ignoruj Pływak)</button>
                     </div>
                 </div>
 
                 <h2>Menedżer Urządzeń (Podłączone Czujniki)</h2>
                 <div class="section-card">
-                    <p style="font-size: 11px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Zaznacz sprzęt, który jest fizycznie wlutowany/podpięty. Moduły odznaczone zostaną zignorowane w algorytmach.</p>
-                    
-                    <div class="toggle-row">
-                        <span>Pływak i Ultradźwięki (JSN-SR04T)</span>
-                        <label class="switch"><input type="checkbox" id="hw-us" onchange="saveHwConfig()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row">
-                        <span>Temp. Wody (DS18B20)</span>
-                        <label class="switch"><input type="checkbox" id="hw-ds" onchange="saveHwConfig()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row">
-                        <span>Pogoda Powietrza (BME280)</span>
-                        <label class="switch"><input type="checkbox" id="hw-bme" onchange="saveHwConfig()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row">
-                        <span>Czujnik Słońca (Fotorezystor)</span>
-                        <label class="switch"><input type="checkbox" id="hw-light" onchange="saveHwConfig()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row" style="border-top: 1px solid var(--range-bg); padding-top:10px;">
-                        <span>Aktywna Wentylacja (Otwieranie Okna na Pin 19)</span>
-                        <label class="switch"><input type="checkbox" id="hw-vent" onchange="saveHwConfig()"><span class="slider"></span></label>
-                    </div>
+                    <p style="font-size: 11px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Zaznacz sprzęt, który jest fizycznie podpięty.</p>
+                    <div class="toggle-row"><span>Pływak i Ultradźwięki (JSN-SR04T)</span><label class="switch"><input type="checkbox" id="hw-us" onchange="saveHwConfig()"><span class="slider"></span></label></div>
+                    <div class="toggle-row"><span>Temp. Wody (DS18B20)</span><label class="switch"><input type="checkbox" id="hw-ds" onchange="saveHwConfig()"><span class="slider"></span></label></div>
+                    <div class="toggle-row"><span>Pogoda Powietrza (BME280)</span><label class="switch"><input type="checkbox" id="hw-bme" onchange="saveHwConfig()"><span class="slider"></span></label></div>
+                    <div class="toggle-row"><span>Czujnik Słońca (Fotorezystor)</span><label class="switch"><input type="checkbox" id="hw-light" onchange="saveHwConfig()"><span class="slider"></span></label></div>
+                    <div class="toggle-row" style="border-top: 1px solid var(--range-bg); padding-top:10px;"><span>Aktywna Wentylacja (Siłownik PIN 19)</span><label class="switch"><input type="checkbox" id="hw-vent" onchange="saveHwConfig()"><span class="slider"></span></label></div>
                 </div>
 
                 <h2>Asystent Kalibracji (Live)</h2>
-                
                 <div class="section-card">
                     <h3 style="margin-top:0; font-size:14px;">🌱 Wilgotność Gleby</h3>
                     <div class="eng-data-row"><span>Odczyt z czujnika:</span> <b id="live-soil-val">---</b></div>
-                    <div style="display:flex; gap:8px; margin-top:10px;">
-                        <button class="btn-test" onclick="zapiszGlebe('air')" style="flex:1; padding:10px; font-size:12px; background:rgba(255,149,0,0.1); color:var(--accent-orange);">Ustaw jako SUCHO</button>
-                        <button class="btn-test" onclick="zapiszGlebe('water')" style="flex:1; padding:10px; font-size:12px; background:rgba(0,122,255,0.1); color:var(--accent-blue);">Ustaw jako MOKRO</button>
-                    </div>
+                    <div style="display:flex; gap:8px; margin-top:10px;"><button id="btn-soil-dry" class="btn-test" onclick="zapiszGlebe('air')" style="flex:1; background:rgba(255,149,0,0.1); color:var(--accent-orange);">SUCHO</button><button id="btn-soil-wet" class="btn-test" onclick="zapiszGlebe('water')" style="flex:1; background:rgba(0,122,255,0.1); color:var(--accent-blue);">MOKRO</button></div>
                 </div>
-
                 <div class="section-card" id="card-calib-us">
                     <h3 style="margin-top:0; font-size:14px;">🛢️ Poziom Wody w Beczce</h3>
-                    <div class="eng-data-row"><span>Odległość tafli od wieka:</span> <b id="live-us-val">--- cm</b></div>
-                    <div style="display:flex; gap:8px; margin-top:10px;">
-                        <button class="btn-test" onclick="zapiszWode('empty')" style="flex:1; padding:10px; font-size:12px; background:rgba(255,59,48,0.1); color:var(--accent-red);">Ustaw PUSTA</button>
-                        <button class="btn-test" onclick="zapiszWode('full')" style="flex:1; padding:10px; font-size:12px; background:rgba(52,199,89,0.1); color:var(--accent-green);">Ustaw PEŁNA</button>
-                    </div>
+                    <div class="eng-data-row"><span>Odległość tafli:</span> <b id="live-us-val">--- cm</b></div>
+                    <div style="display:flex; gap:8px; margin-top:10px;"><button id="btn-water-empty" class="btn-test" onclick="zapiszWode('empty')" style="flex:1; background:rgba(255,59,48,0.1); color:var(--accent-red);">PUSTA</button><button id="btn-water-full" class="btn-test" onclick="zapiszWode('full')" style="flex:1; background:rgba(52,199,89,0.1); color:var(--accent-green);">PEŁNA</button></div>
                 </div>
-
                 <div class="section-card" id="card-calib-ldr">
                     <h3 style="margin-top:0; font-size:14px;">☀️ Światłomierz</h3>
                     <div class="eng-data-row"><span>Surowe natężenie:</span> <b id="live-light-val">---</b></div>
-                    <button class="btn-test" onclick="zapiszSwiatlo()" style="margin-top:10px; background:rgba(255,149,0,0.1); color:var(--accent-orange);">Ustaw jako PEŁNE SŁOŃCE (100%)</button>
+                    <button id="btn-calib-light" class="btn-test" onclick="zapiszSwiatlo()" style="margin-top:10px; background:rgba(255,149,0,0.1); color:var(--accent-orange); width:100%">Ustaw jako SŁOŃCE (100%)</button>
                 </div>
-
                 <div class="section-card" id="card-calib-ds">
                     <h3 style="margin-top:0; font-size:14px;">🌡️ Korekta Temperatury Wody</h3>
-                    <div style="display:flex; align-items:center; justify-content:space-between;">
-                        <span style="font-size:13px; font-weight:600;">Wpisz różnicę (np. -1.5):</span>
-                        <input type="number" id="calib-tOff" class="eng-input" value="0.0" step="0.1" style="width:70px;">
-                    </div>
-                    <button class="btn-test" onclick="zapiszKorekteTemp()" style="margin-top:10px;">💾 Zapisz korektę</button>
+                    <div style="display:flex; align-items:center; justify-content:space-between;"><span>Przesunięcie (np. -1.5):</span><input type="number" id="calib-tOff" class="eng-input" value="0.0" step="0.1" style="width:70px;"></div>
+                    <button id="btn-calib-toff" class="btn-test" onclick="zapiszKorekteTemp()" style="margin-top:10px; width:100%">💾 Zapisz korektę</button>
                 </div>
 
                 <h2>Wydajność Pompy i Testowanie</h2>
                 <div class="section-card">
                     <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
                     <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums;" id="stopwatch-display">00.0s</div>
-                    <button class="btn-test" id="btn-stoper" onclick="toggleStoper()" style="padding: 16px; font-size: 16px;">⏱ Asystent Kalibracji (1 Litr)</button>
+                    <button id="btn-stoper" class="btn-test" onclick="toggleStoper()" style="padding: 16px; font-size: 16px; width:100%">⏱ Asystent Kalibracji (1 Litr)</button>
                     <p id="stoper-result" style="display:none; color: var(--accent-green); text-align:center; font-weight:800; margin-top: 15px;"></p>
-                    
                     <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:25px;"><span>Szybki Test Pompy</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
                     <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
-                    <button class="btn-test" onclick="uruchomTest()">🚀 Uruchom Test</button>
+                    <button id="btn-quick-test" class="btn-test" onclick="uruchomTest()" style="width:100%">🚀 Uruchom Test</button>
                 </div>
 
                 <h2>Aktualizacja Firmware (OTA)</h2>
                 <div class="section-card">
                     <input type="file" id="ota-file" accept=".bin" style="margin-bottom: 15px; width: 100%;">
-                    <button class="btn-test" onclick="wgrywajOTA()" style="color: var(--accent-orange); background: rgba(255, 149, 0, 0.1);">⚡ Wgraj nowy plik .bin</button>
+                    <button id="btn-ota" class="btn-test" onclick="wgrywajOTA()" style="color: var(--accent-orange); background: rgba(255, 149, 0, 0.1); width:100%">⚡ Wgraj plik .bin</button>
                     <div id="ota-progress-container" style="display:none; width: 100%; height: 8px; background: var(--range-bg); border-radius: 4px; margin-top: 15px; overflow: hidden;"><div id="ota-progress-bar" style="height: 100%; width: 0%; background: var(--accent-orange); transition: 0.2s;"></div></div>
                     <div id="ota-status" style="font-size: 12px; font-weight: 600; text-align: center; margin-top: 8px; color: var(--accent-orange);"></div>
                 </div>
@@ -332,288 +296,263 @@
 </div>
 
 <script>
-const domyslneProfile = {
-    'pomidory': { th: 40, time: 3, aggr: 1, name: 'Pomidory' }, 'ogorki': { th: 65, time: 1.5, aggr: 2, name: 'Ogórki' },
-    'sadzonki': { th: 55, time: 0.5, aggr: 1, name: 'Sadzonki' }, 'arbuz': { th: 45, time: 4, aggr: 1, name: 'Arbuz' }, 'borowka': { th: 70, time: 1, aggr: 0, name: 'Borówka' }
-};
+// --- LOGIKA FRONTENDU Z FILTRAMI WEJŚCIOWYMI I ZAMRAŻANIEM STANÓW ---
+let lockConfig = false, lockTank = false, lockCalib = false, lockAction = false;
 
-let profileData = {};
-try { const saved = localStorage.getItem('bazaProfili'); profileData = saved ? JSON.parse(saved) : domyslneProfile; } 
-catch(e) { profileData = domyslneProfile; }
-if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
-if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
-
-let liveSoil = 0, liveUs = 0, liveLight = 0;
-let isServiceModeActive = false;
-let servicePollingInterval = null;
-
-function haptyka(wzor) { if ("vibrate" in navigator) navigator.vibrate(wzor); }
-
-function aktualizujEtykieteAgresywnosci(val) {
-    const etykiety = ["Oszczędny", "Zbalansowany", "Precyzyjny"];
-    document.getElementById('edit-aggr-val').innerText = etykiety[val] || "Błąd";
-}
-
-function zaktualizujUIZESP(th, time, aggr) {
-    document.getElementById('edit-th').value = th; document.getElementById('edit-th-val').innerText = th + '%';
-    document.getElementById('edit-time').value = time; document.getElementById('edit-time-val').innerText = time + ' min';
-    document.getElementById('edit-aggr').value = aggr; aktualizujEtykieteAgresywnosci(aggr);
-
-    document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
-    let znalezionoProfil = false;
-    for (const [id, param] of Object.entries(profileData)) {
-        if (param.th == th && param.time == time && param.aggr == aggr) {
-            document.getElementById('prof-' + id).classList.add('selected');
-            localStorage.setItem("activeProfile", 'prof-' + id);
-            znalezionoProfil = true; break;
+function ustawStanPrzycisku(btnId, isLocking, originalText, loadingText = "⏳ Przetwarzanie...", inputIds = []) {
+    const btn = btnId ? (document.getElementById(btnId) || document.querySelector(`[onclick*="${btnId}"]`)) : null;
+    inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.disabled = isLocking;
+            el.style.opacity = isLocking ? "0.5" : "1";
+            el.style.cursor = isLocking ? "not-allowed" : "auto";
         }
+    });
+    if(!btn) return;
+    if(isLocking) {
+        btn.dataset.originalText = originalText || btn.innerText;
+        btn.innerText = loadingText;
+        btn.style.opacity = "0.5";
+        btn.style.pointerEvents = "none";
+    } else {
+        btn.innerText = btn.dataset.originalText || originalText;
+        btn.style.opacity = "1";
+        btn.style.pointerEvents = "auto";
     }
-    if (!znalezionoProfil) localStorage.removeItem("activeProfile");
 }
 
-function aktywujProfil(id) { ustawProfilZapisz(profileData[id].th, profileData[id].time, profileData[id].aggr, 'prof-' + id, profileData[id].name); }
+function zapiszEdytowanyProfil() {
+    if(lockConfig) return; lockConfig = true; haptyka(15);
+    const id = document.getElementById('edit-profile-select').value;
+    const th = document.getElementById('edit-th').value;
+    const time = document.getElementById('edit-time').value;
+    const aggr = document.getElementById('edit-aggr').value;
+    
+    profileData[id].th = th; profileData[id].time = time; profileData[id].aggr = aggr;
+    localStorage.setItem('bazaProfili', JSON.stringify(profileData));
+    
+    ustawStanPrzycisku('btn-save-profile', true, "💾 Zapisz zmiany", "⏳ Zapisywanie...", ['edit-profile-select', 'edit-th', 'edit-time', 'edit-aggr']);
+    
+    fetch(`/save?thPct=${th}&timeSec=${time * 60}&aggr=${aggr}`)
+    .then(() => { alert(`✅ Zapisano pomyślnie: ${profileData[id].name}`); pobierzDaneZESP32(); })
+    .catch(() => alert("⚠️ Tryb Offline (Zapisano lokalnie)"))
+    .finally(() => { lockConfig = false; ustawStanPrzycisku('btn-save-profile', false, null, null, ['edit-profile-select', 'edit-th', 'edit-time', 'edit-aggr']); });
+}
 
+function zapiszParametryZbiornika() {
+    if(lockTank) return; lockTank = true; haptyka(10);
+    const vol = document.getElementById('tank-vol').value;
+    const flow = document.getElementById('pump-flow').value;
+    ustawStanPrzycisku(null, true, null, null, ['tank-vol', 'pump-flow']);
+    
+    fetch(`/tank?vol=${vol}&flow=${flow}`)
+    .then(() => { pobierzDaneZESP32(); })
+    .catch(() => console.log("Offline"))
+    .finally(() => { lockTank = false; ustawStanPrzycisku(null, false, null, null, ['tank-vol', 'pump-flow']); });
+}
+
+function zapiszGlebe(typ) {
+    if(lockCalib) return; lockCalib = true; haptyka(15);
+    let btnId = (typ === 'air') ? 'btn-soil-dry' : 'btn-soil-wet';
+    ustawStanPrzycisku(btnId, true, (typ === 'air') ? "SUCHO" : "MOKRO");
+    
+    fetch(`/calibrate?${typ}=${liveSoil}`)
+    .then(() => { alert("✅ Skalibrowano pomyślnie."); pobierzDaneZESP32(); })
+    .catch(() => alert("❌ Błąd połączenia."))
+    .finally(() => { lockCalib = false; ustawStanPrzycisku(btnId, false); });
+}
+
+function zapiszWode(typ) {
+    if(lockCalib) return; lockCalib = true; haptyka(15);
+    let btnId = (typ === 'empty') ? 'btn-water-empty' : 'btn-water-full';
+    let pKey = (typ === 'empty') ? 'usMax' : 'usMin';
+    ustawStanPrzycisku(btnId, true, (typ === 'empty') ? "PUSTA" : "PEŁNA");
+    
+    fetch(`/calibrateExtras?${pKey}=${liveUs}`)
+    .then(() => { alert("✅ Poziom beczki zaktualizowany."); pobierzDaneZESP32(); })
+    .catch(() => alert("❌ Błąd połączenia."))
+    .finally(() => { lockCalib = false; ustawStanPrzycisku(btnId, false); });
+}
+
+function zapiszSwiatlo() { 
+    if(lockCalib) return; lockCalib = true; haptyka(15);
+    ustawStanPrzycisku('btn-calib-light', true, "Usetaw jako SŁOŃCE (100%)");
+    fetch(`/calibrateExtras?lMax=${liveLight}`)
+    .then(() => { alert("✅ Skalibrowano światłomierz."); pobierzDaneZESP32(); })
+    .catch(() => alert("❌ Błąd"))
+    .finally(() => { lockCalib = false; ustawStanPrzycisku('btn-calib-light', false); });
+}
+
+function zapiszKorekteTemp() { 
+    if(lockCalib) return; lockCalib = true; haptyka(15);
+    const tOff = document.getElementById('calib-tOff').value; 
+    ustawStanPrzycisku('btn-calib-toff', true, "💾 Zapisz korektę", "⏳ Zapis...", ['calib-tOff']);
+    fetch(`/calibrateExtras?tOff=${tOff}`)
+    .then(() => { alert("✅ Zapisano przesunięcie."); pobierzDaneZESP32(); })
+    .catch(() => alert("❌ Błąd"))
+    .finally(() => { lockCalib = false; ustawStanPrzycisku('btn-calib-toff', false, null, null, ['calib-tOff']); });
+}
+
+function zresetujLicznikWody() { 
+    if(lockAction) return; haptyka([30, 30, 30]); if(!confirm("Wyzerować licznik zużycia wody?")) return;
+    lockAction = true; ustawStanPrzycisku('btn-reset-water', true, "💦 Zresetuj stan po napełnieniu beczki");
+    fetch('/resetWater').then(() => { alert("✅ Wyzerowano."); pobierzDaneZESP32(); }).catch(() => alert("❌ Błąd")).finally(() => { lockAction = false; ustawStanPrzycisku('btn-reset-water', false); });
+}
+
+function wypompujWode() { 
+    if(lockAction) return; haptyka([50, 50, 50]); if(!confirm("Wymusić opróżnianie linii węży?")) return;
+    lockAction = true; ustawStanPrzycisku('btn-wypompuj', true, "❄️ Wypompuj resztki wody z węży", "🌊 Pompowanie...");
+    fetch('/drain').then(() => { alert("❄️ Układ opróżniony."); pobierzDaneZESP32(); }).catch(() => alert("❌ Błąd")).finally(() => { lockAction = false; ustawStanPrzycisku('btn-wypompuj', false); });
+}
+
+function uruchomTest() { 
+    if(lockAction) return; lockAction = true; haptyka(15); const sec = document.getElementById("testSlider").value; 
+    ustawStanPrzycisku('btn-quick-test', true, "🚀 Uruchom Test", `🌊 Praca pompy (${sec}s)...`, ['testSlider']);
+    fetch(`/test?sec=${sec}`).then(r => { if(!r.ok) throw new Error(); alert("🌊 Test pompy zakończony."); }).catch(() => alert("❌ Odmowa przekaźnika."))
+    .finally(() => { lockAction = false; ustawStanPrzycisku('btn-quick-test', false, null, null, ['testSlider']); pobierzDaneZESP32(); }); 
+}
+
+function odblokujPompe() { 
+    if(lockAction) return; haptyka([50, 50, 50]); if(!confirm("Odblokować system po usunięciu awarii?")) return;
+    lockAction = true; fetch('/resetFault').then(() => { alert("✅ Odblokowano."); pobierzDaneZESP32(); }).finally(() => lockAction = false); 
+}
+
+function aktywujHibernacje() { 
+    if(lockAction) return; haptyka([100, 100, 100]); if(!confirm("Uśpić urządzenie na zimę?")) return;
+    lockAction = true; fetch('/hibernate').then(() => alert("❄️ Urządzenie uśpione.")).finally(() => lockAction = false); 
+}
+
+function toggleServiceMode() {
+    if(lockAction) return; lockAction = true; haptyka([50, 50, 50]);
+    let newState = isServiceModeActive ? 0 : 1;
+    ustawStanPrzycisku("btn-service-mode", true, isServiceModeActive ? "Wyłącz Tryb Serwisowy" : "Włącz Tryb Serwisowy");
+    fetch(`/serviceMode?state=${newState}`).then(() => pobierzDaneZESP32()).finally(() => { lockAction = false; ustawStanPrzycisku("btn-service-mode", false); });
+}
+
+function forcePumpRun() {
+    haptyka([100, 50, 100]); if(!confirm("To zignoruje pływak. Uruchomić?")) return;
+    fetch(`/test?sec=5&force=1`).then(() => alert("Wymuszono 5s pracy.")).catch(() => alert("❌ Błąd"));
+}
+
+function saveHwConfig() {
+    haptyka(15);
+    const us = document.getElementById("hw-us").checked ? 1 : 0; const ds = document.getElementById("hw-ds").checked ? 1 : 0;
+    const bme = document.getElementById("hw-bme").checked ? 1 : 0; const light = document.getElementById("hw-light").checked ? 1 : 0;
+    const vent = document.getElementById("hw-vent").checked ? 1 : 0;
+    fetch(`/hwConfig?us=${us}&ds=${ds}&bme=${bme}&light=${light}&vent=${vent}`).then(() => pobierzDaneZESP32());
+}
+
+function ustawLokalizacje(isOutdoors) {
+    if(lockConfig) return; lockConfig = true; haptyka(15);
+    document.getElementById('loc-in').classList.remove('active'); document.getElementById('loc-out').classList.remove('active');
+    isOutdoors === 1 ? document.getElementById('loc-out').classList.add('active') : document.getElementById('loc-in').classList.add('active');
+    fetch(`/location?outdoors=${isOutdoors}`).finally(() => lockConfig = false);
+}
+
+// --- STANDARDOWA KONTROLA INTERFEJSU (Wykresy, Zegar, Rysowanie) ---
+function aktualizujEtykieteAgresywnosci(val) { const etykiety = ["Oszczędny", "Zbalansowany", "Precyzyjny"]; document.getElementById('edit-aggr-val').innerText = etykiety[val]; }
+function aktywujProfil(id) { ustawProfilZapisz(profileData[id].th, profileData[id].time, profileData[id].aggr, 'prof-' + id, profileData[id].name); }
 function wczytajProfilDoEdycji() {
     const p = profileData[document.getElementById('edit-profile-select').value];
     document.getElementById('edit-th').value = p.th; document.getElementById('edit-th-val').innerText = p.th + '%';
     document.getElementById('edit-time').value = p.time; document.getElementById('edit-time-val').innerText = p.time + ' min';
-    document.getElementById('edit-aggr').value = p.aggr !== undefined ? p.aggr : 1; aktualizujEtykieteAgresywnosci(p.aggr !== undefined ? p.aggr : 1);
+    document.getElementById('edit-aggr').value = p.aggr !== undefined ? p.aggr : 1; aktualizujEtykieteAgresywnosci(document.getElementById('edit-aggr').value);
 }
-
-function zapiszEdytowanyProfil() {
-    haptyka(15);
-    const id = document.getElementById('edit-profile-select').value;
-    profileData[id].th = document.getElementById('edit-th').value;
-    profileData[id].time = document.getElementById('edit-time').value;
-    profileData[id].aggr = document.getElementById('edit-aggr').value;
-    localStorage.setItem('bazaProfili', JSON.stringify(profileData));
-    alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
-    if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
+function zmienMotyw(m) {
+    ['light', 'auto', 'dark'].forEach(i => document.getElementById('theme-' + i).classList.remove('active')); document.getElementById('theme-' + m).classList.add('active');
+    if (m === 'auto') { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('theme'); } else { document.documentElement.setAttribute('data-theme', m); localStorage.setItem('theme', m); }
+    const c = localStorage.getItem('lastESPData'); if(c) { try { const p = JSON.parse(c); if(p.data.logs) rysujWykresy(p.data.logs); }catch(e){} }
 }
-
-function zapiszGlebe(typ) {
-    haptyka(15); let url = `/calibrate?`;
-    if (typ === 'air') url += `air=${liveSoil}`; if (typ === 'water') url += `water=${liveSoil}`;
-    fetch(url).then(() => { alert("✅ Zapisano wartość kalibracji gleby!"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
-}
-
-function zapiszWode(typ) {
-    haptyka(15); let url = `/calibrateExtras?`;
-    if (typ === 'empty') url += `usMax=${liveUs}`; if (typ === 'full') url += `usMin=${liveUs}`;
-    fetch(url).then(() => { alert("✅ Zapisano nowy poziom dla beczki!"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
-}
-
-function zapiszSwiatlo() { haptyka(15); fetch(`/calibrateExtras?lMax=${liveLight}`).then(() => { alert("✅ Skalibrowano na 100% słońca!"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-function zapiszKorekteTemp() { haptyka(15); const tOff = document.getElementById('calib-tOff').value; fetch(`/calibrateExtras?tOff=${tOff}`).then(() => { alert("✅ Zapisano przesunięcie temperatury"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-
-let stoperInterval, stoperStartTime, stoperRunning = false;
-function toggleStoper() {
-    const btn = document.getElementById('btn-stoper'), display = document.getElementById('stopwatch-display'), result = document.getElementById('stoper-result');
-    if(!stoperRunning) {
-        stoperStartTime = Date.now(); stoperRunning = true; btn.innerText = "🛑 Zatrzymaj (Mam pełny 1 Litr)"; btn.style.background = "var(--accent-red)"; btn.style.color = "white"; result.style.display = "none";
-        stoperInterval = setInterval(() => { let elapsed = (Date.now() - stoperStartTime) / 1000; display.innerText = elapsed.toFixed(1) + "s"; }, 100); haptyka(15);
-    } else {
-        clearInterval(stoperInterval); stoperRunning = false; btn.innerText = "⏱ Start Stopera"; btn.style.background = "var(--accent-blue)";
-        let finalTime = (Date.now() - stoperStartTime) / 1000; let lPerMin = 60 / finalTime;
-        result.innerText = `Wydajność pompy: ${lPerMin.toFixed(2)} L/min`; result.style.display = "block";
-        document.getElementById('pump-flow').value = lPerMin.toFixed(2); zapiszParametryZbiornika(); haptyka([50, 100, 50]);
-    }
-}
-
-function zapiszParametryZbiornika() {
-    haptyka(10); const vol = document.getElementById('tank-vol').value, flow = document.getElementById('pump-flow').value;
-    fetch(`/tank?vol=${vol}&flow=${flow}`).then(() => { alert("Zapisano parametry zbiornika na ESP32."); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
-}
-
-function zresetujLicznikWody() { haptyka([30, 30, 30]); if(confirm("Czy na pewno wyzerować licznik?")) fetch('/resetWater').then(() => { alert("✅ Licznik wyzerowany."); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-function wypompujWode() { haptyka([50, 50, 50]); if(confirm("Pompa będzie pracować aż do braku wody. Kontynuować?")) fetch('/drain').then(() => { alert("❄️ Rozpoczęto opróżnianie."); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-
-function zmienMotyw(motyw) {
-    haptyka(10);
-    ['light', 'auto', 'dark'].forEach(m => document.getElementById('theme-' + m).classList.remove('active'));
-    document.getElementById('theme-' + motyw).classList.add('active');
-    if (motyw === 'auto') { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('theme'); }
-    else { document.documentElement.setAttribute('data-theme', motyw); localStorage.setItem('theme', motyw); }
-    const cachedData = localStorage.getItem('lastESPData'); if(cachedData) { try { const p = JSON.parse(cachedData); if(p.data && p.data.logs) rysujWykresy(p.data.logs); } catch(e) {} }
-}
-
-function zmienZakladke(tab) {
-    haptyka(15);
-    ['pulpit', 'ustawienia'].forEach(t => { document.getElementById('btn-' + t).classList.remove('active'); document.getElementById('tab-' + t).classList.remove('active'); });
-    document.getElementById('btn-' + tab).classList.add('active'); document.getElementById('tab-' + tab).classList.add('active');
-}
-
-function zmienPodzakladke(tab) {
-    haptyka(10);
-    ['ogolne', 'zaawansowane'].forEach(t => { document.getElementById('btn-sub-' + t).classList.remove('active'); document.getElementById('sub-' + t).classList.remove('active'); });
-    document.getElementById('btn-sub-' + tab).classList.add('active'); document.getElementById('sub-' + tab).classList.add('active');
-}
+function zmienZakladke(t) { ['pulpit', 'ustawienia'].forEach(i => { document.getElementById('btn-' + i).classList.remove('active'); document.getElementById('tab-' + i).classList.remove('active'); }); document.getElementById('btn-' + t).classList.add('active'); document.getElementById('tab-' + t).classList.add('active'); }
+function zmienPodzakladke(t) { ['ogolne', 'zaawansowane'].forEach(i => { document.getElementById('btn-sub-' + i).classList.remove('active'); document.getElementById('sub-' + i).classList.remove('active'); }); document.getElementById('btn-sub-' + t).classList.add('active'); document.getElementById('sub-' + t).classList.add('active'); }
 
 function wyliczZegarAstronomiczny() {
-    const lat = 52.0, lon = 19.0;
-    const now = new Date();
-    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+    const lat = 52.0, lon = 19.0; const now = new Date(); const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
     const gamma = (2 * Math.PI / 365) * (dayOfYear - 1 + 0.5);
     const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
     const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
     const ha = Math.acos((Math.cos(90.833 * Math.PI / 180) / (Math.cos(lat * Math.PI / 180) * Math.cos(decl))) - Math.tan(lat * Math.PI / 180) * Math.tan(decl));
-    const sunriseUTC = 720 - 4 * (lon + ha * 180 / Math.PI) - eqTime;
-    const sunsetUTC  = 720 - 4 * (lon - ha * 180 / Math.PI) - eqTime;
-    const tzOffset = -now.getTimezoneOffset(); 
-    let localSunrise = Math.round(sunriseUTC + tzOffset), localSunset = Math.round(sunsetUTC + tzOffset);
-    if (localSunrise < 0) localSunrise += 1440; if (localSunset >= 1440) localSunset -= 1440;
-    return { sr: localSunrise, ss: localSunset };
+    let s = Math.round(720 - 4 * (lon + ha * 180 / Math.PI) - eqTime - now.getTimezoneOffset());
+    let e = Math.round(720 - 4 * (lon - ha * 180 / Math.PI) - eqTime - now.getTimezoneOffset());
+    return { sr: s < 0 ? s+1440 : s, ss: e >= 1440 ? e-1440 : e };
 }
 
-window.onload = function() {
-    wczytajProfilDoEdycji(); zmienMotyw(localStorage.getItem('theme') || 'auto');
-    const act = localStorage.getItem("activeProfile"); if(act && document.getElementById(act)) document.getElementById(act).classList.add('selected');
-    const cachedData = localStorage.getItem('lastESPData');
-    if(cachedData) { try { const parsed = JSON.parse(cachedData); renderujDane(parsed.data, parsed.timestamp, false); } catch(e) {} }
-    else document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
-    const sunData = wyliczZegarAstronomiczny();
-    fetch(`/sync?t=${Math.floor(Date.now() / 1000)}&sr=${sunData.sr}&ss=${sunData.ss}`).catch(()=>{});
-    pobierzDaneZESP32();
+function pobierzDaneZESP32() {
+    if(!isServiceModeActive) { const b = document.getElementById('update-badge-btn'); if(b) b.classList.add('syncing'); }
+    fetch('/data').then(r => r.json()).then(data => {
+        localStorage.setItem('lastESPData', JSON.stringify({ data: data, timestamp: Date.now() })); renderujDane(data, Date.now(), false);
+    }).catch(() => {
+        const c = localStorage.getItem('lastESPData'), ds = wyliczZegarAstronomiczny();
+        if(!c) renderujDane({temp: 32.5, air_hum: 88, pressure: 1012.5, voltage: 3.95, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: ds.sr, ss: ds.ss, batt_warn: 0, us_max: 90, us_dist: 45, raw_adc: 2100, raw_light: 3500, service_mode: 0, free_heap: 45000, hw: {us:1, ds:1, bme:1, light:1, vent:0}, logs: [{moisture: 42, v: 3.95, t: 32.1, h: 88, action: "BLOKADA (SAUNA)"}]}, Date.now(), true);
+        else renderujDane(JSON.parse(c).data, JSON.parse(c).timestamp, true);
+    }).finally(() => { const b = document.getElementById('update-badge-btn'); if(b && !isServiceModeActive) setTimeout(() => b.classList.remove('syncing'), 500); });
 }
 
-function sformatujCzas(timestamp) {
-    const minuty = Math.floor((Date.now() - timestamp) / 60000);
-    if (minuty < 1) return "przed chwilą"; if (minuty < 60) return `${minuty} min temu`;
-    return `${Math.floor(minuty / 60)} godz. temu`;
-}
-
-function formatujMinuty(minutyOdPolnocy) {
-    if(!minutyOdPolnocy || isNaN(minutyOdPolnocy)) return "-";
-    const h = Math.floor(minutyOdPolnocy / 60).toString().padStart(2, '0');
-    const m = (minutyOdPolnocy % 60).toString().padStart(2, '0');
-    return `${h}:${m}`;
-}
-
-function rysujProstyWykres(canvasId, daneArray, kolorLinii, minVal, maxVal) {
-    const canvas = document.getElementById(canvasId); if(!canvas) return; const ctx = canvas.getContext('2d');
-    const rect = canvas.parentElement.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr);
-    const drawW = rect.width - 20, drawH = rect.height - 20; ctx.clearRect(0, 0, rect.width, rect.height);
-    if(!daneArray || daneArray.length === 0) return;
-    const stepX = drawW / Math.max(1, daneArray.length - 1);
-    ctx.beginPath(); ctx.strokeStyle = kolorLinii; ctx.lineWidth = 3; ctx.lineJoin = 'round';
-    daneArray.forEach((val, i) => {
-        let bVal = Math.max(minVal, Math.min(val, maxVal)); const percent = (bVal - minVal) / (maxVal - minVal);
-        const x = 10 + (i * stepX), y = 10 + drawH - (percent * drawH);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }); ctx.stroke();
-    ctx.fillStyle = kolorLinii;
-    daneArray.forEach((val, i) => {
-        let bVal = Math.max(minVal, Math.min(val, maxVal)); const percent = (bVal - minVal) / (maxVal - minVal);
-        const x = 10 + (i * stepX), y = 10 + drawH - (percent * drawH);
-        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
-    });
-}
-
-function rysujWykresy(logi) {
-    const dane = [...logi].reverse(), rs = getComputedStyle(document.documentElement);
-    rysujProstyWykres('moistureChart', dane.map(l => l.moisture), rs.getPropertyValue('--accent-blue').trim()||'#007aff', 0, 100);
-    rysujProstyWykres('tempChart', dane.map(l => l.t || 20), rs.getPropertyValue('--accent-red').trim()||'#ff3b30', 0, 50);
-    rysujProstyWykres('humChart', dane.map(l => l.h || 50), rs.getPropertyValue('--accent-cyan').trim()||'#32ade6', 0, 100);
-    rysujProstyWykres('batteryChart', dane.map(l => l.v || 3.5), rs.getPropertyValue('--accent-orange').trim()||'#ff9500', 3.2, 4.3);
-}
-
-function renderujDane(data, timestamp, trybDemo = false) {
+function renderujDane(data, timestamp, demo = false) {
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
-    
     liveSoil = data.raw_adc; liveUs = data.us_dist; liveLight = data.raw_light;
-    document.getElementById('live-soil-val').innerText = (liveSoil !== undefined) ? liveSoil : "---";
+    document.getElementById('live-soil-val').innerText = liveSoil || "---";
     document.getElementById('live-us-val').innerText = (liveUs !== undefined) ? liveUs + " cm" : "--- cm";
-    document.getElementById('live-light-val').innerText = (liveLight !== undefined) ? liveLight : "---";
+    document.getElementById('live-light-val').innerText = liveLight || "---";
     if(data.t_off !== undefined) document.getElementById("calib-tOff").value = data.t_off;
 
-    // Aktualizacja Toggle Switches z Hardware (Menedżer urządzeń)
     if(data.hw) {
-        document.getElementById("hw-us").checked = data.hw.us === 1;
-        document.getElementById("hw-ds").checked = data.hw.ds === 1;
-        document.getElementById("hw-bme").checked = data.hw.bme === 1;
-        document.getElementById("hw-light").checked = data.hw.light === 1;
+        document.getElementById("hw-us").checked = data.hw.us === 1; document.getElementById("hw-ds").checked = data.hw.ds === 1;
+        document.getElementById("hw-bme").checked = data.hw.bme === 1; document.getElementById("hw-light").checked = data.hw.light === 1;
         document.getElementById("hw-vent").checked = data.hw.vent === 1;
-
-        // Dynamiczne ukrywanie kafli na podstawie HW config
         document.getElementById("ui-water-module").style.display = data.hw.us ? "flex" : "none";
         document.getElementById("card-param-zb").style.display = data.hw.us ? "block" : "none";
         document.getElementById("title-param-zb").style.display = data.hw.us ? "block" : "none";
         document.getElementById("card-calib-us").style.display = data.hw.us ? "block" : "none";
-        
         document.getElementById("ui-ds-temp").style.display = data.hw.ds ? "block" : "none";
         document.getElementById("card-calib-ds").style.display = data.hw.ds ? "block" : "none";
-
         document.getElementById("ui-bme-temp").style.display = data.hw.bme ? "block" : "none";
         document.getElementById("ui-bme-hum").style.display = data.hw.bme ? "block" : "none";
         document.getElementById("ui-bme-pres").style.display = data.hw.bme ? "block" : "none";
         document.getElementById("chart-temp-box").style.display = data.hw.bme ? "block" : "none";
-
         document.getElementById("ui-light").style.display = data.hw.light ? "block" : "none";
         document.getElementById("card-calib-ldr").style.display = data.hw.light ? "block" : "none";
-
         document.getElementById("ui-vent").style.display = data.hw.vent ? "block" : "none";
         if(data.hw.vent) document.getElementById("dash-vent").innerText = (data.vent_state == 1) ? "OTWARTE" : "ZAMKNIĘTE";
     }
 
-    // Tryb Serwisowy UI
     if(data.service_mode !== undefined) {
-        isServiceModeActive = (data.service_mode == 1);
-        const btnService = document.getElementById("btn-service-mode");
+        isServiceModeActive = (data.service_mode == 1); const sBanner = document.getElementById("service-banner"), sTools = document.getElementById("service-tools"), sBtn = document.getElementById("btn-service-mode");
         if(isServiceModeActive) {
-            document.getElementById("service-banner").style.display = "block";
-            document.getElementById("service-tools").style.display = "block";
-            btnService.innerText = "Wyłącz Tryb Serwisowy";
-            btnService.style.background = "var(--text-sub)";
+            sBanner.style.display = "block"; sTools.style.display = "block"; sBtn.innerText = "Wyłącz Tryb Serwisowy"; sBtn.style.background = "var(--text-sub)";
             document.getElementById("diag-heap").innerText = (data.free_heap / 1024).toFixed(1) + " KB";
-            
-            // Odświeżanie co 2 sekundy w tle
-            if(!servicePollingInterval && !trybDemo) {
-                servicePollingInterval = setInterval(pobierzDaneZESP32, 2000);
-            }
+            if(!servicePollingInterval && !demo) servicePollingInterval = setInterval(pobierzDaneZESP32, 2000);
         } else {
-            document.getElementById("service-banner").style.display = "none";
-            document.getElementById("service-tools").style.display = "none";
-            btnService.innerText = "Włącz Tryb Serwisowy";
-            btnService.style.background = "var(--accent-orange)";
+            sBanner.style.display = "none"; sTools.style.display = "none"; sBtn.innerText = "Włącz Tryb Serwisowy"; sBtn.style.background = "var(--accent-orange)";
             if(servicePollingInterval) { clearInterval(servicePollingInterval); servicePollingInterval = null; }
         }
     }
 
-    if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_aggr !== undefined) zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_aggr);
+    if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_aggr !== undefined && !lockConfig) zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_aggr);
     
-    document.getElementById("dash-temp").innerText = (data.temp !== undefined && data.temp > 0) ? data.temp.toFixed(1) + "°" : "-";
-    document.getElementById("dash-hum").innerText = (data.air_hum !== undefined && data.air_hum > 0) ? data.air_hum.toFixed(0) + "%" : "-";
+    document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp.toFixed(1) + "°" : "-";
+    document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum.toFixed(0) + "%" : "-";
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
     document.getElementById("dash-water-temp").innerText = (data.water_temp && data.water_temp > 0) ? data.water_temp.toFixed(1) + "°" : "-";
     document.getElementById("dash-sun").innerText = (data.sun_hours !== undefined) ? data.sun_hours + " h" : "-";
-    document.getElementById("dash-sunrise").innerText = formatujMinuty(data.sr);
-    document.getElementById("dash-sunset").innerText = formatujMinuty(data.ss);
+    document.getElementById("dash-sunrise").innerText = formatujMinuty(data.sr); document.getElementById("dash-sunset").innerText = formatujMinuty(data.ss);
 
     if(data.pump_sec !== undefined && data.hw && data.hw.us) {
         let tVol = data.tank_vol || 220, fRate = data.pump_flow || 2.0, remLiters = 0, pct = 0;
         if (data.us_dist !== undefined && data.us_dist > 0 && data.us_max !== undefined && data.us_min !== undefined) {
-            pct = Math.max(0, Math.min(100, Math.round(100 - (((data.us_dist - data.us_min) / (data.us_max - data.us_min)) * 100))));
-            remLiters = (pct / 100.0) * tVol;
+            pct = Math.max(0, Math.min(100, Math.round(100 - (((data.us_dist - data.us_min) / (data.us_max - data.us_min)) * 100)))); remLiters = (pct / 100.0) * tVol;
         } else {
-            remLiters = Math.max(0, tVol - ((data.pump_sec / 60) * fRate));
-            pct = Math.max(0, Math.min(100, Math.round((remLiters / tVol) * 100)));
+            remLiters = Math.max(0, tVol - ((data.pump_sec / 60) * fRate)); pct = Math.max(0, Math.min(100, Math.round((remLiters / tVol) * 100)));
         }
-        
         document.getElementById("water-height-controller").style.bottom = (-800 + (100 * (pct / 100))) + "px";
-        document.getElementById("dash-water-pct").innerText = pct + "%";
-        document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
-
+        document.getElementById("dash-water-pct").innerText = pct + "%"; document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
         let estStr = "Brak danych";
         if (document.querySelector('.profile-btn.selected') && data.cfg_time) {
             let litersPerDay = ((data.cfg_aggr == 2) ? 4 : (data.cfg_aggr == 1 ? 3 : 2)) * (data.cfg_time * fRate);
-            if (litersPerDay > 0) {
-                let days = Math.floor(remLiters / litersPerDay);
-                estStr = days > 14 ? "Zapas na ponad 2 tyg." : (days > 1 ? `Wystarczy na ok. ${days} dni` : (days === 1 ? `Wystarczy na 1 dzień` : `Woda się kończy!`));
-            }
+            if (litersPerDay > 0) { let days = Math.floor(remLiters / litersPerDay); estStr = days > 14 ? "Zapas na ponad 2 tyg." : (days > 1 ? `Wystarczy na ok. ${days} dni` : (days === 1 ? `Wystarczy na 1 dzień` : `Woda się kończy!`)); }
         }
-        document.getElementById("dash-water-est").innerText = estStr;
-        document.getElementById("dash-water-pct").style.color = pct <= 15 ? "var(--accent-red)" : "var(--text-main)";
+        document.getElementById("dash-water-est").innerText = estStr; document.getElementById("dash-water-pct").style.color = pct <= 15 ? "var(--accent-red)" : "var(--text-main)";
         pct <= 15 ? document.getElementById("tank-mask").classList.add("alert") : document.getElementById("tank-mask").classList.remove("alert");
     }
 
@@ -625,16 +564,15 @@ function renderujDane(data, timestamp, trybDemo = false) {
     if (data.voltage) {
         document.getElementById("eng-voltage").innerText = data.voltage.toFixed(3) + " V";
         let pct = Math.max(0, Math.min(100, Math.round(((data.voltage - 3.2) / 1.0) * 100)));
-        let bEl = document.getElementById("dash-batt"); bEl.innerText = (data.voltage >= 4.4 ? "⚡ " : "") + pct + "%"; bEl.style.color = pct <= 20 ? "var(--accent-red)" : "var(--text-main)";
+        document.getElementById("dash-batt").innerText = (data.voltage >= 4.4 ? "⚡ " : "") + pct + "%";
     }
 
-    if(!isServiceModeActive) document.getElementById("last-update-text").innerText = (timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Zaktualizowano przed chwilą") + (trybDemo ? " (Demo)" : "");
-    else document.getElementById("last-update-text").innerText = "Połączono (Live Data 🟢)";
+    document.getElementById("last-update-text").innerText = isServiceModeActive ? "Połączono (Live Data 🟢)" : (timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Przed chwilą") + (demo ? " (Demo)" : "");
 
     const hI = document.getElementById("hero-icon"), hT = document.getElementById("hero-text"), uB = document.getElementById("fault-unlock-btn"), pC = document.getElementById("plants-container"), pT = document.getElementById("plants-title");
     uB.style.display = "none"; pC.style.display = "flex"; pT.style.display = "block";
 
-    if(data.batt_warn === 1) { hI.innerText = "🔋"; hI.classList.add("pulse-alert"); hT.innerText = "Spadek pojemności Akumulatora!"; hT.style.color = "var(--accent-orange)"; }
+    if(data.batt_warn === 1) { hI.innerText = "🔋"; hI.classList.add("pulse-alert"); hT.innerText = "Spadek pojemności Aku!"; hT.style.color = "var(--accent-orange)"; }
     else if(data.survival === 1) { hI.innerText = "🔋"; hI.classList.add("pulse-alert"); hT.innerText = "Tryb przetrwania (Słaba Bateria)"; hT.style.color = "var(--accent-orange)"; }
     else if(data.fault === 1) { hI.innerText = "🔥"; hI.classList.add("pulse-alert"); hT.innerText = "AWARIA POMPY!"; hT.style.color = "var(--accent-red)"; uB.style.display = "block"; pC.style.display = "none"; pT.style.display = "none"; }
     else if(data.water === "EMPTY") { hI.innerText = "⚠️"; hI.classList.add("pulse-alert"); hT.innerText = "Dolej wody do beczki!"; hT.style.color = "var(--accent-red)"; }
@@ -654,81 +592,49 @@ function renderujDane(data, timestamp, trybDemo = false) {
     }
 }
 
-function pobierzDaneZESP32() {
-    if(!isServiceModeActive) { haptyka(10); const badge = document.getElementById('update-badge-btn'); if(badge) badge.classList.add('syncing'); }
-    fetch('/data').then(r => r.json()).then(data => {
-        localStorage.setItem('lastESPData', JSON.stringify({ data: data, timestamp: Date.now() })); renderujDane(data, Date.now(), false);
-    }).catch(() => {
-        const cached = localStorage.getItem('lastESPData'), ds = wyliczZegarAstronomiczny();
-        if(!cached) renderujDane({temp: 32.5, air_hum: 88, pressure: 1012.5, voltage: 3.95, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: ds.sr, ss: ds.ss, batt_warn: 0, us_max: 90, us_dist: 45, raw_adc: 2100, raw_light: 3500, service_mode: 0, free_heap: 45000, hw: {us:1, ds:1, bme:1, light:1, vent:0}, logs: [{moisture: 42, v: 3.95, t: 32.1, h: 88, action: "BLOKADA (SAUNA)"}]}, Date.now(), true);
-        else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
-    }).finally(() => { const badge = document.getElementById('update-badge-btn'); if(badge && !isServiceModeActive) setTimeout(() => badge.classList.remove('syncing'), 500); });
-}
+let servicePollingInterval = null;
+function formatujMinuty(m) { if(!m || isNaN(m)) return "-"; return Math.floor(m / 60).toString().padStart(2, '0') + ":" + (m % 60).toString().padStart(2, '0'); }
+function sformatujCzas(t) { let m = Math.floor((Date.now() - t) / 60000); if (m < 1) return "przed chwilą"; if (m < 60) return `${m} min temu`; return `${Math.floor(m / 60)} godz. temu`; }
 
-// Funkcje Trybu Serwisowego
-function toggleServiceMode() {
-    haptyka([50, 50, 50]);
-    let newState = isServiceModeActive ? 0 : 1;
-    fetch(`/serviceMode?state=${newState}`).then(() => { pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
+function rysujProstyWykres(id, arr, col, minV, maxV) {
+    const c = document.getElementById(id); if(!c) return; const ctx = c.getContext('2d'); const r = c.parentElement.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    c.width = r.width * dpr; c.height = r.height * dpr; ctx.scale(dpr, dpr); const dW = r.width - 20, dH = r.height - 20; ctx.clearRect(0, 0, r.width, r.height);
+    if(arr.length === 0) return; const sX = dW / Math.max(1, arr.length - 1);
+    ctx.beginPath(); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+    arr.forEach((v, i) => { let b = Math.max(minV, Math.min(v, maxV)); const p = (b - minV) / (maxV - minV); const x = 10 + (i * sX), y = 10 + dH - (p * dH); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }); ctx.stroke();
+    ctx.fillStyle = col; arr.forEach((v, i) => { let b = Math.max(minV, Math.min(v, maxV)); const p = (b - minV) / (maxV - minV); const x = 10 + (i * sX), y = 10 + dH - (p * dH); ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); });
 }
-
-function saveHwConfig() {
-    haptyka(15);
-    const us = document.getElementById("hw-us").checked ? 1 : 0;
-    const ds = document.getElementById("hw-ds").checked ? 1 : 0;
-    const bme = document.getElementById("hw-bme").checked ? 1 : 0;
-    const light = document.getElementById("hw-light").checked ? 1 : 0;
-    const vent = document.getElementById("hw-vent").checked ? 1 : 0;
-    
-    fetch(`/hwConfig?us=${us}&ds=${ds}&bme=${bme}&light=${light}&vent=${vent}`)
-    .then(() => { pobierzDaneZESP32(); })
-    .catch(() => alert("⚠️ Tryb Offline"));
+function rysujWykresy(logi) {
+    const d = [...logi].reverse(), rs = getComputedStyle(document.documentElement);
+    rysujProstyWykres('moistureChart', d.map(l => l.moisture), rs.getPropertyValue('--accent-blue').trim()||'#007aff', 0, 100);
+    rysujProstyWykres('tempChart', d.map(l => l.t || 20), rs.getPropertyValue('--accent-red').trim()||'#ff3b30', 0, 50);
 }
-
-function forcePumpRun() {
-    haptyka([100, 50, 100]);
-    if(confirm("To pominie WSZYSTKIE blokady (nawet brak wody). Jesteś pewien?")) {
-        fetch(`/test?sec=5&force=1`).then(() => alert("Wymuszono 5 sekund pracy pompy.")).catch(() => alert("⚠️ Tryb Offline"));
+function toggleStoper() {
+    const b = document.getElementById('btn-stoper'), d = document.getElementById('stopwatch-display'), r = document.getElementById('stoper-result');
+    if(!stoperRunning) {
+        stoperStartTime = Date.now(); stoperRunning = true; b.innerText = "🛑 Zatrzymaj (Mam pełny 1 Litr)"; b.style.background = "var(--accent-red)"; b.style.color = "white"; r.style.display = "none";
+        stoperInterval = setInterval(() => { d.innerText = ((Date.now() - stoperStartTime) / 1000).toFixed(1) + "s"; }, 100); haptyka(15);
+    } else {
+        clearInterval(stoperInterval); stoperRunning = false; b.innerText = "⏱ Start Stopera"; b.style.background = "var(--accent-blue)";
+        let f = (Date.now() - stoperStartTime) / 1000; let l = 60 / f; r.innerText = `Wydajność pompy: ${l.toFixed(2)} L/min`; r.style.display = "block";
+        document.getElementById('pump-flow').value = l.toFixed(2); zapiszParametryZbiornika(); haptyka([50, 100, 50]);
     }
 }
-
-function ustawProfilZapisz(th, time, aggr, btnId, name) {
-    haptyka([15, 50, 15]); document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
-    document.getElementById(btnId).classList.add('selected'); localStorage.setItem("activeProfile", btnId);
-    const toast = document.getElementById("pulpit-toast"); toast.style.opacity = "1"; toast.innerText = "⏳ Wysyłanie...";
-    fetch(`/save?thPct=${th}&timeSec=${time * 60}&aggr=${aggr}`).then(() => { toast.innerText = "✓ Zapisano ustawienia: " + name; pobierzDaneZESP32(); }).catch(() => { toast.innerText = "✓ (Demo) Ustawiono lokalnie"; setTimeout(() => toast.style.opacity = "0", 3000); });
-}
-
-function ustawLokalizacje(isOutdoors) {
-    haptyka(15); document.getElementById('loc-in').classList.remove('active'); document.getElementById('loc-out').classList.remove('active');
-    isOutdoors === 1 ? document.getElementById('loc-out').classList.add('active') : document.getElementById('loc-in').classList.add('active');
-    fetch(`/location?outdoors=${isOutdoors}`).then(() => alert("Zaktualizowano profil.")).catch(() => alert("⚠️ Tryb Offline"));
-}
-
-function uruchomTest() { haptyka(15); const sec = document.getElementById("testSlider").value; fetch(`/test?sec=${sec}`).then(() => alert(`🌊 Test pompy (${sec}s) aktywny.`)).catch(() => alert("❌ Tryb offline.")); }
-
 function eksportujCSV() {
-    haptyka(15); const cached = localStorage.getItem('lastESPData'); if(!cached) return alert("Brak danych.");
-    const logs = JSON.parse(cached).data.logs; if(!logs) return;
-    let csv = "data:text/csv;charset=utf-8,ID,Wilgotnosc_Pct,Temperatura_C,Wilgotnosc_Powietrza_Pct,Napiecie_V,Zarejestrowana_Akcja\n"; 
+    const c = localStorage.getItem('lastESPData'); if(!c) return alert("Brak danych."); const logs = JSON.parse(c).data.logs; if(!logs) return;
+    let csv = "data:text/csv;charset=utf-8,ID,Wilgotnosc_Pct,Temperatura_C,Wilgotnosc_Powietrza_Pct,Napiecie_V,Akcja\n"; 
     logs.forEach((l, i) => csv += `${i + 1},${l.moisture},${l.t || "-"},${l.h || "-"},${l.v || "-"},${l.action}\n`);
     const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "szklarnia_raport.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
-
-function odblokujPompe() { haptyka([50, 50, 50]); if(confirm("Usunąłeś awarię fizyczną. Odblokować?")) fetch('/resetFault').then(() => { alert("✅ Odblokowano"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-function aktywujHibernacje() { haptyka([100, 100, 100]); if(confirm("Uśpić szklarnię na stałe?")) fetch('/hibernate').then(() => { alert("❄️ Urządzenie uśpione."); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
-
 function wgrywajOTA() {
-    const file = document.getElementById('ota-file').files[0]; if(!file || !file.name.endsWith('.bin')) return alert("Wybierz plik .bin!");
-    haptyka([20, 50, 20]); const status = document.getElementById('ota-status'), bar = document.getElementById('ota-progress-bar');
-    status.innerText = "Nawiązywanie połączenia..."; document.getElementById('ota-progress-container').style.display = "block"; bar.style.width = "0%";
-    const fd = new FormData(); fd.append("update", file, file.name); const xhr = new XMLHttpRequest(); xhr.open("POST", "/update", true);
-    xhr.upload.addEventListener("progress", e => { if (e.lengthComputable) { bar.style.width = (e.loaded / e.total) * 100 + "%"; status.innerText = `Przesyłanie: ${Math.round((e.loaded / e.total) * 100)}%`; }});
-    xhr.onload = () => { if (xhr.status === 200) { status.innerText = "✅ Sukces! Restart..."; bar.style.background = "var(--accent-green)"; haptyka([50, 100, 50, 100, 50]); } else status.innerText = "❌ Błąd."; };
-    xhr.onerror = () => { status.innerText = "❌ Błąd sieci."; bar.style.background = "var(--accent-red)"; }; xhr.send(fd);
+    const f = document.getElementById('ota-file').files[0]; if(!f || !f.name.endsWith('.bin')) return alert("Wybierz plik .bin!"); haptyka([20, 50, 20]);
+    const s = document.getElementById('ota-status'), bar = document.getElementById('ota-progress-bar');
+    s.innerText = "Łączenie..."; document.getElementById('ota-progress-container').style.display = "block"; bar.style.width = "0%";
+    const fd = new FormData(); fd.append("update", f, f.name); const xhr = new XMLHttpRequest(); xhr.open("POST", "/update", true);
+    xhr.upload.addEventListener("progress", e => { if (e.lengthComputable) { bar.style.width = (e.loaded / e.total) * 100 + "%"; s.innerText = `Przesyłanie: ${Math.round((e.loaded / e.total) * 100)}%`; }});
+    xhr.onload = () => { if (xhr.status === 200) { s.innerText = "✅ Sukces! Restart..."; bar.style.background = "var(--accent-green)"; haptyka([50, 100, 50, 100, 50]); } else s.innerText = "❌ Błąd."; }; xhr.send(fd);
 }
-
-window.addEventListener('resize', () => { const cached = localStorage.getItem('lastESPData'); if(cached) { try { const p = JSON.parse(cached); if(p.data && p.data.logs) rysujWykresy(p.data.logs); } catch(e) {} } });
+window.addEventListener('resize', () => { const c = localStorage.getItem('lastESPData'); if(c) { try { const p = JSON.parse(c); if(p.data.logs) rysujWykresy(p.data.logs); }catch(e){} } });
 </script>
 </body>
 </html>
