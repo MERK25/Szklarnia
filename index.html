@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Szklarnia Kontrola</title>
+    <title>Szklarnia Pro</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -228,6 +228,7 @@
                     <div class="tank-text-overlay">
                         <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">--%</span>
                         <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">-- / -- L</span>
+                        <span id="dash-water-est" style="font-size: 10px; font-weight: 700; color: var(--text-main); opacity: 0.75; margin-top: 4px;">Szacowanie...</span>
                     </div>
                 </div>
 
@@ -241,7 +242,7 @@
 
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-sun">-</div><div class="weather-lbl">Godziny Słońca</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
-                <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
                 
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-sunrise">-</div><div class="weather-lbl">Wschód (Dziś)</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-sunset">-</div><div class="weather-lbl">Zachód (Dziś)</div></div>
@@ -357,6 +358,15 @@
                     <button class="btn-test" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz kalibrację gleby</button>
                 </div>
 
+                <h2>Kalibracja Zaawansowanych Sensorów</h2>
+                <div class="section-card">
+                    <div class="eng-data-row"><span>Offset temp. wody:</span><input type="number" id="calib-tOff" class="eng-input" value="0.0" step="0.1"></div>
+                    <div class="eng-data-row"><span>Odległość do dna (cm):</span><input type="number" id="calib-usDno" class="eng-input" value="90"></div>
+                    <div class="eng-data-row"><span>Max Światło (ADC):</span><input type="number" id="calib-lMax" class="eng-input" value="4095"></div>
+                    <button class="btn-test" onclick="zapiszKalibracjeExtras()" style="margin-top: 15px;">📡 Zapisz kalibrację sensorów</button>
+                    <button class="btn-test" onclick="ustawAktualneSwiatlo()" style="background: rgba(255, 149, 0, 0.1); margin-top: 8px;">☀️ Ustaw jako "Pełne Słońce"</button>
+                </div>
+
                 <h2>Aktualizacja Firmware (OTA)</h2>
                 <div class="section-card">
                     <label style="font-size: 12px; color: var(--text-sub); display:block; margin-bottom: 6px;">Wybierz skompilowany plik .bin</label>
@@ -424,7 +434,7 @@ function wczytajProfilDoEdycji() {
     const p = profileData[document.getElementById('edit-profile-select').value];
     document.getElementById('edit-th').value = p.th; document.getElementById('edit-th-val').innerText = p.th + '%';
     document.getElementById('edit-time').value = p.time; document.getElementById('edit-time-val').innerText = p.time + ' min';
-    document.getElementById('edit-aggr').value = p.aggr || 1; aktualizujEtykieteAgresywnosci(p.aggr || 1);
+    document.getElementById('edit-aggr').value = p.aggr !== undefined ? p.aggr : 1; aktualizujEtykieteAgresywnosci(p.aggr !== undefined ? p.aggr : 1);
 }
 
 function zapiszEdytowanyProfil() {
@@ -722,6 +732,21 @@ function renderujDane(data, timestamp, trybDemo = false) {
         document.getElementById("water-height-controller").style.bottom = calculatedBottom + "px";
         document.getElementById("dash-water-pct").innerText = pct + "%";
         document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
+
+        let activeProfileEl = document.querySelector('.profile-btn.selected');
+        let dailyEstimateStr = "Brak danych";
+        if (activeProfileEl && data.cfg_time) {
+            let wateringsPerDay = (data.cfg_aggr == 2) ? 4 : (data.cfg_aggr == 1 ? 3 : 2); // Przybliżona ilość podlań dla szacunku
+            let litersPerDay = wateringsPerDay * (data.cfg_time * fRate);
+            if (litersPerDay > 0) {
+                let daysLeft = Math.floor(remLiters / litersPerDay);
+                if (daysLeft > 14) dailyEstimateStr = "Spokojnie na ponad 2 tyg.";
+                else if (daysLeft > 1) dailyEstimateStr = `Wystarczy na ok. ${daysLeft} dni`;
+                else if (daysLeft === 1) dailyEstimateStr = `Wystarczy na 1 dzień`;
+                else dailyEstimateStr = `Woda się kończy!`;
+            }
+        }
+        document.getElementById("dash-water-est").innerText = dailyEstimateStr;
         
         if (pct <= 15) {
             document.getElementById("dash-water-pct").style.color = "var(--accent-red)";
@@ -741,6 +766,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
     if(data.raw_adc !== undefined) document.getElementById("eng-raw-adc").innerText = data.raw_adc;
     if(data.air_val !== undefined) document.getElementById("calib-air").value = data.air_val;
     if(data.water_val !== undefined) document.getElementById("calib-water").value = data.water_val;
+    if(data.us_max !== undefined) document.getElementById("calib-usDno").value = data.us_max;
 
     if (data.voltage) {
         let vFloat = parseFloat(data.voltage);
@@ -810,7 +836,7 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
         const demoSun = wyliczZegarAstronomiczny();
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
+        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, us_max: 90, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
@@ -833,6 +859,23 @@ function ustawLokalizacje(isOutdoors) {
 
 function uruchomTest() { haptyka(15); const sec = document.getElementById("testSlider").value; fetch(`http://192.168.4.1/test?sec=${sec}`, { mode: 'no-cors' }).then(() => alert(`🌊 Test pompy (${sec}s) aktywny.`)).catch(() => alert("❌ Tryb offline.")); }
 function zapiszKalibracje() { haptyka([20, 30, 20]); fetch(`http://192.168.4.1/calibrate?air=${document.getElementById('calib-air').value}&water=${document.getElementById('calib-water').value}`, { mode: 'no-cors' }).then(() => { alert("✅ Zapisano kalibrację"); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline")); }
+
+function zapiszKalibracjeExtras() {
+    haptyka(10);
+    const tOff = document.getElementById('calib-tOff').value;
+    const usDno = document.getElementById('calib-usDno').value;
+    const lMax = document.getElementById('calib-lMax').value;
+    fetch(`http://192.168.4.1/calibrateExtras?tOff=${tOff}&usDno=${usDno}&lMax=${lMax}`, { mode: 'no-cors' })
+    .then(() => { alert("✅ Zapisano kalibrację sensorów"); pobierzDaneZESP32(); })
+    .catch(() => alert("⚠️ Tryb Offline"));
+}
+
+function ustawAktualneSwiatlo() {
+    haptyka(10);
+    const rawLight = document.getElementById('eng-raw-adc').innerText; 
+    document.getElementById('calib-lMax').value = rawLight;
+    alert("Zaktualizowano wartość Max Światła na: " + rawLight + ". Kliknij Zapisz.");
+}
 
 function eksportujCSV() {
     haptyka(15); const cached = localStorage.getItem('lastESPData'); if(!cached) return alert("Brak danych.");
