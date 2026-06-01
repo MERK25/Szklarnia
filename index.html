@@ -89,6 +89,7 @@
         .bg-manual { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
         .bg-sleep { background: rgba(88, 86, 214, 0.12); color: #5856d6; }
         .bg-cold { background: rgba(50, 173, 230, 0.12); color: var(--accent-cyan); }
+        .bg-sauna { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
 
         .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
@@ -423,7 +424,6 @@ try {
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
 
-// --- Zmienne na żywo dla asystenta kalibracji ---
 let liveSoil = 0;
 let liveUs = 0;
 let liveLight = 0;
@@ -475,7 +475,6 @@ function zapiszEdytowanyProfil() {
     if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
 }
 
-// --- LOGIKA KALIBRACJI Z WYKORZYSTANIEM DANYCH LIVE ---
 function zapiszGlebe(typ) {
     haptyka(15);
     let url = `http://192.168.4.1/calibrate?`;
@@ -661,13 +660,6 @@ function formatujMinuty(minutyOdPolnocy) {
     return `${h}:${m}`;
 }
 
-function obliczVPD(temp, hum) {
-    if(!temp || !hum || temp <= 0 || hum <= 0) return "-";
-    const svp = 0.61078 * Math.exp((17.27 * temp) / (temp + 237.3));
-    const avp = svp * (hum / 100);
-    return (svp - avp).toFixed(2);
-}
-
 function rysujProstyWykres(canvasId, daneArray, kolorLinii, minVal, maxVal) {
     const canvas = document.getElementById(canvasId);
     if(!canvas) return;
@@ -743,7 +735,6 @@ function rysujWykresy(logi) {
 function renderujDane(data, timestamp, trybDemo = false) {
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
     
-    // AKTUALIZACJA ZMIENNYCH LIVE DLA ASYSTENTA KALIBRACJI
     liveSoil = data.raw_adc;
     liveUs = data.us_dist;
     liveLight = data.raw_light;
@@ -885,6 +876,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
             if(log.action === "RĘCZNE") cls = "bg-manual";
             if(log.action === "NOCNY SEN") cls = "bg-sleep";
             if(log.action === "ZIMNA WODA") cls = "bg-cold"; 
+            if(log.action === "BLOKADA (SAUNA)") cls = "bg-sauna"; 
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${cls}'>${log.action}</span></div>`;
         });
         rysujWykresy(data.logs);
@@ -900,7 +892,7 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
         const demoSun = wyliczZegarAstronomiczny();
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, us_max: 90, us_dist: 45, raw_adc: 2100, raw_light: 3500, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
+        if(!cached) renderujDane({temp: 32.5, air_hum: 88, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, us_max: 90, us_dist: 45, raw_adc: 2100, raw_light: 3500, logs: [{moisture: 42, v: 3.95, t: 32.1, h: 88, action: "BLOKADA (SAUNA)"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
