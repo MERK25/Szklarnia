@@ -14,7 +14,7 @@
 #include <DallasTemperature.h>
 #include <esp_task_wdt.h>
 
-#define WDT_TIMEOUT 15 // Watchdog na 15 sekund
+#define WDT_TIMEOUT 15 
 #define BUTTON_PIN 13
 #define MANUAL_BTN_PIN 27
 #define SOIL_PIN 34
@@ -25,8 +25,10 @@
 #define ONE_WIRE_BUS 4
 #define TRIG_PIN 5
 #define ECHO_PIN 18
+#define VENT_PIN 19 // NOWOŚĆ: PIN siłownika okna / wentylatora
 
 const float TEMP_LIMIT = 30.0;
+const float TEMP_VENT_CLOSE = 25.0;
 const float WATER_MIN_TEMP = 15.0; 
 const float SURVIVAL_VOLTAGE = 3.60; 
 
@@ -43,6 +45,9 @@ RTC_DATA_ATTR float voltageAtSunset = 0.0, voltageAtSunrise = 0.0;
 RTC_DATA_ATTR int battWarning = 0;
 RTC_DATA_ATTR bool wasNight = false;
 
+// HARDWARE CONFIG
+int hasUs, hasDs, hasBme, hasLight, hasVent;
+
 int dryThresholdPct, wateringTimeSec, aggrMode, airValue, waterValue, usMax, usMin, maxLight;
 float tempOffset;
 
@@ -52,6 +57,10 @@ bool shouldGoToSleep = false;
 bool isUpdating = false;
 unsigned long sleepDelayTimer = 0;
 
+// TRYB SERWISOWY
+bool isServiceMode = false;
+unsigned long serviceStartTime = 0;
+
 const char* ssid = "Szklarnia-Net";
 const char* password = "pomidory123";
 
@@ -59,8 +68,7 @@ AsyncWebServer server(80);
 
 float getInternalVoltage() {
   int vCode = analogRead(35);
-  float voltage = (vCode / 4095.0) * 3.3 * 2.0;
-  return (voltage < 1.0) ? 5.01 : voltage;
+  return ((vCode / 4095.0) * 3.3 * 2.0 < 1.0) ? 5.01 : (vCode / 4095.0) * 3.3 * 2.0;
 }
 
 void saveLog(int moisture, int action, float voltage, float temp, float hum) {
@@ -84,6 +92,7 @@ void addPumpSeconds(int sec) {
 }
 
 int getUltrasonicDistance() {
+  if(!hasUs) return 0;
   digitalWrite(TRIG_PIN, LOW); delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH); delayMicroseconds(10); digitalWrite(TRIG_PIN, LOW);
   long duration = pulseIn(ECHO_PIN, HIGH, 30000); 
@@ -106,10 +115,22 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP); pinMode(MANUAL_BTN_PIN, INPUT_PULLUP);
   pinMode(FLOAT_PIN, INPUT_PULLUP); pinMode(RELAY_PIN, OUTPUT); pinMode(SENSOR_VCC_PIN, OUTPUT);
   pinMode(TRIG_PIN, OUTPUT); pinMode(ECHO_PIN, INPUT);
+  
   digitalWrite(RELAY_PIN, LOW);
 
-  bmeStatus = bme.begin(0x76);
-  waterSensor.begin();
+  // Wczytywanie konfiguracji sprzętowej
+  preferences.begin("hw", true);
+  hasUs = preferences.getInt("hasUs", 1);
+  hasDs = preferences.getInt("hasDs", 1);
+  hasBme = preferences.getInt("hasBme", 1);
+  hasLight = preferences.getInt("hasLight", 1);
+  hasVent = preferences.getInt("hasVent", 0);
+  preferences.end();
+
+  if(hasVent) { pinMode(VENT_PIN, OUTPUT); }
+
+  if(hasBme) bmeStatus = bme.begin(0x76);
+  if(hasDs) waterSensor.begin();
   
   preferences.begin("garden", true);
   dryThresholdPct = preferences.getInt("th", 40);
@@ -150,18 +171,24 @@ void setup() {
     
     if(isHibernated == 1) { preferences.begin("sys", false); preferences.putInt("hib", 0); preferences.end(); }
     
-    // --- ASYNCHRONICZNE ENDPOINTY API ---
     server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
+      if(!isServiceMode) configStartTime = millis(); 
       digitalWrite(SENSOR_VCC_PIN, HIGH); delay(1000); esp_task_wdt_reset();
       
       float v = getInternalVoltage();
-      float temp = bmeStatus ? bme.readTemperature() : 0.0;
-      float hum = bmeStatus ? bme.readHumidity() : 0.0;
-      float pressure = bmeStatus ? (bme.readPressure() / 100.0F) : 0.0;
+      float temp = (hasBme && bmeStatus) ? bme.readTemperature() : 0.0;
+      float hum = (hasBme && bmeStatus) ? bme.readHumidity() : 0.0;
+      float pressure = (hasBme && bmeStatus) ? (bme.readPressure() / 100.0F) : 0.0;
       int rawMoisture = analogRead(SOIL_PIN);
-      int rawLight = analogRead(LIGHT_PIN); 
-      waterSensor.requestTemperatures();
-      float waterTemp = waterSensor.getTempCByIndex(0) + tempOffset;
+      int rawLight = hasLight ? analogRead(LIGHT_PIN) : 0; 
+      
+      float waterTemp = 0.0;
+      if(hasDs) {
+          waterSensor.requestTemperatures();
+          waterTemp = waterSensor.getTempCByIndex(0) + tempOffset;
+          if(waterTemp == DEVICE_DISCONNECTED_C || waterTemp < -50.0) waterTemp = 0.0;
+      }
+      
       int usDist = getUltrasonicDistance();
       digitalWrite(SENSOR_VCC_PIN, LOW);
 
@@ -175,8 +202,6 @@ void setup() {
       int failCountRead = preferences.getInt("fail", 0);
       preferences.end();
 
-      if(waterTemp == DEVICE_DISCONNECTED_C || waterTemp < -50.0) waterTemp = 0.0;
-
       JsonDocument doc;
       doc["cfg_th"] = dryThresholdPct; doc["cfg_time"] = wateringTimeSec / 60.0; doc["cfg_aggr"] = aggrMode;
       doc["tank_vol"] = currentTankVol; doc["pump_flow"] = currentPumpFlow; doc["voltage"] = v;
@@ -189,6 +214,15 @@ void setup() {
       doc["survival"] = (v < SURVIVAL_VOLTAGE ? 1 : 0); doc["pump_sec"] = pumpSec;
       doc["temp"] = temp; doc["air_hum"] = hum; doc["pressure"] = pressure;
       doc["water"] = (digitalRead(FLOAT_PIN) == HIGH ? "EMPTY" : "OK");
+      
+      // Diagnostyka serwisowa
+      doc["service_mode"] = isServiceMode ? 1 : 0;
+      doc["free_heap"] = ESP.getFreeHeap();
+      doc["vent_state"] = hasVent ? digitalRead(VENT_PIN) : 0;
+
+      // Konfiguracja sprzętu dla frontendu
+      JsonObject hw = doc["hw"].to<JsonObject>();
+      hw["us"] = hasUs; hw["ds"] = hasDs; hw["bme"] = hasBme; hw["light"] = hasLight; hw["vent"] = hasVent;
 
       JsonArray logs = doc["logs"].to<JsonArray>();
       for(int i = 0; i < logCount; i++) {
@@ -203,24 +237,44 @@ void setup() {
         if(a==10) aTxt="ZIMNA WODA"; if(a==11) aTxt="BLOKADA (SAUNA)"; 
         l["action"] = aTxt;
       }
-      String jsonResponse;
-      serializeJson(doc, jsonResponse);
+      String jsonResponse; serializeJson(doc, jsonResponse);
       request->send(200, "application/json", jsonResponse);
     });
 
+    server.on("/hwConfig", HTTP_GET, [](AsyncWebServerRequest *request){
+      preferences.begin("hw", false);
+      if(request->hasParam("us")) { hasUs = request->getParam("us")->value().toInt(); preferences.putInt("hasUs", hasUs); }
+      if(request->hasParam("ds")) { hasDs = request->getParam("ds")->value().toInt(); preferences.putInt("hasDs", hasDs); }
+      if(request->hasParam("bme")) { hasBme = request->getParam("bme")->value().toInt(); preferences.putInt("hasBme", hasBme); }
+      if(request->hasParam("light")) { hasLight = request->getParam("light")->value().toInt(); preferences.putInt("hasLight", hasLight); }
+      if(request->hasParam("vent")) { hasVent = request->getParam("vent")->value().toInt(); preferences.putInt("hasVent", hasVent); }
+      preferences.end();
+      if(hasVent) pinMode(VENT_PIN, OUTPUT); else digitalWrite(VENT_PIN, LOW);
+      request->send(200, "text/plain", "OK");
+    });
+
+    server.on("/serviceMode", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(request->hasParam("state")) {
+        isServiceMode = (request->getParam("state")->value().toInt() == 1);
+        if(isServiceMode) serviceStartTime = millis(); 
+      }
+      request->send(200, "text/plain", "OK");
+    });
+
     server.on("/save", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("thPct") && request->hasParam("timeSec") && request->hasParam("aggr")) {
         preferences.begin("garden", false);
         preferences.putInt("th", request->getParam("thPct")->value().toInt());
         preferences.putInt("time", request->getParam("timeSec")->value().toInt());
         preferences.putInt("aggr", request->getParam("aggr")->value().toInt());
         preferences.end();
-        shouldGoToSleep = true; sleepDelayTimer = millis();
         request->send(200, "text/plain", "OK");
       } else request->send(400);
     });
 
     server.on("/tank", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("vol") && request->hasParam("flow")) {
         preferences.begin("garden", false);
         preferences.putInt("tVol", request->getParam("vol")->value().toInt());
@@ -231,6 +285,7 @@ void setup() {
     });
 
     server.on("/calibrate", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       preferences.begin("garden", false);
       if(request->hasParam("air")) preferences.putInt("airVal", request->getParam("air")->value().toInt());
       if(request->hasParam("water")) preferences.putInt("waterVal", request->getParam("water")->value().toInt());
@@ -239,6 +294,7 @@ void setup() {
     });
 
     server.on("/calibrateExtras", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       preferences.begin("garden", false);
       if(request->hasParam("tOff")) preferences.putFloat("tOffset", request->getParam("tOff")->value().toFloat());
       if(request->hasParam("usMax")) preferences.putInt("usMax", request->getParam("usMax")->value().toInt());
@@ -249,6 +305,7 @@ void setup() {
     });
 
     server.on("/location", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("outdoors")) {
         preferences.begin("sys", false); preferences.putInt("outdoors", request->getParam("outdoors")->value().toInt()); preferences.end();
         request->send(200, "text/plain", "OK");
@@ -256,26 +313,34 @@ void setup() {
     });
 
     server.on("/test", HTTP_GET, [](AsyncWebServerRequest *request){
-      if(digitalRead(FLOAT_PIN) == HIGH) request->send(403, "text/plain", "Brak Wody!");
+      if(!isServiceMode) configStartTime = millis();
+      
+      bool force = false;
+      if(request->hasParam("force") && request->getParam("force")->value().toInt() == 1) force = true;
+
+      if(digitalRead(FLOAT_PIN) == HIGH && !force) request->send(403, "text/plain", "Brak Wody!");
       else if(request->hasParam("sec")) {
         int tSec = request->getParam("sec")->value().toInt();
-        digitalWrite(RELAY_PIN, HIGH); delay(tSec * 1000); digitalWrite(RELAY_PIN, LOW);
+        digitalWrite(RELAY_PIN, HIGH);
+        // Bezpieczny asynchroniczny delay z watchdogiem
+        for(int i=0; i<tSec; i++) { delay(1000); esp_task_wdt_reset(); }
+        digitalWrite(RELAY_PIN, LOW);
         addPumpSeconds(tSec); 
-        shouldGoToSleep = true; sleepDelayTimer = millis();
         request->send(200, "text/plain", "OK");
       }
     });
 
     server.on("/drain", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       if(digitalRead(FLOAT_PIN) == HIGH) { request->send(200, "text/plain", "ALREADY_EMPTY"); return; }
       int drainedSec = 0; digitalWrite(RELAY_PIN, HIGH);
       while (digitalRead(FLOAT_PIN) == LOW && drainedSec < 120) { delay(1000); drainedSec++; esp_task_wdt_reset(); }
       digitalWrite(RELAY_PIN, LOW); addPumpSeconds(drainedSec);
-      shouldGoToSleep = true; sleepDelayTimer = millis();
       request->send(200, "text/plain", "DRAINED");
     });
 
     server.on("/sync", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       if(request->hasParam("t")) {
         struct timeval tv; tv.tv_sec = request->getParam("t")->value().toInt(); tv.tv_usec = 0;
         settimeofday(&tv, NULL);
@@ -288,26 +353,29 @@ void setup() {
     });
 
     server.on("/resetFault", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       preferences.begin("sys", false); preferences.putInt("fail", 0); preferences.end();
       request->send(200, "text/plain", "OK");
     });
     
     server.on("/resetWater", HTTP_GET, [](AsyncWebServerRequest *request){
+      if(!isServiceMode) configStartTime = millis();
       preferences.begin("sys", false); preferences.putInt("pumpSec", 0); preferences.end();
       request->send(200, "text/plain", "OK");
     });
 
     server.on("/hibernate", HTTP_GET, [](AsyncWebServerRequest *request){
       preferences.begin("sys", false); preferences.putInt("hib", 1); preferences.end();
-      shouldGoToSleep = true; sleepDelayTimer = millis();
+      shouldGoToSleep = true; sleepDelayTimer = millis(); 
       request->send(200, "text/plain", "HIBERNATING");
     });
 
     server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request){
-      shouldGoToSleep = true; sleepDelayTimer = millis();
+      shouldGoToSleep = true; sleepDelayTimer = millis(); 
       request->send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
       delay(1000); ESP.restart();
     }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
+      configStartTime = millis(); serviceStartTime = millis();
       if(!index) { isUpdating = true; Update.begin(UPDATE_SIZE_UNKNOWN); }
       if(!Update.hasError()) Update.write(data, len);
       if(final) { if(Update.end(true)) isUpdating = false; }
@@ -319,23 +387,28 @@ void setup() {
     if (digitalRead(FLOAT_PIN) == LOW && failCount < 3) {
       digitalWrite(RELAY_PIN, HIGH); delay(actualWateringSec * 1000); digitalWrite(RELAY_PIN, LOW);
       addPumpSeconds(actualWateringSec);
-      float t = bmeStatus ? bme.readTemperature() : 0;
-      float h = bmeStatus ? bme.readHumidity() : 0;
+      float t = (hasBme && bmeStatus) ? bme.readTemperature() : 0;
+      float h = (hasBme && bmeStatus) ? bme.readHumidity() : 0;
       saveLog(100, 4, currentV, t, h);
     }
     SystemGoToSleep(14400); 
   } 
   else {
-    float currentPressure = bmeStatus ? (bme.readPressure() / 100.0F) : 0.0;
-    float currentTemp = bmeStatus ? bme.readTemperature() : 0.0;
-    float currentHum = bmeStatus ? bme.readHumidity() : 0.0;
-    if (currentPressure > 500) { preferences.begin("sys", false); preferences.putFloat("lastP", currentPressure); preferences.end(); }
+    // Normalne wybudzenie
+    float currentPressure = (hasBme && bmeStatus) ? (bme.readPressure() / 100.0F) : 0.0;
+    float currentTemp = (hasBme && bmeStatus) ? bme.readTemperature() : 0.0;
+    float currentHum = (hasBme && bmeStatus) ? bme.readHumidity() : 0.0;
+    if (hasBme && currentPressure > 500) { preferences.begin("sys", false); preferences.putFloat("lastP", currentPressure); preferences.end(); }
+
+    // WENTYLACJA - Automatyczne sterowanie oknem
+    if(hasVent) {
+      if(currentTemp > TEMP_LIMIT) digitalWrite(VENT_PIN, HIGH);
+      else if (currentTemp < TEMP_VENT_CLOSE) digitalWrite(VENT_PIN, LOW);
+    }
 
     struct tm ti; getLocalTime(&ti);
     bool timeIsSet = (ti.tm_year > 120); 
-
     if (timeIsSet && ti.tm_yday != lastDayOfYear) { sunSecondsToday = 0; lastDayOfYear = ti.tm_yday; }
-
     int currentMin = ti.tm_hour * 60 + ti.tm_min;
     bool isNight = (timeIsSet && (currentMin >= sunsetMin || currentMin < sunriseMin));
 
@@ -349,19 +422,19 @@ void setup() {
     digitalWrite(SENSOR_VCC_PIN, HIGH); delay(1000); esp_task_wdt_reset();
     int reading = 0; for(int i=0; i<10; i++) { reading += analogRead(SOIL_PIN); delay(30); }
     int rawMoisture = reading / 10;
-    int rawLight = analogRead(LIGHT_PIN); 
+    int rawLight = hasLight ? analogRead(LIGHT_PIN) : 0; 
     
-    waterSensor.requestTemperatures();
-    float waterTemp = waterSensor.getTempCByIndex(0) + tempOffset;
+    float waterTemp = 0.0;
+    if(hasDs) {
+       waterSensor.requestTemperatures(); waterTemp = waterSensor.getTempCByIndex(0) + tempOffset;
+    }
     digitalWrite(SENSOR_VCC_PIN, LOW);
 
     int currentMoisturePct = constrain(map(rawMoisture, airValue, waterValue, 0, 100), 0, 100);
-
     if (checkSoak == 0 && lastMoisturePct != -1 && (currentMoisturePct - lastMoisturePct) > 25) currentMoisturePct = lastMoisturePct; 
     lastMoisturePct = currentMoisturePct;
 
     int activeAggr = (currentV < 3.75) ? 0 : aggrMode; 
-
     int delta = currentMoisturePct - dryThresholdPct;
     int calculatedSleepSec = 14400; 
 
@@ -370,12 +443,12 @@ void setup() {
     else calculatedSleepSec = (activeAggr == 2) ? 2700 : (activeAggr == 1 ? 3600 : 5400); 
 
     if (failCount > 0) calculatedSleepSec = 21600; 
-    if (rawLight > 2500 && timeIsSet) sunSecondsToday += calculatedSleepSec;
+    if (hasLight && rawLight > 2500 && timeIsSet) sunSecondsToday += calculatedSleepSec;
     
     float svp = 0.61078 * exp((17.27 * currentTemp) / (currentTemp + 237.3));
     float avp = svp * (currentHum / 100.0);
     float currentVPD = svp - avp;
-    bool isSauna = (currentVPD < 0.4 && currentVPD > 0.0);
+    bool isSauna = (hasBme && currentVPD < 0.4 && currentVPD > 0.0);
 
     if (checkSoak == 1) {
       preferences.begin("sys", false); preferences.putInt("soak", 0);
@@ -393,14 +466,14 @@ void setup() {
         SystemGoToSleep(minsToSunrise * 60);
       }
       else if (currentMoisturePct < dryThresholdPct) {
-        bool stormApproaching = (isOutdoors == 1 && lastPressure > 500 && currentPressure > 500 && (lastPressure - currentPressure) >= 2.0);
+        bool stormApproaching = (hasBme && isOutdoors == 1 && lastPressure > 500 && currentPressure > 500 && (lastPressure - currentPressure) >= 2.0);
         
         if (failCount >= 3) actionTaken = 6; 
         else if (stormApproaching) actionTaken = 7; 
-        else if (rawLight > 3000 && isOutdoors == 1) actionTaken = 5;  
+        else if (hasLight && rawLight > 3000 && isOutdoors == 1) actionTaken = 5;  
         else if (digitalRead(FLOAT_PIN) == HIGH) actionTaken = 2;  
-        else if (currentTemp >= TEMP_LIMIT && isOutdoors == 0) actionTaken = 3; 
-        else if (waterTemp > 0.0 && waterTemp < WATER_MIN_TEMP) actionTaken = 10;  
+        else if (hasBme && currentTemp >= TEMP_LIMIT && isOutdoors == 0) actionTaken = 3; 
+        else if (hasDs && waterTemp > 0.0 && waterTemp < WATER_MIN_TEMP) actionTaken = 10;  
         else if (isSauna && isOutdoors == 0) actionTaken = 11; 
         else {
           actionTaken = isSurvivalMode ? 8 : 1; 
@@ -422,7 +495,16 @@ void setup() {
 void loop() {
   esp_task_wdt_reset();
   if (inConfigMode) {
-    if (shouldGoToSleep && !isUpdating && (millis() - sleepDelayTimer > 1500)) SystemGoToSleep(14400);
-    if (!isUpdating && (millis() - configStartTime > 180000)) SystemGoToSleep(14400);
+    if (isServiceMode) {
+       // KAGANIEC: Po 60 minutach wymusza uśpienie
+       if (millis() - serviceStartTime > 3600000) { 
+           isServiceMode = false;
+           SystemGoToSleep(14400); 
+       }
+    } else {
+       if (shouldGoToSleep && !isUpdating && (millis() - sleepDelayTimer > 1500)) SystemGoToSleep(14400);
+       // TIMEOUT: Po 5 minutach bezczynności
+       if (!isUpdating && (millis() - configStartTime > 300000)) SystemGoToSleep(14400); 
+    }
   }
 }
