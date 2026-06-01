@@ -100,9 +100,12 @@
         
         .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; align-items: center; }
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
+        .file-input { display: block; width: 100%; padding: 8px; font-size: 12px; color: var(--text-sub); border: 1px dashed var(--border-light); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
+        .progress-container { width: 100%; background: var(--range-bg); border-radius: 8px; margin-top: 10px; overflow: hidden; display: none; height: 8px; }
+        .progress-bar { height: 100%; background: var(--accent-orange); width: 0%; transition: width 0.2s ease; }
 
         /* =========================================
-           ANIMACJA WODY I ŻYROSKOP (NOWOCZESNY EFEKT)
+           ANIMACJA WODY - WARIANT FALE (SCROLL)
            ========================================= */
         .water-module {
             background: var(--glass-card);
@@ -124,56 +127,53 @@
             overflow: hidden;
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.08);
             border: 1px solid rgba(0,0,0,0.05);
-            cursor: pointer;
-            isolation: isolate; /* Fix dla Safari border-radius z overflow hidden */
-            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            isolation: isolate;
         }
 
-        #gyro-wrapper {
+        .water-fill {
             position: absolute;
-            bottom: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            transform-origin: center center;
-            transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            will-change: transform;
-        }
-
-        #water-height-controller {
-            position: absolute;
-            bottom: -800px; /* Baza - całkowicie pusty zbiornik */
-            left: 50%;
-            width: 800px;
-            height: 800px;
-            transform: translateX(-50%);
-            transition: bottom 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        /* Fale kręcące się na wierzchu poziomu wody */
-        .wave {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(180deg, #5ac8fa 0%, var(--accent-blue) 100%);
-            border-radius: 38%;
             bottom: 0;
             left: 0;
-            animation: spinWave 6s linear infinite;
-        }
-        .wave:nth-child(2) {
-            opacity: 0.5;
-            border-radius: 42%;
-            animation-duration: 8s;
-            animation-direction: reverse;
-        }
-        
-        .tank-mask.alert .wave {
-            background: linear-gradient(180deg, #ff6b22 0%, var(--accent-red) 100%);
+            width: 100%;
+            height: 0%; /* Zmieniane przez JS */
+            background: linear-gradient(180deg, #5ac8fa 0%, #007aff 100%);
+            transition: height 1s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        @keyframes spinWave {
-            100% { transform: rotate(360deg); }
+        /* Dodanie 160 stopni do niebieskiego zmienia go na czerwony */
+        .tank-mask.alert .water-fill {
+            filter: hue-rotate(160deg);
+        }
+
+        /* Fale poruszające się horyzontalnie na samej krawędzi wody */
+        .wave-top, .wave-back {
+            position: absolute;
+            left: 0;
+            width: 200%;
+            height: 16px;
+            background-repeat: repeat-x;
+            background-size: 50% 100%;
+        }
+
+        .wave-top {
+            top: -15px;
+            /* SVG z jaśniejszą falą */
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 120 28" xmlns="http://www.w3.org/2000/svg"><path d="M0 28 V 14 Q 30 0 60 14 T 120 14 V 28 Z" fill="%235ac8fa"/></svg>');
+            animation: slideWave 2.5s linear infinite;
+            z-index: 2;
+        }
+
+        .wave-back {
+            top: -16px;
+            /* SVG z ciemniejszą, półprzezroczystą falą idącą w drugą stronę */
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 120 28" xmlns="http://www.w3.org/2000/svg"><path d="M0 28 V 14 Q 30 28 60 14 T 120 14 V 28 Z" fill="%23007aff" opacity="0.4"/></svg>');
+            animation: slideWave 3.5s linear infinite reverse;
+            z-index: 1;
+        }
+
+        @keyframes slideWave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         .tank-text-overlay {
@@ -186,19 +186,7 @@
             z-index: 10;
             pointer-events: none;
             color: var(--text-main);
-            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
-        }
-
-        #gyro-hint {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--text-sub);
-            margin-top: 4px;
-            background: var(--glass-card);
-            padding: 4px 10px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s;
+            text-shadow: 0 1px 12px rgba(255,255,255,0.8); /* Cień zapewniający czytelność na wodzie i na tle */
         }
 
         .btn-water-reset {
@@ -243,18 +231,15 @@
             <div class="water-module">
                 <div class="weather-lbl" style="text-align: center; margin-bottom: -4px;">Woda w zbiorniku</div>
                 
-                <div class="tank-mask" id="tank-mask" onclick="initGyro()">
-                    <div id="gyro-wrapper">
-                        <div id="water-height-controller">
-                            <div class="wave"></div>
-                            <div class="wave"></div>
-                        </div>
+                <div class="tank-mask" id="tank-mask">
+                    <div id="water-fill" class="water-fill">
+                        <div class="wave-back"></div>
+                        <div class="wave-top"></div>
                     </div>
                     
                     <div class="tank-text-overlay">
                         <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">--%</span>
                         <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">-- / -- L</span>
-                        <div id="gyro-hint">Dotknij aby włączyć żyroskop</div>
                     </div>
                 </div>
 
@@ -394,44 +379,6 @@
 <script>
 let chartInstance = null;
 let batteryChartInstance = null;
-let isGyroActive = false;
-
-// --- OBSŁUGA ŻYROSKOPU (WODA) ---
-function initGyro() {
-    if (isGyroActive) return; // Zapobiega wielokrotnemu pytaniu o zgodę
-    haptyka(15);
-    
-    // Sprawdzenie wymogów Safari/iOS 13+
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation);
-                    isGyroActive = true;
-                    document.getElementById('gyro-hint').style.opacity = "0";
-                }
-            })
-            .catch(console.error);
-    } else {
-        // Inne urządzenia (Android / starsze iOS)
-        window.addEventListener('deviceorientation', handleOrientation);
-        isGyroActive = true;
-        document.getElementById('gyro-hint').style.opacity = "0";
-    }
-}
-
-function handleOrientation(event) {
-    let gamma = event.gamma; // Kąt przechyłu lewo/prawo [-90 do 90]
-    if (gamma === null) return;
-    
-    // Zabezpieczenie przed zbytnim przekręceniem animacji
-    let rotation = gamma;
-    if (rotation > 40) rotation = 40;
-    if (rotation < -40) rotation = -40;
-    
-    // Aplikowanie rotacji do kontenera z wodą
-    document.getElementById('gyro-wrapper').style.transform = `rotate(${rotation}deg)`;
-}
 
 // --- LOGIKA APLIKACJI ---
 const domyslneProfile = {
@@ -658,7 +605,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
-    // --- RENDEROWANIE POZIOMU WODY (Wysokość zbiornika) ---
+    // --- RENDEROWANIE POZIOMU WODY (Animacja SVG) ---
     if(data.pump_sec !== undefined) {
         let tVol = data.tank_vol !== undefined ? data.tank_vol : 220; 
         let fRate = data.pump_flow !== undefined ? data.pump_flow : 2.0;
@@ -670,23 +617,16 @@ function renderujDane(data, timestamp, trybDemo = false) {
         let remLiters = Math.max(0, tVol - usedLiters);
         let pct = Math.round((remLiters / tVol) * 100);
         if (pct < 0) pct = 0;
+        if (pct > 100) pct = 100;
         
-        // Logika podnoszenia wody (-800px to minimum, -300px to maksimum)
-        // Maksymalne wychylenie do góry ustalamy jako 0 (pełny kontener), a dół na -800.
-        // Ponieważ wysokość widocznego kontenera to 140px, woda musi wychodzić od -800 (puste) do ok. -660 (pełne).
-        let minBottom = -800;
-        let maxBottom = -660;
-        let calculatedBottom = minBottom + ((maxBottom - minBottom) * (pct / 100));
-        
-        document.getElementById("water-height-controller").style.bottom = calculatedBottom + "px";
+        document.getElementById("water-fill").style.height = pct + "%";
         document.getElementById("dash-water-pct").innerText = pct + "%";
         document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
         
+        // Zmiana koloru na czerwony przy rezerwie
         if (pct <= 15) {
-            document.getElementById("dash-water-pct").style.color = "var(--accent-red)";
             document.getElementById("tank-mask").classList.add("alert");
         } else {
-            document.getElementById("dash-water-pct").style.color = "var(--text-main)";
             document.getElementById("tank-mask").classList.remove("alert");
         }
     }
