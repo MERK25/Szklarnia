@@ -88,7 +88,7 @@
         .bg-warn { background: rgba(255, 149, 0, 0.12); color: var(--accent-orange); }
         .bg-manual { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
         .bg-sleep { background: rgba(88, 86, 214, 0.12); color: #5856d6; }
-        .bg-cold { background: rgba(50, 173, 230, 0.12); color: var(--accent-cyan); } /* Zimna woda badge */
+        .bg-cold { background: rgba(50, 173, 230, 0.12); color: var(--accent-cyan); }
 
         .btn-test { display: block; width: 100%; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .btn-test { padding: 12px; font-size: 14px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
@@ -243,6 +243,9 @@
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-sun">-</div><div class="weather-lbl">Godziny Słońca</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
+                
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-sunrise">-</div><div class="weather-lbl">Wschód (Dziś)</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-sunset">-</div><div class="weather-lbl">Zachód (Dziś)</div></div>
             </div>
 
             <h2 id="plants-title">Co dzisiaj rośnie?</h2>
@@ -533,6 +536,38 @@ function zmienPodzakladke(tab) {
     document.getElementById('sub-' + tab).classList.add('active');
 }
 
+// --- ALGORYTM ZEGARA ASTRONOMICZNEGO ---
+function wyliczZegarAstronomiczny() {
+    // Współrzędne dla centralnej Polski
+    const lat = 52.0; 
+    const lon = 19.0;
+    
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+
+    const gamma = (2 * Math.PI / 365) * (dayOfYear - 1 + (12 - 12) / 24);
+    const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
+    const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+
+    const ha = Math.acos((Math.cos(90.833 * Math.PI / 180) / (Math.cos(lat * Math.PI / 180) * Math.cos(decl))) - Math.tan(lat * Math.PI / 180) * Math.tan(decl));
+
+    const sunriseUTC = 720 - 4 * (lon + ha * 180 / Math.PI) - eqTime;
+    const sunsetUTC  = 720 - 4 * (lon - ha * 180 / Math.PI) - eqTime;
+
+    const tzOffset = -now.getTimezoneOffset(); // Przesunięcie przeglądarki (np. czas letni)
+    
+    let localSunrise = Math.round(sunriseUTC + tzOffset);
+    let localSunset = Math.round(sunsetUTC + tzOffset);
+    
+    if (localSunrise < 0) localSunrise += 1440;
+    if (localSunset >= 1440) localSunset -= 1440;
+    
+    return { sr: localSunrise, ss: localSunset };
+}
+
 window.onload = function() {
     wczytajProfilDoEdycji(); 
     zmienMotyw(localStorage.getItem('theme') || 'auto');
@@ -541,7 +576,10 @@ window.onload = function() {
     if(cachedData) { try { const parsed = JSON.parse(cachedData); renderujDane(parsed.data, parsed.timestamp, false); } catch(e) {} }
     else document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     
-    fetch(`http://192.168.4.1/sync?t=${Math.floor(Date.now() / 1000)}`, {mode:'no-cors'}).catch(()=>{});
+    // Wysyłamy do ESP32 dokładny czas + minuty dzisiejszego wschodu i zachodu
+    const sunData = wyliczZegarAstronomiczny();
+    fetch(`http://192.168.4.1/sync?t=${Math.floor(Date.now() / 1000)}&sr=${sunData.sr}&ss=${sunData.ss}`, {mode:'no-cors'}).catch(()=>{});
+    
     pobierzDaneZESP32();
 }
 
@@ -549,6 +587,20 @@ function sformatujCzas(timestamp) {
     const minuty = Math.floor((new Date().getTime() - timestamp) / 60000);
     if (minuty < 1) return "przed chwilą"; if (minuty < 60) return `${minuty} min temu`;
     return `${Math.floor(minuty / 60)} godz. temu`;
+}
+
+function formatujMinuty(minutyOdPolnocy) {
+    if(!minutyOdPolnocy || isNaN(minutyOdPolnocy)) return "-";
+    const h = Math.floor(minutyOdPolnocy / 60).toString().padStart(2, '0');
+    const m = (minutyOdPolnocy % 60).toString().padStart(2, '0');
+    return `${h}:${m}`;
+}
+
+function obliczVPD(temp, hum) {
+    if(!temp || !hum || temp <= 0 || hum <= 0) return "-";
+    const svp = 0.61078 * Math.exp((17.27 * temp) / (temp + 237.3));
+    const avp = svp * (hum / 100);
+    return (svp - avp).toFixed(2);
 }
 
 // --- NATYWNE RYSOWANIE WYKRESÓW BEZ BIBLIOTEK ---
@@ -635,9 +687,12 @@ function renderujDane(data, timestamp, trybDemo = false) {
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
     
-    // Nowe czujniki
     document.getElementById("dash-water-temp").innerText = (data.water_temp && data.water_temp > 0) ? data.water_temp + "°" : "-";
     document.getElementById("dash-sun").innerText = (data.sun_hours !== undefined) ? data.sun_hours + " h" : "-";
+    
+    // Render Zegara Astronomicznego
+    document.getElementById("dash-sunrise").innerText = formatujMinuty(data.sr);
+    document.getElementById("dash-sunset").innerText = formatujMinuty(data.ss);
 
     // --- HYBRYDOWA LOGIKA WODY I SZACUNKÓW ---
     if(data.pump_sec !== undefined) {
@@ -650,7 +705,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
         let remLiters = 0;
         let pct = 0;
 
-        // Priorytet dla ultradźwięków (jeśli podłączono)
         if (data.us_dist !== undefined && data.us_dist > 0 && data.us_max !== undefined && data.us_min !== undefined) {
             let maxDist = data.us_max;
             let minDist = data.us_min;
@@ -659,7 +713,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
             if (pct > 100) pct = 100;
             remLiters = (pct / 100.0) * tVol;
         } else {
-            // Fallback (powrót do matematyki z czasu pompy)
             let usedLiters = (data.pump_sec / 60) * fRate;
             remLiters = Math.max(0, tVol - usedLiters);
             pct = Math.round((remLiters / tVol) * 100);
@@ -675,7 +728,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
         document.getElementById("dash-water-pct").innerText = pct + "%";
         document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
 
-        // Obliczanie szacowanych dni
         let activeProfileEl = document.querySelector('.profile-btn.selected');
         let dailyEstimateStr = "Brak danych";
         if (activeProfileEl && data.cfg_time && data.cfg_sleep) {
@@ -759,7 +811,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
             if(log.action === "ZA GORĄCO" || log.action === "BLOKADA (SŁOŃCE)" || log.action === "BLOKADA (BURZA)" || log.action === "TRYB SURVIVAL") cls = "bg-warn"; 
             if(log.action === "RĘCZNE") cls = "bg-manual";
             if(log.action === "NOCNY SEN") cls = "bg-sleep";
-            if(log.action === "ZIMNA WODA") cls = "bg-cold"; // Nowa klasa
+            if(log.action === "ZIMNA WODA") cls = "bg-cold"; 
             logBox.innerHTML += `<div class='log-item'><span>Wilgotność: <b>${log.moisture}%</b></span><span class='log-badge ${cls}'>${log.action}</span></div>`;
         });
         rysujWykresy(data.logs);
@@ -774,7 +826,8 @@ function pobierzDaneZESP32() {
         renderujDane(data, now, false);
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_sleep: 4, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
+        const demoSun = wyliczZegarAstronomiczny();
+        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_sleep: 4, sr: demoSun.sr, ss: demoSun.ss, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
