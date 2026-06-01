@@ -35,7 +35,6 @@
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-gradient); margin: 0; padding: 16px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; color: var(--text-main); -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         .wrapper { width: 100%; max-width: 410px; margin-top: 20px; background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border-light); border-radius: 38px; padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box; position: relative; }
         
-        /* Segmented Controls (Zakładki w stylu iOS) */
         .tab-nav { display: flex; background: var(--nav-bg); border-radius: 14px; padding: 4px; margin-bottom: 24px; position: relative; z-index: 10; user-select: none; -webkit-user-select: none; }
         .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: all 0.3s ease; }
         .tab-btn.active { background: var(--glass-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -43,8 +42,6 @@
         .tabs-wrapper { position: relative; width: 100%; }
         .tab-content { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; right: 0; height: 0; overflow: hidden; transform: scale(0.96) translateY(5px); transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s, height 0s 0.35s; }
         .tab-content.active { opacity: 1; visibility: visible; position: relative; height: auto; overflow: visible; transform: scale(1) translateY(0); transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s, height 0s 0s; }
-
-        /* Podzakładki dla sekcji Ustawienia */
         .sub-content { display: none; animation: fadeIn 0.4s ease; }
         .sub-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
@@ -52,17 +49,16 @@
         .status-hero { text-align: center; padding: 10px 0 20px 0; }
         .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
         .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        .update-badge { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; padding: 6px 14px; background: var(--nav-bg); border: 0.5px solid var(--border-light); border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-sub); cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.2s ease; }
+        .update-badge { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; padding: 6px 14px; background: var(--nav-bg); border: 0.5px solid var(--border-light); border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-sub); cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s ease; }
         .update-badge:active { transform: scale(0.95); background: var(--glass-card); }
         .sync-icon { width: 12px; height: 12px; color: var(--accent-blue); }
-        .syncing .sync-icon { animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .syncing .sync-icon { animation: spinSync 1s linear infinite; }
+        @keyframes spinSync { 100% { transform: rotate(360deg); } }
         @keyframes pulseAlert { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
 
         .weather-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .weather-card { flex: 1 1 calc(33.333% - 8px); min-width: 90px; background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 20px; padding: 12px 4px; text-align: center; box-sizing: border-box; }
-        .weather-card.full-width { flex: 1 1 100%; padding: 16px 10px; }
         .weather-val { font-size: 19px; font-weight: 800; margin-bottom: 2px; min-height: 22px; }
         .weather-lbl { font-size: 9px; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
 
@@ -87,7 +83,6 @@
         .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
         .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
         .log-item:last-child { border: none; padding-bottom: 0; }
-        
         .log-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
         .bg-ok { background: rgba(52, 199, 89, 0.12); color: var(--accent-green); }
         .bg-water { background: rgba(0, 122, 255, 0.12); color: var(--accent-blue); }
@@ -102,13 +97,123 @@
 
         #pulpit-toast { text-align: center; color: var(--accent-green); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s; margin-top: 5px; height: 20px; }
         .chart-container { position: relative; height: 160px; width: 100%; margin-bottom: 10px; }
-
-        .eng-title { color: var(--accent-orange); display: flex; align-items: center; gap: 6px; font-size: 15px; margin-bottom: 12px; font-weight: 800; }
+        
         .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; align-items: center; }
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
-        .file-input { display: block; width: 100%; padding: 8px; font-size: 12px; color: var(--text-sub); border: 1px dashed var(--border-light); border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; }
-        .progress-container { width: 100%; background: var(--range-bg); border-radius: 8px; margin-top: 10px; overflow: hidden; display: none; height: 8px; }
-        .progress-bar { height: 100%; background: var(--accent-orange); width: 0%; transition: width 0.2s ease; }
+
+        /* =========================================
+           ANIMACJA WODY I ŻYROSKOP (NOWOCZESNY EFEKT)
+           ========================================= */
+        .water-module {
+            background: var(--glass-card);
+            border: 1px solid var(--border-light);
+            border-radius: 22px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .tank-mask {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            background: var(--range-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            isolation: isolate; /* Fix dla Safari border-radius z overflow hidden */
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+        }
+
+        #gyro-wrapper {
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            transform-origin: center center;
+            transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+
+        #water-height-controller {
+            position: absolute;
+            bottom: -800px; /* Baza - całkowicie pusty zbiornik */
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            transform: translateX(-50%);
+            transition: bottom 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Fale kręcące się na wierzchu poziomu wody */
+        .wave {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #5ac8fa 0%, var(--accent-blue) 100%);
+            border-radius: 38%;
+            bottom: 0;
+            left: 0;
+            animation: spinWave 6s linear infinite;
+        }
+        .wave:nth-child(2) {
+            opacity: 0.5;
+            border-radius: 42%;
+            animation-duration: 8s;
+            animation-direction: reverse;
+        }
+        
+        .tank-mask.alert .wave {
+            background: linear-gradient(180deg, #ff6b22 0%, var(--accent-red) 100%);
+        }
+
+        @keyframes spinWave {
+            100% { transform: rotate(360deg); }
+        }
+
+        .tank-text-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+            color: var(--text-main);
+            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
+        }
+
+        #gyro-hint {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-top: 4px;
+            background: var(--glass-card);
+            padding: 4px 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s;
+        }
+
+        .btn-water-reset {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--accent-blue);
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-water-reset:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
@@ -135,6 +240,27 @@
                 </div>
             </div>
 
+            <div class="water-module">
+                <div class="weather-lbl" style="text-align: center; margin-bottom: -4px;">Woda w zbiorniku</div>
+                
+                <div class="tank-mask" id="tank-mask" onclick="initGyro()">
+                    <div id="gyro-wrapper">
+                        <div id="water-height-controller">
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="tank-text-overlay">
+                        <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">--%</span>
+                        <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">-- / -- L</span>
+                        <div id="gyro-hint">Dotknij aby włączyć żyroskop</div>
+                    </div>
+                </div>
+
+                <button class="btn-water-reset" onclick="zresetujLicznikWody()">💦 Zresetuj stan po napełnieniu beczki</button>
+            </div>
+
             <div class="weather-grid">
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-hum">-</div><div class="weather-lbl">Wilgotność</div></div>
@@ -143,12 +269,6 @@
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-time">-</div><div class="weather-lbl">Zapas Pracy</div></div>
-                
-                <div class="weather-card full-width" style="padding-bottom: 8px;">
-                    <div class="weather-val skeleton" id="dash-water-meter">-</div>
-                    <div class="weather-lbl">Estymacja wody w zbiorniku</div>
-                    <button class="btn-test" onclick="zresetujLicznikWody()" style="margin-top: 10px; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); font-size: 13px; padding: 10px;">💦 Zresetuj stan po napełnieniu beczki</button>
-                </div>
             </div>
 
             <h2 id="plants-title">Co dzisiaj rośnie?</h2>
@@ -163,7 +283,6 @@
         </div>
 
         <div id="tab-ustawienia" class="tab-content">
-            
             <div class="tab-nav" style="margin-bottom: 20px;">
                 <div id="btn-sub-ogolne" class="tab-btn active" onclick="zmienPodzakladke('ogolne')">Ogólne</div>
                 <div id="btn-sub-zaawansowane" class="tab-btn" onclick="zmienPodzakladke('zaawansowane')">Zaawansowane</div>
@@ -275,13 +394,58 @@
 <script>
 let chartInstance = null;
 let batteryChartInstance = null;
+let isGyroActive = false;
 
+// --- OBSŁUGA ŻYROSKOPU (WODA) ---
+function initGyro() {
+    if (isGyroActive) return; // Zapobiega wielokrotnemu pytaniu o zgodę
+    haptyka(15);
+    
+    // Sprawdzenie wymogów Safari/iOS 13+
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                    isGyroActive = true;
+                    document.getElementById('gyro-hint').style.opacity = "0";
+                }
+            })
+            .catch(console.error);
+    } else {
+        // Inne urządzenia (Android / starsze iOS)
+        window.addEventListener('deviceorientation', handleOrientation);
+        isGyroActive = true;
+        document.getElementById('gyro-hint').style.opacity = "0";
+    }
+}
+
+function handleOrientation(event) {
+    let gamma = event.gamma; // Kąt przechyłu lewo/prawo [-90 do 90]
+    if (gamma === null) return;
+    
+    // Zabezpieczenie przed zbytnim przekręceniem animacji
+    let rotation = gamma;
+    if (rotation > 40) rotation = 40;
+    if (rotation < -40) rotation = -40;
+    
+    // Aplikowanie rotacji do kontenera z wodą
+    document.getElementById('gyro-wrapper').style.transform = `rotate(${rotation}deg)`;
+}
+
+// --- LOGIKA APLIKACJI ---
 const domyslneProfile = {
     'pomidory': { th: 40, time: 3, sleep: 6, name: 'Pomidory' }, 'ogorki': { th: 65, time: 1.5, sleep: 3, name: 'Ogórki' },
     'sadzonki': { th: 55, time: 0.5, sleep: 2, name: 'Sadzonki' }, 'arbuz': { th: 45, time: 4, sleep: 6, name: 'Arbuz' }, 'borowka': { th: 70, time: 1, sleep: 3, name: 'Borówka' }
 };
 
-let profileData = JSON.parse(localStorage.getItem('bazaProfili')) || domyslneProfile;
+let profileData = {};
+try {
+    const saved = localStorage.getItem('bazaProfili');
+    profileData = saved ? JSON.parse(saved) : domyslneProfile;
+} catch(e) { profileData = domyslneProfile; }
+
+// Wymuszenie dodania nowych roślin jeśli stara pamięć ich nie miała
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
 
@@ -384,8 +548,10 @@ function zapiszParametryZbiornika() {
 
 function zresetujLicznikWody() {
     haptyka([30, 30, 30]);
-    if(confirm("Czy na pewno chcesz wyzerować licznik zużytej wody?")) {
-        fetch('http://192.168.4.1/resetWater', { mode: 'no-cors' }).then(() => { alert("✅ Licznik wody wyzerowany."); pobierzDaneZESP32(); }).catch(() => alert("⚠️ Tryb Offline"));
+    if(confirm("Czy na pewno napełniłeś beczkę i chcesz wyzerować licznik zużytej wody?")) {
+        fetch('http://192.168.4.1/resetWater', { mode: 'no-cors' })
+        .then(() => { alert("✅ Licznik wody wyzerowany."); pobierzDaneZESP32(); })
+        .catch(() => alert("⚠️ Tryb Offline"));
     }
 }
 
@@ -492,6 +658,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
 
+    // --- RENDEROWANIE POZIOMU WODY (Wysokość zbiornika) ---
     if(data.pump_sec !== undefined) {
         let tVol = data.tank_vol !== undefined ? data.tank_vol : 220; 
         let fRate = data.pump_flow !== undefined ? data.pump_flow : 2.0;
@@ -502,9 +669,26 @@ function renderujDane(data, timestamp, trybDemo = false) {
         let usedLiters = (data.pump_sec / 60) * fRate;
         let remLiters = Math.max(0, tVol - usedLiters);
         let pct = Math.round((remLiters / tVol) * 100);
-        let wEl = document.getElementById("dash-water-meter");
-        wEl.innerText = `${pct}% (~${Math.round(remLiters)} L)`;
-        wEl.style.color = pct <= 15 ? "var(--accent-red)" : "var(--accent-blue)";
+        if (pct < 0) pct = 0;
+        
+        // Logika podnoszenia wody (-800px to minimum, -300px to maksimum)
+        // Maksymalne wychylenie do góry ustalamy jako 0 (pełny kontener), a dół na -800.
+        // Ponieważ wysokość widocznego kontenera to 140px, woda musi wychodzić od -800 (puste) do ok. -660 (pełne).
+        let minBottom = -800;
+        let maxBottom = -660;
+        let calculatedBottom = minBottom + ((maxBottom - minBottom) * (pct / 100));
+        
+        document.getElementById("water-height-controller").style.bottom = calculatedBottom + "px";
+        document.getElementById("dash-water-pct").innerText = pct + "%";
+        document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
+        
+        if (pct <= 15) {
+            document.getElementById("dash-water-pct").style.color = "var(--accent-red)";
+            document.getElementById("tank-mask").classList.add("alert");
+        } else {
+            document.getElementById("dash-water-pct").style.color = "var(--text-main)";
+            document.getElementById("tank-mask").classList.remove("alert");
+        }
     }
 
     if(data.outdoors !== undefined) {
