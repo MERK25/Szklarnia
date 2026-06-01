@@ -15,7 +15,7 @@
             --html-bg: #e5e5ea; --bg-gradient: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 100%);
             --glass-bg: rgba(255, 255, 255, 0.65); --glass-card: rgba(255, 255, 255, 0.8);
             --text-main: #1c1c1e; --text-sub: #636366;
-            --accent-green: #34c759; --accent-blue: #007aff; --accent-red: #ff3b30; --accent-orange: #ff9500; --accent-purple: #af52de;
+            --accent-green: #34c759; --accent-blue: #007aff; --accent-red: #ff3b30; --accent-orange: #ff9500; --accent-purple: #af52de; --accent-cyan: #32ade6;
             --border-light: rgba(255, 255, 255, 0.5); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
             --input-bg: #ffffff; --nav-bg: rgba(0,0,0,0.06); --range-bg: rgba(0,0,0,0.05); --profile-sel-bg: rgba(52, 199, 89, 0.05);
         }
@@ -23,11 +23,11 @@
             --html-bg: #000000; --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
             --glass-bg: rgba(28, 28, 30, 0.4); --glass-card: rgba(44, 44, 46, 0.6);
             --text-main: #ffffff; --text-sub: #aeaea2;
-            --accent-green: #30d158; --accent-blue: #0a84ff; --accent-red: #ff453a; --accent-orange: #ff9f0a; --accent-purple: #bf5af2;
+            --accent-green: #30d158; --accent-blue: #0a84ff; --accent-red: #ff453a; --accent-orange: #ff9f0a; --accent-purple: #bf5af2; --accent-cyan: #64d2ff;
             --border-light: rgba(255, 255, 255, 0.05); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
             --input-bg: rgba(28, 28, 30, 0.6); --nav-bg: rgba(255,255,255,0.1); --range-bg: rgba(255,255,255,0.1); --profile-sel-bg: rgba(48, 209, 88, 0.15);
         }
-        @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --html-bg: #000000; --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%); --glass-bg: rgba(28, 28, 30, 0.4); --glass-card: rgba(44, 44, 46, 0.6); --text-main: #ffffff; --text-sub: #aeaea2; --accent-green: #30d158; --accent-blue: #0a84ff; --accent-red: #ff453a; --accent-orange: #ff9f0a; --accent-purple: #bf5af2; --border-light: rgba(255, 255, 255, 0.05); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3); --input-bg: rgba(28, 28, 30, 0.6); --nav-bg: rgba(255,255,255,0.1); --range-bg: rgba(255,255,255,0.1); --profile-sel-bg: rgba(48, 209, 88, 0.15); } }
+        @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --html-bg: #000000; --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%); --glass-bg: rgba(28, 28, 30, 0.4); --glass-card: rgba(44, 44, 46, 0.6); --text-main: #ffffff; --text-sub: #aeaea2; --accent-green: #30d158; --accent-blue: #0a84ff; --accent-red: #ff453a; --accent-orange: #ff9f0a; --accent-purple: #bf5af2; --accent-cyan: #64d2ff; --border-light: rgba(255, 255, 255, 0.05); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3); --input-bg: rgba(28, 28, 30, 0.6); --nav-bg: rgba(255,255,255,0.1); --range-bg: rgba(255,255,255,0.1); --profile-sel-bg: rgba(48, 209, 88, 0.15); } }
 
         html { background-color: var(--html-bg); transition: background-color 0.3s; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-gradient); margin: 0; padding: 16px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; color: var(--text-main); -webkit-font-smoothing: antialiased; box-sizing: border-box; }
@@ -102,7 +102,7 @@
         .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
 
         /* =========================================
-           Oryginalna animacja wody z pierwszego kodu
+           Animacja wody
            ========================================= */
         .water-module {
             background: var(--glass-card);
@@ -138,7 +138,6 @@
             transition: bottom 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Fale kręcące się na wierzchu poziomu wody */
         .wave {
             position: absolute;
             width: 100%;
@@ -237,7 +236,7 @@
             <div class="weather-grid">
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-temp">-</div><div class="weather-lbl">Temp.</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-hum">-</div><div class="weather-lbl">Wilgotność</div></div>
-                <div class="weather-card"><div class="weather-val skeleton" id="dash-vpd">-</div><div class="weather-lbl">Stres Wodny</div></div>
+                <div class="weather-card"><div class="weather-val skeleton" id="dash-light">-</div><div class="weather-lbl">Światło</div></div>
                 
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
                 <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
@@ -308,15 +307,22 @@
                     <h3 style="font-size: 12px; margin-top: 0; color: var(--text-sub);">Poziom nawodnienia (%)</h3>
                     <div class="chart-container"><canvas id="moistureChart"></canvas></div>
                     
+                    <h3 style="font-size: 12px; margin-top: 15px; color: var(--text-sub);">Temperatura (°C)</h3>
+                    <div class="chart-container"><canvas id="tempChart"></canvas></div>
+
+                    <h3 style="font-size: 12px; margin-top: 15px; color: var(--text-sub);">Wilgotność powietrza (%)</h3>
+                    <div class="chart-container"><canvas id="humChart"></canvas></div>
+
                     <h3 style="font-size: 12px; margin-top: 15px; color: var(--text-sub);">Kondycja Zasilania (V)</h3>
                     <div class="chart-container"><canvas id="batteryChart"></canvas></div>
 
                     <div class="log-container" id="logBox" style="margin-top: 15px;"><div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div></div>
                 </div>
                 
-                <h2>Zarządzanie Energią</h2>
+                <h2>Zarządzanie Energią i Zimą</h2>
                 <div class="section-card">
-                    <button class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red);">❄️ Włącz tryb zimowania</button>
+                    <button class="btn-test" onclick="wypompujWode()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-bottom: 12px;">❄️ Wypompuj resztki wody z węży</button>
+                    <button class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red);">💤 Włącz tryb zimowania (Uśpienie)</button>
                 </div>
             </div>
 
@@ -339,7 +345,7 @@
                 <h2>Diagnostyka i Kalibracja ADC</h2>
                 <div class="section-card">
                     <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
-                    <div class="eng-data-row"><span>Surowy odczyt ADC:</span> <b id="eng-raw-adc">---</b></div>
+                    <div class="eng-data-row"><span>Surowy odczyt wilgotności:</span> <b id="eng-raw-adc">---</b></div>
                     <div class="eng-data-row" style="border-bottom:none; margin-top:15px; margin-bottom:4px;"><span>Wartość AIR (Sucho):</span><input type="number" id="calib-air" class="eng-input" value="3200"></div>
                     <div class="eng-data-row" style="border-bottom:none;"><span>Wartość WATER (Mokro):</span><input type="number" id="calib-water" class="eng-input" value="1500"></div>
                     <button class="btn-test" onclick="zapiszKalibracje()" style="margin-top: 15px;">📡 Zapisz kalibrację gleby</button>
@@ -483,6 +489,15 @@ function zresetujLicznikWody() {
     }
 }
 
+function wypompujWode() {
+    haptyka([50, 50, 50]);
+    if(confirm("Czy upewniłeś się, że wąż jest skierowany poza szklarnię? Pompa będzie pracować aż do wskazania braku wody.")) {
+        fetch('http://192.168.4.1/drain', { mode: 'no-cors' })
+        .then(() => { alert("❄️ Rozpoczęto opróżnianie układu."); })
+        .catch(() => alert("⚠️ Tryb Offline"));
+    }
+}
+
 function haptyka(wzor) { if ("vibrate" in navigator) navigator.vibrate(wzor); }
 
 function zmienMotyw(motyw) {
@@ -603,11 +618,15 @@ function rysujProstyWykres(canvasId, daneArray, kolorLinii, minVal, maxVal) {
 
 function rysujWykresy(logi) {
     const dane = [...logi].reverse(); 
-    const cLinii = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim() || '#007aff';
-    const cVolt = getComputedStyle(document.documentElement).getPropertyValue('--accent-orange').trim() || '#ff9500';
+    const cNiebieski = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim() || '#007aff';
+    const cPomaranczowy = getComputedStyle(document.documentElement).getPropertyValue('--accent-orange').trim() || '#ff9500';
+    const cCzerwony = getComputedStyle(document.documentElement).getPropertyValue('--accent-red').trim() || '#ff3b30';
+    const cBlekitny = getComputedStyle(document.documentElement).getPropertyValue('--accent-cyan').trim() || '#32ade6';
 
-    rysujProstyWykres('moistureChart', dane.map(l => l.moisture), cLinii, 0, 100);
-    rysujProstyWykres('batteryChart', dane.map(l => l.v || 3.5), cVolt, 3.2, 4.3);
+    rysujProstyWykres('moistureChart', dane.map(l => l.moisture), cNiebieski, 0, 100);
+    rysujProstyWykres('tempChart', dane.map(l => l.t || 20), cCzerwony, 0, 50);
+    rysujProstyWykres('humChart', dane.map(l => l.h || 50), cBlekitny, 0, 100);
+    rysujProstyWykres('batteryChart', dane.map(l => l.v || 3.5), cPomaranczowy, 3.2, 4.3);
 }
 
 function renderujDane(data, timestamp, trybDemo = false) {
@@ -619,6 +638,7 @@ function renderujDane(data, timestamp, trybDemo = false) {
     
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
     document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum + "%" : "-";
+    document.getElementById("dash-light").innerText = (data.light !== undefined) ? data.light + "%" : "-";
     
     let vpdVal = obliczVPD(data.temp, data.air_hum);
     let vpdEl = document.getElementById("dash-vpd");
@@ -735,7 +755,7 @@ function pobierzDaneZESP32() {
         renderujDane(data, now, false);
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, tank_vol: 220, pump_flow: 2.0, logs: [{moisture: 42, v: 3.95, action: "OK"}]}, new Date().getTime(), true);
+        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, light: 85, tank_vol: 220, pump_flow: 2.0, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
@@ -762,8 +782,8 @@ function zapiszKalibracje() { haptyka([20, 30, 20]); fetch(`http://192.168.4.1/c
 function eksportujCSV() {
     haptyka(15); const cached = localStorage.getItem('lastESPData'); if(!cached) return alert("Brak danych.");
     const logs = JSON.parse(cached).data.logs; if(!logs) return;
-    let csv = "data:text/csv;charset=utf-8,ID,Wilgotnosc_Pct,Napiecie_V,Zarejestrowana_Akcja\n"; 
-    logs.forEach((l, i) => csv += `${i + 1},${l.moisture},${l.v || "-"},${l.action}\n`);
+    let csv = "data:text/csv;charset=utf-8,ID,Wilgotnosc_Pct,Temperatura_C,Wilgotnosc_Powietrza_Pct,Napiecie_V,Zarejestrowana_Akcja\n"; 
+    logs.forEach((l, i) => csv += `${i + 1},${l.moisture},${l.t || "-"},${l.h || "-"},${l.v || "-"},${l.action}\n`);
     const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "szklarnia_raport_zaawansowany.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 
