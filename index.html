@@ -228,7 +228,6 @@
                     <div class="tank-text-overlay">
                         <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">--%</span>
                         <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">-- / -- L</span>
-                        <span id="dash-water-est" style="font-size: 10px; font-weight: 700; color: var(--text-main); opacity: 0.75; margin-top: 4px;">Szacowanie...</span>
                     </div>
                 </div>
 
@@ -277,8 +276,10 @@
                     <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
                     <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span></div>
                     <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Interwał usypiania</span><span id="edit-sleep-val" style="color:var(--accent-blue);">4 h</span></div>
-                    <input type="range" id="edit-sleep" min="1" max="24" step="1" value="4" oninput="document.getElementById('edit-sleep-val').innerText = this.value + ' h'">
+                    
+                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Tryb Inteligentnego Snu</span><span id="edit-aggr-val" style="color:var(--accent-blue);">Zbalansowany</span></div>
+                    <input type="range" id="edit-aggr" min="0" max="2" step="1" value="1" oninput="aktualizujEtykieteAgresywnosci(this.value)">
+                    
                     <button class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px;">💾 Zapisz zmiany</button>
                 </div>
 
@@ -376,10 +377,9 @@
 </div>
 
 <script>
-// --- LOGIKA APLIKACJI ---
 const domyslneProfile = {
-    'pomidory': { th: 40, time: 3, sleep: 6, name: 'Pomidory' }, 'ogorki': { th: 65, time: 1.5, sleep: 3, name: 'Ogórki' },
-    'sadzonki': { th: 55, time: 0.5, sleep: 2, name: 'Sadzonki' }, 'arbuz': { th: 45, time: 4, sleep: 6, name: 'Arbuz' }, 'borowka': { th: 70, time: 1, sleep: 3, name: 'Borówka' }
+    'pomidory': { th: 40, time: 3, aggr: 1, name: 'Pomidory' }, 'ogorki': { th: 65, time: 1.5, aggr: 2, name: 'Ogórki' },
+    'sadzonki': { th: 55, time: 0.5, aggr: 1, name: 'Sadzonki' }, 'arbuz': { th: 45, time: 4, aggr: 1, name: 'Arbuz' }, 'borowka': { th: 70, time: 1, aggr: 0, name: 'Borówka' }
 };
 
 let profileData = {};
@@ -391,38 +391,40 @@ try {
 if (!profileData['arbuz']) profileData['arbuz'] = domyslneProfile['arbuz'];
 if (!profileData['borowka']) profileData['borowka'] = domyslneProfile['borowka'];
 
-function zaktualizujUIZESP(th, time, sleep) {
+function aktualizujEtykieteAgresywnosci(val) {
+    const etykiety = ["Oszczędny", "Zbalansowany", "Precyzyjny"];
+    document.getElementById('edit-aggr-val').innerText = etykiety[val] || "Błąd";
+}
+
+function zaktualizujUIZESP(th, time, aggr) {
     document.getElementById('edit-th').value = th;
     document.getElementById('edit-th-val').innerText = th + '%';
     document.getElementById('edit-time').value = time;
     document.getElementById('edit-time-val').innerText = time + ' min';
-    document.getElementById('edit-sleep').value = sleep;
-    document.getElementById('edit-sleep-val').innerText = sleep + ' h';
+    document.getElementById('edit-aggr').value = aggr;
+    aktualizujEtykieteAgresywnosci(aggr);
 
     document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     
     let znalezionoProfil = false;
     for (const [id, param] of Object.entries(profileData)) {
-        if (param.th == th && param.time == time && param.sleep == sleep) {
+        if (param.th == th && param.time == time && param.aggr == aggr) {
             document.getElementById('prof-' + id).classList.add('selected');
             localStorage.setItem("activeProfile", 'prof-' + id);
             znalezionoProfil = true;
             break;
         }
     }
-    
-    if (!znalezionoProfil) {
-        localStorage.removeItem("activeProfile");
-    }
+    if (!znalezionoProfil) localStorage.removeItem("activeProfile");
 }
 
-function aktywujProfil(id) { ustawProfilZapisz(profileData[id].th, profileData[id].time, profileData[id].sleep, 'prof-' + id, profileData[id].name); }
+function aktywujProfil(id) { ustawProfilZapisz(profileData[id].th, profileData[id].time, profileData[id].aggr, 'prof-' + id, profileData[id].name); }
 
 function wczytajProfilDoEdycji() {
     const p = profileData[document.getElementById('edit-profile-select').value];
     document.getElementById('edit-th').value = p.th; document.getElementById('edit-th-val').innerText = p.th + '%';
     document.getElementById('edit-time').value = p.time; document.getElementById('edit-time-val').innerText = p.time + ' min';
-    document.getElementById('edit-sleep').value = p.sleep; document.getElementById('edit-sleep-val').innerText = p.sleep + ' h';
+    document.getElementById('edit-aggr').value = p.aggr || 1; aktualizujEtykieteAgresywnosci(p.aggr || 1);
 }
 
 function zapiszEdytowanyProfil() {
@@ -430,7 +432,7 @@ function zapiszEdytowanyProfil() {
     const id = document.getElementById('edit-profile-select').value;
     profileData[id].th = document.getElementById('edit-th').value;
     profileData[id].time = document.getElementById('edit-time').value;
-    profileData[id].sleep = document.getElementById('edit-sleep').value;
+    profileData[id].aggr = document.getElementById('edit-aggr').value;
     localStorage.setItem('bazaProfili', JSON.stringify(profileData));
     alert(`✅ Zapisano nowe parametry dla: ${profileData[id].name}`);
     if(document.getElementById('prof-' + id).classList.contains('selected')) aktywujProfil(id);
@@ -536,12 +538,9 @@ function zmienPodzakladke(tab) {
     document.getElementById('sub-' + tab).classList.add('active');
 }
 
-// --- ALGORYTM ZEGARA ASTRONOMICZNEGO ---
 function wyliczZegarAstronomiczny() {
-    // Współrzędne dla centralnej Polski
     const lat = 52.0; 
     const lon = 19.0;
-    
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
     const diff = now - start;
@@ -557,7 +556,7 @@ function wyliczZegarAstronomiczny() {
     const sunriseUTC = 720 - 4 * (lon + ha * 180 / Math.PI) - eqTime;
     const sunsetUTC  = 720 - 4 * (lon - ha * 180 / Math.PI) - eqTime;
 
-    const tzOffset = -now.getTimezoneOffset(); // Przesunięcie przeglądarki (np. czas letni)
+    const tzOffset = -now.getTimezoneOffset(); 
     
     let localSunrise = Math.round(sunriseUTC + tzOffset);
     let localSunset = Math.round(sunsetUTC + tzOffset);
@@ -576,7 +575,6 @@ window.onload = function() {
     if(cachedData) { try { const parsed = JSON.parse(cachedData); renderujDane(parsed.data, parsed.timestamp, false); } catch(e) {} }
     else document.querySelectorAll('.weather-val').forEach(el => el.classList.add('skeleton'));
     
-    // Wysyłamy do ESP32 dokładny czas + minuty dzisiejszego wschodu i zachodu
     const sunData = wyliczZegarAstronomiczny();
     fetch(`http://192.168.4.1/sync?t=${Math.floor(Date.now() / 1000)}&sr=${sunData.sr}&ss=${sunData.ss}`, {mode:'no-cors'}).catch(()=>{});
     
@@ -603,7 +601,6 @@ function obliczVPD(temp, hum) {
     return (svp - avp).toFixed(2);
 }
 
-// --- NATYWNE RYSOWANIE WYKRESÓW BEZ BIBLIOTEK ---
 function rysujProstyWykres(canvasId, daneArray, kolorLinii, minVal, maxVal) {
     const canvas = document.getElementById(canvasId);
     if(!canvas) return;
@@ -679,8 +676,8 @@ function rysujWykresy(logi) {
 function renderujDane(data, timestamp, trybDemo = false) {
     document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
     
-    if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_sleep !== undefined) {
-        zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_sleep);
+    if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_aggr !== undefined) {
+        zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_aggr);
     }
     
     document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp + "°" : "-";
@@ -690,11 +687,9 @@ function renderujDane(data, timestamp, trybDemo = false) {
     document.getElementById("dash-water-temp").innerText = (data.water_temp && data.water_temp > 0) ? data.water_temp + "°" : "-";
     document.getElementById("dash-sun").innerText = (data.sun_hours !== undefined) ? data.sun_hours + " h" : "-";
     
-    // Render Zegara Astronomicznego
     document.getElementById("dash-sunrise").innerText = formatujMinuty(data.sr);
     document.getElementById("dash-sunset").innerText = formatujMinuty(data.ss);
 
-    // --- HYBRYDOWA LOGIKA WODY I SZACUNKÓW ---
     if(data.pump_sec !== undefined) {
         let tVol = data.tank_vol !== undefined ? data.tank_vol : 220; 
         let fRate = data.pump_flow !== undefined ? data.pump_flow : 2.0;
@@ -727,21 +722,6 @@ function renderujDane(data, timestamp, trybDemo = false) {
         document.getElementById("water-height-controller").style.bottom = calculatedBottom + "px";
         document.getElementById("dash-water-pct").innerText = pct + "%";
         document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
-
-        let activeProfileEl = document.querySelector('.profile-btn.selected');
-        let dailyEstimateStr = "Brak danych";
-        if (activeProfileEl && data.cfg_time && data.cfg_sleep) {
-            let wateringsPerDay = 24 / data.cfg_sleep;
-            let litersPerDay = wateringsPerDay * (data.cfg_time * fRate);
-            if (litersPerDay > 0) {
-                let daysLeft = Math.floor(remLiters / litersPerDay);
-                if (daysLeft > 14) dailyEstimateStr = "Spokojnie na ponad 2 tyg.";
-                else if (daysLeft > 1) dailyEstimateStr = `Wystarczy na ok. ${daysLeft} dni`;
-                else if (daysLeft === 1) dailyEstimateStr = `Wystarczy na 1 dzień`;
-                else dailyEstimateStr = `Woda się kończy!`;
-            }
-        }
-        document.getElementById("dash-water-est").innerText = dailyEstimateStr;
         
         if (pct <= 15) {
             document.getElementById("dash-water-pct").style.color = "var(--accent-red)";
@@ -783,7 +763,10 @@ function renderujDane(data, timestamp, trybDemo = false) {
 
     unlockBtn.style.display = "none"; pContainer.style.display = "flex"; pTitle.style.display = "block";
 
-    if(data.survival === 1) {
+    if(data.batt_warn === 1) {
+        hIcon.innerText = "🔋"; hIcon.classList.add("pulse-alert");
+        hText.innerText = "Spadek pojemności Akumulatora!"; hText.style.color = "var(--accent-orange)";
+    } else if(data.survival === 1) {
         hIcon.innerText = "🔋"; hIcon.classList.add("pulse-alert");
         hText.innerText = "Tryb przetrwania (Słaba Bateria)"; hText.style.color = "var(--accent-orange)";
     } else if(data.fault === 1) {
@@ -827,16 +810,16 @@ function pobierzDaneZESP32() {
     }).catch(() => {
         const cached = localStorage.getItem('lastESPData');
         const demoSun = wyliczZegarAstronomiczny();
-        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_sleep: 4, sr: demoSun.sr, ss: demoSun.ss, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
+        if(!cached) renderujDane({temp: 32.5, air_hum: 28, pressure: 1012.5, voltage: 3.952, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: demoSun.sr, ss: demoSun.ss, batt_warn: 0, logs: [{moisture: 42, v: 3.95, t: 25.1, h: 44, action: "OK"}]}, new Date().getTime(), true);
         else renderujDane(JSON.parse(cached).data, JSON.parse(cached).timestamp, true);
     }).finally(() => { if(badge) setTimeout(() => badge.classList.remove('syncing'), 500); });
 }
 
-function ustawProfilZapisz(th, time, sleep, btnId, name) {
+function ustawProfilZapisz(th, time, aggr, btnId, name) {
     haptyka([15, 50, 15]); document.querySelectorAll('.profile-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById(btnId).classList.add('selected'); localStorage.setItem("activeProfile", btnId);
     const toast = document.getElementById("pulpit-toast"); toast.style.opacity = "1"; toast.innerText = "⏳ Wysyłanie konfiguracji...";
-    fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&sleepSec=${sleep * 3600}`, { mode: 'no-cors' })
+    fetch(`http://192.168.4.1/save?thPct=${th}&timeSec=${time * 60}&aggr=${aggr}`, { mode: 'no-cors' })
     .then(() => { toast.innerText = "✓ Zapisano ustawienia: " + name; pobierzDaneZESP32(); })
     .catch(() => { toast.innerText = "✓ (Demo) Ustawiono lokalnie"; setTimeout(() => toast.style.opacity = "0", 3000); });
 }
