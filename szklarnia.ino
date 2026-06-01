@@ -53,7 +53,7 @@ unsigned long configStartTime;
 bool inConfigMode = false;
 bool isUpdating = false;
 
-// --- ZABEZPIECZENIA WSPÓŁBIEŻNOŚCI (Volatile Flags) ---
+// --- KOLEJKA FLAG DLA UNIKNIĘCIA WYŚCIGÓW DANYCH ---
 volatile bool flag_saveConfig = false;
 volatile int tmp_th, tmp_time, tmp_aggr;
 
@@ -98,7 +98,6 @@ float getInternalVoltage() {
   return ((vCode / 4095.0) * 3.3 * 2.0 < 1.0) ? 5.01 : (vCode / 4095.0) * 3.3 * 2.0;
 }
 
-// Bezpieczna funkcja zdejmująca NaN (Not-a-Number)
 float safeFloat(float val) {
   if (isnan(val) || isinf(val)) return 0.0;
   return val;
@@ -502,7 +501,7 @@ void loop() {
   esp_task_wdt_reset();
   
   if (inConfigMode) {
-    // --- LINIOWA (JEDNOWĄTKOWA) EGZEKUCJA ZADAŃ Z KOLEJKI ---
+    // --- BEZPIECZNE WYKONYWANIE ZADAŃ SEKWENCYJNYCH W JEDNYM WĄTKU ---
     if (flag_saveConfig) {
       preferences.begin("garden", false);
       preferences.putInt("th", tmp_th); preferences.putInt("time", tmp_time); preferences.putInt("aggr", tmp_aggr);
@@ -572,7 +571,7 @@ void loop() {
       shouldGoToSleep = true; sleepDelayTimer = millis(); 
     }
 
-    // --- ZARZĄDZANIE CZASEM PRACY ---
+    // --- TIMEOUTY USYPIANIA ---
     if (isServiceMode) {
        if (millis() - serviceStartTime > 3600000) { 
            isServiceMode = false;
