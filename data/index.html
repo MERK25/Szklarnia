@@ -96,7 +96,8 @@ canvas{display:block;width:100%;height:100%}
 .ptr-spin{animation:ptrSpin .8s linear infinite}
 @keyframes ptrSpin{to{transform:rotate(360deg)}}
 .demo-pill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:var(--accent-purple);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;display:none}
-.profile-modal-bg{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,0.4);align-items:center;justify-content:center}
+.profile-modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:6000;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;overscroll-behavior:contain}
+body.modal-open{overflow:hidden;touch-action:none}
 .hwswitch{position:relative;display:inline-block;width:50px;height:28px;flex-shrink:0}
 .hwswitch input{opacity:0;width:0;height:0}
 .hwslider{position:absolute;cursor:pointer;inset:0;background:var(--range-bg);border-radius:28px;transition:.3s;border:1px solid var(--border-light)}
@@ -389,7 +390,7 @@ canvas{display:block;width:100%;height:100%}
 </div>
 <script>
 var IS_DEMO=location.hostname.includes('github.io')||location.hostname.includes('localhost')||location.hostname==='127.0.0.1'||location.protocol==='file:';
-var isServiceModeActive=false,lockConfig=false,zakresDni=7,lastDataCache=null;
+var isServiceModeActive=false,lockConfig=false,zakresDni=7,lastDataCache=null,nieobsluzoneAlarmy=[];
 
 function genDemoHistory(){var arr=[],now=Math.floor(Date.now()/1000),m=70;for(var i=120;i>=0;i--){var ts=now-i*21600;m-=Math.random()*8;var a=0,p=0;if(m<45){a=1;p=180;m=75+Math.random()*10;}var hr=new Date(ts*1000).getHours();var t=18+Math.sin(hr/24*Math.PI*2)*8+Math.random()*3;arr.push({ts:ts,m:Math.round(Math.max(20,m)),t:Math.round(t*10),h:Math.round(55+Math.random()*20),v:Math.round((12.8+Math.random()*0.8)*100),a:a,p:p});}return arr;}
 var demoHistory=genDemoHistory();
@@ -399,6 +400,10 @@ var DEMO_PROFILES={pomidory:{name:"Pomidory",icon:"🍅",th:45,time:3,aggr:1,bui
 var profileData={};
 
 function haptyka(p){if(navigator.vibrate&&!IS_DEMO)navigator.vibrate(p);}
+function liczbaOtwartychModali(){return document.querySelectorAll('.profile-modal-bg.otwarty').length;}
+function pokazModal(id){var m=document.getElementById(id);if(!m)return;m.style.display='flex';m.classList.add('otwarty');document.body.classList.add('modal-open');}
+function ukryjModal(id){var m=document.getElementById(id);if(!m)return;m.style.display='none';m.classList.remove('otwarty');if(liczbaOtwartychModali()===0)document.body.classList.remove('modal-open');}
+
 function espFetch(url,opts){
   if(IS_DEMO){return new Promise(function(res){setTimeout(function(){
     if(url.indexOf('/data')===0)res({ok:true,json:function(){return Promise.resolve(JSON.parse(JSON.stringify(DEMO_DATA)));}});
@@ -430,9 +435,9 @@ function odswiezListeEdycji(){var s=document.getElementById('edit-profile-select
 function aktywujProfil(id){var p=profileData[id];if(!p)return;document.querySelectorAll('.profile-btn').forEach(function(b){b.classList.remove('selected');});var btn=document.getElementById('prof-'+id);if(btn)btn.classList.add('selected');haptyka(15);espFetch('/save?thPct='+p.th+'&timeSec='+(p.time*60)+'&aggr='+p.aggr).then(function(){potwierdz('Aktywowano: '+p.name);if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Offline',false);});}
 var EMOJI_LIST=['🍅','🥒','🌱','🍉','🫐','🌶️','🥬','🍓','🌽','🥕','🧄','🧅','🍆','🎃','🌻','🌿','🪴','🍇'];
 var edytowanyProfilId=null,wybraneEmoji='🌿';
-function otworzDodawanieProfilu(){edytowanyProfilId=null;document.getElementById('modal-title').innerText='Nowa uprawa';document.getElementById('new-prof-name').value='';document.getElementById('new-prof-th').value=45;document.getElementById('new-prof-th-val').innerText='45%';document.getElementById('new-prof-time').value=3;document.getElementById('new-prof-time-val').innerText='3 min';document.getElementById('btn-delete-prof').style.display='none';renderujEmojiPicker('🌿');document.getElementById('profile-modal').style.display='flex';}
+function otworzDodawanieProfilu(){edytowanyProfilId=null;document.getElementById('modal-title').innerText='Nowa uprawa';document.getElementById('new-prof-name').value='';document.getElementById('new-prof-th').value=45;document.getElementById('new-prof-th-val').innerText='45%';document.getElementById('new-prof-time').value=3;document.getElementById('new-prof-time-val').innerText='3 min';document.getElementById('btn-delete-prof').style.display='none';renderujEmojiPicker('🌿');pokazModal('profile-modal');}
 function renderujEmojiPicker(sel){wybraneEmoji=sel;var p=document.getElementById('emoji-picker');p.innerHTML='';EMOJI_LIST.forEach(function(e){var b=document.createElement('button');b.innerText=e;b.style.cssText='font-size:22px;padding:6px;border-radius:10px;border:2px solid '+(e===sel?'var(--accent-green)':'transparent')+';background:var(--nav-bg);cursor:pointer';b.onclick=function(){renderujEmojiPicker(e);};p.appendChild(b);});}
-function zamknijModal(){document.getElementById('profile-modal').style.display='none';}
+function zamknijModal(){ukryjModal('profile-modal');}
 function zapiszNowyProfil(){var name=document.getElementById('new-prof-name').value.trim();if(!name){potwierdz('Podaj nazwę',false);return;}if(!edytowanyProfilId&&Object.keys(profileData).length>=15){potwierdz('Limit 15 upraw',false);return;}var id=edytowanyProfilId||('custom_'+Date.now());profileData[id]={name:name,icon:wybraneEmoji,th:parseInt(document.getElementById('new-prof-th').value),time:parseFloat(document.getElementById('new-prof-time').value),aggr:1,builtin:0};haptyka(15);ustawStanPrzycisku('btn-save-new-prof',true,'Zapisz');zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();zamknijModal();potwierdz('Zapisano uprawę');}).catch(function(){potwierdz('Zapisano lokalnie',false);}).finally(function(){ustawStanPrzycisku('btn-save-new-prof',false,'Zapisz');});}
 function usunProfil(){if(!edytowanyProfilId)return;if(!confirm('Usunąć tę uprawę?'))return;delete profileData[edytowanyProfilId];haptyka([30,30]);zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();zamknijModal();potwierdz('Usunięto');});}
 function aktualizujEtykieteAgresywnosci(v){var e=["Oszczędny","Zbalansowany","Precyzyjny"];document.getElementById('edit-aggr-val').innerText=e[v];}
@@ -458,6 +463,29 @@ function formatMin(m){if(m===undefined||isNaN(m))return'--:--';return String(Mat
 function formatCzas(sec){if(!sec)return'--';var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);if(h>0)return h+'h '+(m>0?m+'min':'');return m+' min';}
 function obliczWilgotnosc(d){if(d.raw_adc===undefined||d.air_val===undefined||d.water_val===undefined){if(d.logs&&d.logs.length)return d.logs[d.logs.length-1].moisture;return null;}var pct=(d.raw_adc-d.air_val)/(d.water_val-d.air_val)*100;return Math.max(0,Math.min(100,Math.round(pct)));}
 
+var ALARM_HERO={2:{icon:'⚠️',txt:'Wystąpił pusty zbiornik',k:'var(--accent-orange)'},6:{icon:'🔥',txt:'Wystąpiła awaria pompy',k:'var(--accent-red)'},8:{icon:'🔋',txt:'Wystąpiła słaba bateria',k:'var(--accent-orange)'}};
+function aktualizujStatusHero(d){
+  var hI=document.getElementById("hero-icon"),hT=document.getElementById("hero-text"),uB=document.getElementById("fault-unlock-btn"),pC=document.getElementById("plants-container"),pT=document.getElementById("plants-title");
+  uB.style.display="none";pC.style.display="flex";pT.style.display="block";hI.classList.remove("pulse-alert");
+  var progi=JSON.parse(localStorage.getItem('progiAlarmow')||'{"batt":20,"temp":35}');
+  var battPct=d.voltage?Math.max(0,Math.min(100,Math.round(((d.voltage-11.5)/2.1)*100))):100;
+  // 1) Stan BIEŻĄCY ma najwyższy priorytet
+  if(d.fault===1){hI.innerText="🔥";hI.classList.add("pulse-alert");hT.innerText="AWARIA POMPY!";hT.style.color="var(--accent-red)";uB.style.display="block";pC.style.display="none";pT.style.display="none";return;}
+  if(d.water==="EMPTY"){hI.innerText="⚠️";hI.classList.add("pulse-alert");hT.innerText="Dolej wody do beczki!";hT.style.color="var(--accent-red)";return;}
+  if(battPct<progi.batt){hI.innerText="🔋";hI.classList.add("pulse-alert");hT.innerText="Niski poziom baterii";hT.style.color="var(--accent-orange)";return;}
+  if(d.temp!==undefined&&d.temp>progi.temp){hI.innerText="🌡️";hI.classList.add("pulse-alert");hT.innerText="Wysoka temperatura";hT.style.color="var(--accent-orange)";return;}
+  // 2) Stan bieżący OK, ale są NIEOBSŁUŻONE zdarzenia z przeszłości
+  if(nieobsluzoneAlarmy&&nieobsluzoneAlarmy.length>0){
+    var najwazniejszy=nieobsluzoneAlarmy.slice().sort(function(a,b){var rank={6:3,2:2,8:1};return (rank[b.type]||0)-(rank[a.type]||0);})[0];
+    var info=ALARM_HERO[najwazniejszy.type]||{icon:'🔔',txt:'Wystąpiło zdarzenie',k:'var(--accent-orange)'};
+    hI.innerText=info.icon;
+    hT.innerText=(nieobsluzoneAlarmy.length>1?'Zdarzenia pod nieobecność ('+nieobsluzoneAlarmy.length+')':info.txt);
+    hT.style.color=info.k;
+    return;
+  }
+  // 3) Wszystko czyste
+  hI.innerText="🌿";hT.innerText="Wszystko w porządku";hT.style.color="var(--accent-green)";
+}
 function renderujDane(d,timestamp,demo){
   document.getElementById("dash-temp").innerText=(d.temp!==undefined)?d.temp.toFixed(1)+"°":"-";
   document.getElementById("dash-hum").innerText=(d.air_hum!==undefined)?d.air_hum.toFixed(0)+"%":"-";
@@ -497,15 +525,7 @@ function renderujDane(d,timestamp,demo){
   }
 
   // STATUS HERO
-  var hI=document.getElementById("hero-icon"),hT=document.getElementById("hero-text"),uB=document.getElementById("fault-unlock-btn"),pC=document.getElementById("plants-container"),pT=document.getElementById("plants-title");
-  uB.style.display="none";pC.style.display="flex";pT.style.display="block";hI.classList.remove("pulse-alert");
-  var progi=JSON.parse(localStorage.getItem('progiAlarmow')||'{"batt":20,"temp":35}');
-  var battPct=d.voltage?Math.max(0,Math.min(100,Math.round(((d.voltage-11.5)/2.1)*100))):100;
-  if(d.fault===1){hI.innerText="🔥";hI.classList.add("pulse-alert");hT.innerText="AWARIA POMPY!";hT.style.color="var(--accent-red)";uB.style.display="block";pC.style.display="none";pT.style.display="none";}
-  else if(d.water==="EMPTY"){hI.innerText="⚠️";hI.classList.add("pulse-alert");hT.innerText="Dolej wody do beczki!";hT.style.color="var(--accent-red)";}
-  else if(battPct<progi.batt){hI.innerText="🔋";hI.classList.add("pulse-alert");hT.innerText="Niski poziom baterii";hT.style.color="var(--accent-orange)";}
-  else if(d.temp!==undefined&&d.temp>progi.temp){hI.innerText="🌡️";hI.classList.add("pulse-alert");hT.innerText="Wysoka temperatura";hT.style.color="var(--accent-orange)";}
-  else{hI.innerText="🌿";hT.innerText="Wszystko w porządku";hT.style.color="var(--accent-green)";}
+  aktualizujStatusHero(d);
 
   document.getElementById("last-update-text").innerText=(demo?"Demo":"Połączono");
 
@@ -534,8 +554,8 @@ function renderujPrognoze(d){var card=document.getElementById('forecast-card');i
 
 // ALARMY
 var ALARM_NAZWY={2:{txt:'Pusty zbiornik wody',icon:'⚠️'},6:{txt:'Awaria pompy',icon:'🔥'},8:{txt:'Słaba bateria',icon:'🔋'}};
-function wczytajAlarmy(){espFetch('/getAlarms',{cache:'no-store'}).then(function(r){return r.json();}).then(function(al){var np=al.filter(function(a){return a.ack===0;});var b=document.getElementById('alarm-banner'),l=document.getElementById('alarm-list');if(np.length===0){b.style.display='none';return;}b.style.display='block';l.innerHTML='';np.slice().reverse().forEach(function(a){var info=ALARM_NAZWY[a.type]||{txt:'Zdarzenie',icon:'•'};var k=a.ts>1000000000?new Date(a.ts*1000).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';l.innerHTML+='<div style="font-size:12px;padding:4px 0">'+info.icon+' '+info.txt+' <span style="color:var(--text-sub)">'+k+'</span></div>';});}).catch(function(){});}
-function oznaczAlarmyPrzeczytane(){haptyka(15);if(IS_DEMO){DEMO_ALARMS.forEach(function(a){a.ack=1;});document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');return;}fetch('/ackAlarms').then(function(){document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');});}
+function wczytajAlarmy(){espFetch('/getAlarms',{cache:'no-store'}).then(function(r){return r.json();}).then(function(al){var np=al.filter(function(a){return a.ack===0;});nieobsluzoneAlarmy=np;var b=document.getElementById('alarm-banner'),l=document.getElementById('alarm-list');if(lastDataCache)aktualizujStatusHero(lastDataCache);if(np.length===0){b.style.display='none';return;}b.style.display='block';l.innerHTML='';np.slice().reverse().forEach(function(a){var info=ALARM_NAZWY[a.type]||{txt:'Zdarzenie',icon:'•'};var k=a.ts>1000000000?new Date(a.ts*1000).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';l.innerHTML+='<div style="font-size:12px;padding:4px 0">'+info.icon+' '+info.txt+' <span style="color:var(--text-sub)">'+k+'</span></div>';});}).catch(function(){});}
+function oznaczAlarmyPrzeczytane(){haptyka(15);nieobsluzoneAlarmy=[];if(lastDataCache)aktualizujStatusHero(lastDataCache);if(IS_DEMO){DEMO_ALARMS.forEach(function(a){a.ack=1;});document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');return;}fetch('/ackAlarms').then(function(){document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');});}
 // STATYSTYKI WODY + WYKRESY (z zakresem)
 function filtrujHistorie(hist){if(!hist)return[];var teraz=Math.floor(Date.now()/1000),granica=teraz-zakresDni*86400;var f=hist.filter(function(e){return e.ts>=granica||e.ts<1000000000;});return f.length?f:hist;}
 function wczytajStatystykiWody(pumpFlow){
@@ -580,7 +600,9 @@ window.addEventListener('touchmove',function(e){if(startY===0)return;var dy=e.to
 window.addEventListener('touchend',function(e){if(pulling){var dy=e.changedTouches[0].clientY-startY;if(dy>60){if(ptr){ptr.querySelector('svg').classList.add('ptr-spin');}pobierzDaneZESP32();setTimeout(function(){if(ptr){ptr.style.opacity=0;ptr.querySelector('svg').classList.remove('ptr-spin');}},800);}else if(ptr)ptr.style.opacity=0;}startY=0;pulling=false;});})();
 
 // BOOT
-(function(){var st=localStorage.getItem('theme');if(st)document.documentElement.setAttribute('data-theme',st);if(IS_DEMO)document.getElementById('demo-pill').style.display='block';wczytajProgiAlarmow();var ov=document.getElementById('boot-overlay'),s=document.getElementById('boot-status');function hide(){ov.style.opacity=0;setTimeout(function(){ov.style.display='none';},500);}function start(){wczytajProfileZESP();wczytajAlarmy();pobierzDaneZESP32();if(s)s.textContent='Gotowe!';setTimeout(hide,400);}
+(function(){var st=localStorage.getItem('theme');if(st)document.documentElement.setAttribute('data-theme',st);if(IS_DEMO)document.getElementById('demo-pill').style.display='block';wczytajProgiAlarmow();
+document.querySelectorAll('.profile-modal-bg').forEach(function(overlay){overlay.addEventListener('click',function(e){if(e.target===overlay){ukryjModal(overlay.id);}});});
+var ov=document.getElementById('boot-overlay'),s=document.getElementById('boot-status');function hide(){ov.style.opacity=0;setTimeout(function(){ov.style.display='none';},500);}function start(){wczytajProfileZESP();wczytajAlarmy();pobierzDaneZESP32();if(s)s.textContent='Gotowe!';setTimeout(hide,400);}
 if(IS_DEMO){if(s)s.textContent='Tryb demo...';setTimeout(function(){if(s)s.textContent='Ładowanie danych...';},700);setTimeout(start,1400);}
 else{if('serviceWorker'in navigator&&location.protocol!=='file:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}var att=0;(function tryC(){att++;if(att===2&&s)s.textContent='Łączenie...';fetch('/data',{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(){start();}).catch(function(){if(att<8)setTimeout(tryC,700);else{if(s)s.textContent='Tryb offline';start();}});})();}
 })();
@@ -697,8 +719,8 @@ function renderujKalendarzTeaser(){
 
 // pełny ekran kalendarza
 var kalMiesiac=new Date().getMonth()+1, kalTryb=null;
-function otworzKalendarz(){kalMiesiac=new Date().getMonth()+1;kalTryb=trybUprawy();document.getElementById('kal-modal').style.display='flex';renderujPelnyKalendarz();}
-function zamknijKalendarz(){document.getElementById('kal-modal').style.display='none';}
+function otworzKalendarz(){kalMiesiac=new Date().getMonth()+1;kalTryb=trybUprawy();pokazModal('kal-modal');renderujPelnyKalendarz();}
+function zamknijKalendarz(){ukryjModal('kal-modal');}
 function kalZmienMiesiac(d){kalMiesiac+=d;if(kalMiesiac<1)kalMiesiac=12;if(kalMiesiac>12)kalMiesiac=1;renderujPelnyKalendarz();}
 function kalZmienTryb(t){kalTryb=t;document.getElementById('kal-tryb-grunt').classList.toggle('active',t==='grunt');document.getElementById('kal-tryb-szkl').classList.toggle('active',t==='szklarnia');renderujPelnyKalendarz();}
 function renderujPelnyKalendarz(){
@@ -719,8 +741,8 @@ function renderujPelnyKalendarz(){
 }
 
 // dodawanie własnej rośliny do kalendarza
-function otworzDodajRosline(){zbudujSiatkeMiesiecy();document.getElementById('kal-add-modal').style.display='flex';document.getElementById('kal-add-name').value='';['siew','sadzenie','zbiory','pielegnacja'].forEach(function(akc){for(var m=1;m<=12;m++){var el=document.getElementById('kalm-'+akc+'-'+m);if(el)el.classList.remove('sel');}});}
-function zamknijDodajRosline(){document.getElementById('kal-add-modal').style.display='none';}
+function otworzDodajRosline(){zbudujSiatkeMiesiecy();pokazModal('kal-add-modal');document.getElementById('kal-add-name').value='';['siew','sadzenie','zbiory','pielegnacja'].forEach(function(akc){for(var m=1;m<=12;m++){var el=document.getElementById('kalm-'+akc+'-'+m);if(el)el.classList.remove('sel');}});}
+function zamknijDodajRosline(){ukryjModal('kal-add-modal');}
 function kalToggleMies(akc,m){document.getElementById('kalm-'+akc+'-'+m).classList.toggle('sel');}
 function zapiszWlasnaRosline(){
   var name=document.getElementById('kal-add-name').value.trim();
@@ -819,6 +841,5 @@ function uruchomDiagnostyke(){
 <div style="display:flex;gap:8px;margin-top:16px"><button class="btn-test" onclick="zamknijDodajRosline()" style="flex:1;background:var(--nav-bg);color:var(--text-sub)">Anuluj</button><button class="btn-test" onclick="zapiszWlasnaRosline()" style="flex:1">Zapisz</button></div>
 </div>
 </div>
-
 </body>
 </html>
