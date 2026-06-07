@@ -96,8 +96,9 @@ canvas{display:block;width:100%;height:100%}
 .ptr-spin{animation:ptrSpin .8s linear infinite}
 @keyframes ptrSpin{to{transform:rotate(360deg)}}
 .demo-pill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:var(--accent-purple);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;display:none}
-.profile-modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:6000;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;overscroll-behavior:contain}
+.profile-modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:6000;background:var(--bg-gradient);align-items:center;justify-content:center;overscroll-behavior:contain;padding:16px;box-sizing:border-box}
 body.modal-open{overflow:hidden;touch-action:none}
+.profile-modal-bg .section-card{background:var(--glass-card);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.15)}
 .hwswitch{position:relative;display:inline-block;width:50px;height:28px;flex-shrink:0}
 .hwswitch input{opacity:0;width:0;height:0}
 .hwslider{position:absolute;cursor:pointer;inset:0;background:var(--range-bg);border-radius:28px;transition:.3s;border:1px solid var(--border-light)}
@@ -831,7 +832,7 @@ function uruchomDiagnostyke(){
 </div>
 </div>
 
-<div id="kal-add-modal" class="profile-modal-bg" style="z-index:5500">
+<div id="kal-add-modal" class="profile-modal-bg" style="z-index:6500">
 <div class="section-card" style="width:92%;max-width:380px;margin:0;max-height:88vh;overflow-y:auto">
 <h2 style="margin-top:0">Własna roślina</h2>
 <label>Nazwa</label>
