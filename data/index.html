@@ -1,640 +1,824 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Szklarnia Pro</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-
-    <style>
-        :root {
-            --html-bg: #e5e5ea; --bg-gradient: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 100%);
-            --glass-bg: rgba(255, 255, 255, 0.65); --glass-card: rgba(255, 255, 255, 0.8);
-            --text-main: #1c1c1e; --text-sub: #636366;
-            --accent-green: #34c759; --accent-blue: #007aff; --accent-red: #ff3b30; --accent-orange: #ff9500; --accent-purple: #af52de; --accent-cyan: #32ade6;
-            --border-light: rgba(255, 255, 255, 0.5); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
-            --input-bg: #ffffff; --nav-bg: rgba(0,0,0,0.06); --range-bg: rgba(0,0,0,0.05); --profile-sel-bg: rgba(52, 199, 89, 0.05);
-        }
-        :root[data-theme="dark"] {
-            --html-bg: #000000; --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
-            --glass-bg: rgba(28, 28, 30, 0.4); --glass-card: rgba(44, 44, 46, 0.6);
-            --text-main: #ffffff; --text-sub: #aeaea2;
-            --accent-green: #30d158; --accent-blue: #0a84ff; --accent-red: #ff453a; --accent-orange: #ff9f0a; --accent-purple: #bf5af2; --accent-cyan: #64d2ff;
-            --border-light: rgba(255, 255, 255, 0.05); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
-            --input-bg: rgba(28, 28, 30, 0.6); --nav-bg: rgba(255,255,255,0.1); --range-bg: rgba(255,255,255,0.1); --profile-sel-bg: rgba(48, 209, 88, 0.15);
-        }
-        @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --html-bg: #000000; --bg-gradient: linear-gradient(135deg, #000000 0%, #1c1c1e 100%); --glass-bg: rgba(28, 28, 30, 0.4); --glass-card: rgba(44, 44, 46, 0.6); --text-main: #ffffff; --text-sub: #aeaea2; --accent-green: #30d158; --accent-blue: #0a84ff; --accent-red: #ff453a; --accent-orange: #ff9f0a; --accent-purple: #bf5af2; --accent-cyan: #64d2ff; --border-light: rgba(255, 255, 255, 0.05); --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3); --input-bg: rgba(28, 28, 30, 0.6); --nav-bg: rgba(255,255,255,0.1); --range-bg: rgba(255,255,255,0.1); --profile-sel-bg: rgba(48, 209, 88, 0.15); } }
-
-        html { background-color: var(--html-bg); transition: background-color 0.3s; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-gradient); margin: 0; padding: 16px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; color: var(--text-main); -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        .wrapper { width: 100%; max-width: 410px; margin-top: 20px; background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border-light); border-radius: 38px; padding: 24px; box-shadow: var(--shadow-soft); box-sizing: border-box; position: relative; }
-        
-        .tab-nav { display: flex; background: var(--nav-bg); border-radius: 14px; padding: 4px; margin-bottom: 24px; position: relative; z-index: 10; user-select: none; -webkit-user-select: none; }
-        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: all 0.3s ease; }
-        .tab-btn.active { background: var(--glass-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        
-        .tabs-wrapper { position: relative; width: 100%; }
-        .tab-content { opacity: 0; visibility: hidden; position: absolute; top: 0; left: 0; right: 0; height: 0; overflow: hidden; transform: scale(0.96) translateY(5px); transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0.35s, height 0s 0.35s; }
-        .tab-content.active { opacity: 1; visibility: visible; position: relative; height: auto; overflow: visible; transform: scale(1) translateY(0); transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), visibility 0s 0s, height 0s 0s; }
-        .sub-content { display: none; animation: fadeIn 0.4s ease; }
-        .sub-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .status-hero { text-align: center; padding: 10px 0 20px 0; }
-        .status-icon { font-size: 54px; margin-bottom: 8px; display: inline-block; }
-        .status-text { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        .update-badge { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; padding: 6px 14px; background: var(--nav-bg); border: 0.5px solid var(--border-light); border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-sub); cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s ease; }
-        .update-badge:active { transform: scale(0.95); background: var(--glass-card); }
-        
-        .pulse-alert { animation: pulseAlert 1.2s infinite ease-in-out; color: var(--accent-red); }
-        @keyframes pulseAlert { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-
-        .service-banner { background: var(--accent-orange); color: #fff; text-align: center; padding: 10px; border-radius: 12px; font-weight: 800; font-size: 14px; margin-bottom: 20px; display: none; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3); }
-
-        .weather-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-        .weather-card { flex: 1 1 calc(33.333% - 8px); min-width: 90px; background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 20px; padding: 12px 4px; text-align: center; box-sizing: border-box; }
-        .weather-val { font-size: 19px; font-weight: 800; margin-bottom: 2px; min-height: 22px; }
-        .weather-lbl { font-size: 9px; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
-
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        .skeleton { background: linear-gradient(90deg, var(--range-bg) 25%, rgba(150,150,150,0.1) 50%, var(--range-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: transparent !important; border-radius: 8px; display: inline-block; min-width: 40px; }
-
-        h2 { font-size: 13px; margin: 0 0 10px 4px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
-        .section-card { background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 22px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-soft); box-sizing: border-box; }
-        
-        .profile-container { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .profile-btn { flex: 1 1 calc(33.333% - 6px); min-width: 90px; background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 14px 4px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; box-sizing: border-box; transition: all 0.2s ease; }
-        .profile-btn:active { transform: scale(0.95); }
-        .profile-btn.selected { border-color: var(--accent-green); background: var(--profile-sel-bg); }
-        .profile-icon { font-size: 26px; display: block; margin-bottom: 6px; }
-        
-        label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px; }
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; background: var(--range-bg); outline: none; margin: 12px 0; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; border: 0.5px solid rgba(0,0,0,0.04); transition: transform 0.1s; }
-        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.15); }
-        .text-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; box-sizing: border-box; margin-bottom: 15px;}
-
-        .log-container { max-height: 140px; overflow-y: auto; padding-right: 2px; }
-        .log-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
-        .log-item:last-child { border: none; padding-bottom: 0; }
-        .log-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
-        .bg-ok { background: rgba(52, 199, 89, 0.12); color: var(--accent-green); }
-        .bg-water { background: rgba(0, 122, 255, 0.12); color: var(--accent-blue); }
-        .bg-error { background: rgba(255, 59, 48, 0.12); color: var(--accent-red); }
-        .bg-warn { background: rgba(255, 149, 0, 0.12); color: var(--accent-orange); }
-        .bg-manual { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
-        .bg-sleep { background: rgba(88, 86, 214, 0.12); color: #5856d6; }
-        .bg-cold { background: rgba(50, 173, 230, 0.12); color: var(--accent-cyan); }
-        .bg-sauna { background: rgba(175, 82, 222, 0.12); color: var(--accent-purple); }
-
-        .btn-test { display: block; width: 100%; padding: 12px; border: none; border-radius: 18px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-top: 8px; }
-        .btn-test:active { transform: scale(0.96); }
-
-        .chart-container { position: relative; height: 100px; width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.02); border-radius: 12px; overflow: hidden; padding: 5px; box-sizing: border-box; }
-        canvas { display: block; width: 100%; height: 100%; }
-        
-        .eng-data-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed var(--border-light); padding-bottom: 4px; align-items: center; }
-        .eng-input { width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); font-family: monospace; text-align: center; }
-
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; font-weight: 600; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--range-bg); border-radius: 28px; transition: .3s; border: 1px solid var(--border-light); }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 2px; background-color: #fff; border-radius: 50%; transition: .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        input:checked + .slider { background-color: var(--accent-green); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-        .water-module { background: var(--glass-card); border: 1px solid var(--border-light); border-radius: 22px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
-        .tank-mask { position: relative; width: 100%; height: 100px; background: var(--range-bg); border-radius: 20px; overflow: hidden; box-shadow: inset 0 4px 10px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black); }
-        #water-height-controller { position: absolute; bottom: -800px; left: 50%; width: 800px; height: 800px; transform: translateX(-50%); transition: bottom 1.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .wave { position: absolute; width: 100%; height: 100%; background: linear-gradient(180deg, #5ac8fa 0%, var(--accent-blue) 100%); border-radius: 38%; bottom: 0; left: 0; animation: spinWave 6s linear infinite; }
-        .wave:nth-child(2) { opacity: 0.5; border-radius: 42%; animation-duration: 8s; animation-direction: reverse; }
-        .tank-mask.alert .wave { background: linear-gradient(180deg, #ff6b22 0%, var(--accent-red) 100%); }
-        @keyframes spinWave { 100% { transform: rotate(360deg); } }
-        .tank-text-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; pointer-events: none; color: var(--text-main); text-shadow: 0 2px 10px rgba(255,255,255,0.8); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Szklarnia Pro</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Szklarnia">
+<meta name="theme-color" content="#34c759">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--html-bg:#e5e5ea;--bg-gradient:linear-gradient(135deg,#e5e5ea 0%,#f2f2f7 100%);--glass-bg:rgba(255,255,255,0.65);--glass-card:rgba(255,255,255,0.8);--text-main:#1c1c1e;--text-sub:#636366;--accent-green:#34c759;--accent-blue:#007aff;--accent-red:#ff3b30;--accent-orange:#ff9500;--accent-purple:#af52de;--accent-cyan:#32ade6;--border-light:rgba(255,255,255,0.5);--shadow-soft:0 10px 40px rgba(0,0,0,0.04);--input-bg:#fff;--nav-bg:rgba(0,0,0,0.06);--range-bg:rgba(0,0,0,0.05);--profile-sel-bg:rgba(52,199,89,0.05)}
+:root[data-theme="dark"]{--html-bg:#000;--bg-gradient:linear-gradient(135deg,#000 0%,#1c1c1e 100%);--glass-bg:rgba(28,28,30,0.4);--glass-card:rgba(44,44,46,0.6);--text-main:#fff;--text-sub:#aeaea2;--accent-green:#30d158;--accent-blue:#0a84ff;--accent-red:#ff453a;--accent-orange:#ff9f0a;--accent-purple:#bf5af2;--accent-cyan:#64d2ff;--border-light:rgba(255,255,255,0.05);--shadow-soft:0 10px 40px rgba(0,0,0,0.3);--input-bg:rgba(28,28,30,0.6);--nav-bg:rgba(255,255,255,0.1);--range-bg:rgba(255,255,255,0.1);--profile-sel-bg:rgba(48,209,88,0.15)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--html-bg:#000;--bg-gradient:linear-gradient(135deg,#000 0%,#1c1c1e 100%);--glass-bg:rgba(28,28,30,0.4);--glass-card:rgba(44,44,46,0.6);--text-main:#fff;--text-sub:#aeaea2;--accent-green:#30d158;--accent-blue:#0a84ff;--accent-red:#ff453a;--accent-orange:#ff9f0a;--accent-purple:#bf5af2;--accent-cyan:#64d2ff;--border-light:rgba(255,255,255,0.05);--shadow-soft:0 10px 40px rgba(0,0,0,0.3);--input-bg:rgba(28,28,30,0.6);--nav-bg:rgba(255,255,255,0.1);--range-bg:rgba(255,255,255,0.1);--profile-sel-bg:rgba(48,209,88,0.15)}}
+html{background:var(--html-bg);transition:background .3s}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-gradient);margin:0;padding:16px;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;color:var(--text-main);-webkit-font-smoothing:antialiased;box-sizing:border-box}
+.wrapper{width:100%;max-width:410px;margin-top:20px;background:var(--glass-bg);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--border-light);border-radius:38px;padding:24px;box-shadow:var(--shadow-soft);box-sizing:border-box;position:relative}
+.tab-nav{display:flex;background:var(--nav-bg);border-radius:14px;padding:4px;margin-bottom:24px;position:relative;z-index:10;user-select:none;-webkit-user-select:none}
+.tab-btn{flex:1;padding:10px;text-align:center;border-radius:10px;font-size:14px;font-weight:600;color:var(--text-sub);cursor:pointer;transition:all .3s}
+.tab-btn.active{background:var(--glass-card);color:var(--text-main);box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.tab-content{display:none;animation:fadeIn .4s ease}
+.tab-content.active{display:block}
+.sub-content{display:none;animation:fadeIn .4s ease}
+.sub-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.status-hero{text-align:center;padding:10px 0 16px}
+.status-icon{font-size:54px;margin-bottom:8px;display:inline-block}
+.status-text{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.update-badge{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:6px 14px;background:var(--nav-bg);border:.5px solid var(--border-light);border-radius:20px;font-size:11px;font-weight:600;color:var(--text-sub);cursor:pointer}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-green);display:inline-block}
+.conn-dot.off{background:var(--accent-red)}
+.pulse-alert{animation:pulseAlert 1.2s infinite ease-in-out;color:var(--accent-red)}
+@keyframes pulseAlert{0%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.8}100%{transform:scale(1);opacity:1}}
+.service-banner{background:var(--accent-orange);color:#fff;text-align:center;padding:10px;border-radius:12px;font-weight:800;font-size:14px;margin-bottom:20px;display:none}
+.weather-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.weather-card{flex:1 1 calc(33.333% - 8px);min-width:90px;background:var(--glass-card);border:1px solid var(--border-light);border-radius:20px;padding:12px 4px;text-align:center;box-sizing:border-box}
+.weather-val{font-size:19px;font-weight:800;margin-bottom:2px;min-height:22px}
+.weather-lbl{font-size:9px;color:var(--text-sub);font-weight:700;text-transform:uppercase}
+h2{font-size:13px;margin:0 0 10px 4px;color:var(--text-sub);text-transform:uppercase;font-weight:700}
+.section-card{background:var(--glass-card);border:1px solid var(--border-light);border-radius:22px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow-soft);box-sizing:border-box}
+.profile-container{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}
+.profile-btn{flex:1 1 calc(33.333% - 6px);min-width:90px;background:var(--glass-card);border:1px solid var(--border-light);border-radius:16px;padding:14px 4px;font-size:13px;font-weight:600;color:var(--text-main);cursor:pointer;box-sizing:border-box;transition:all .2s}
+.profile-btn:active{transform:scale(.95)}
+.profile-btn.selected{border-color:var(--accent-green);background:var(--profile-sel-bg)}
+.profile-icon{font-size:26px;display:block;margin-bottom:6px}
+label{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
+input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:5px;background:var(--range-bg);outline:none;margin:12px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;border:.5px solid rgba(0,0,0,0.04)}
+.text-input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-light);background:var(--input-bg);color:var(--text-main);font-size:14px;outline:none;box-sizing:border-box;margin-bottom:15px}
+.btn-test{display:block;width:100%;padding:12px;border:none;border-radius:18px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;background:rgba(0,122,255,0.1);color:var(--accent-blue);margin-top:8px}
+.btn-test:active{transform:scale(.96)}
+.chart-container{position:relative;height:100px;width:100%;margin-bottom:10px;background:rgba(0,0,0,0.02);border-radius:12px;overflow:hidden;padding:5px;box-sizing:border-box}
+canvas{display:block;width:100%;height:100%}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-green{background:var(--accent-green);color:#fff}
+/* WODA - 4 koła, spowolnione, pierwsze 70% */
+.water-module{background:var(--glass-card);border:1px solid var(--border-light);border-radius:22px;padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:12px}
+.tank-mask{position:relative;width:100%;height:120px;background:var(--range-bg);border-radius:20px;overflow:hidden;box-shadow:inset 0 4px 10px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.05);isolation:isolate}
+#water-height-controller{position:absolute;bottom:-800px;left:50%;width:800px;height:800px;transform:translateX(-50%);transition:bottom 1.5s cubic-bezier(.25,.8,.25,1)}
+.wave{position:absolute;width:100%;height:100%;background:linear-gradient(180deg,#5ac8fa 0%,var(--accent-blue) 100%);border-radius:38%;bottom:0;left:0;animation:spinWave 9s linear infinite;opacity:.7}
+.wave:nth-child(2){opacity:.5;border-radius:42%;animation-duration:12s;animation-direction:reverse}
+.wave:nth-child(3){opacity:.65;border-radius:40%;animation-duration:15s}
+.wave:nth-child(4){opacity:.4;border-radius:45%;animation-duration:19s;animation-direction:reverse}
+.tank-mask.alert .wave{background:linear-gradient(180deg,#ff6b22 0%,var(--accent-red) 100%)}
+@keyframes spinWave{100%{transform:rotate(360deg)}}
+.tank-text-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10;pointer-events:none;color:var(--text-main);text-shadow:0 2px 10px rgba(255,255,255,0.8)}
+/* PASEK WILGOTNOŚCI */
+.moist-card{background:var(--glass-card);border:1px solid var(--border-light);border-radius:22px;padding:16px;margin-bottom:16px}
+.moist-track{position:relative;height:14px;background:var(--range-bg);border-radius:8px;overflow:hidden;margin-top:10px}
+.moist-fill{position:absolute;left:0;top:0;height:100%;border-radius:8px;transition:width .8s cubic-bezier(.34,1.2,.5,1);background:linear-gradient(90deg,#5ac8fa,var(--accent-blue))}
+.moist-thresh{position:absolute;top:-3px;width:2px;height:20px;background:var(--accent-orange);z-index:5}
+/* PRZYCISK PODLEJ */
+.water-now{width:100%;padding:16px;border:none;border-radius:20px;font-size:16px;font-weight:800;background:linear-gradient(135deg,#5ac8fa,var(--accent-blue));color:#fff;cursor:pointer;transition:.2s;box-shadow:0 6px 20px rgba(0,122,255,0.25);margin-bottom:16px}
+.water-now:active{transform:scale(.97)}
+.water-now:disabled{opacity:.5}
+/* NASTĘPNE SPRAWDZENIE */
+.next-check{text-align:center;font-size:12px;color:var(--text-sub);font-weight:600;margin:-6px 0 16px}
+/* ALARM BANNER */
+#alarm-banner{display:none;background:rgba(255,59,48,0.12);border:1px solid var(--accent-red);border-radius:16px;padding:14px;margin-bottom:16px}
+/* PROGI ALARMÓW + ZAKRES */
+.range-btns{display:flex;gap:6px;background:var(--nav-bg);border-radius:12px;padding:4px;margin-bottom:12px}
+.range-btn{flex:1;padding:7px;text-align:center;border-radius:9px;font-size:12px;font-weight:600;color:var(--text-sub);cursor:pointer}
+.range-btn.active{background:var(--glass-card);color:var(--text-main)}
+/* TOAST POTWIERDZENIA */
+#confirm-toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.8);z-index:7000;background:var(--glass-card);backdrop-filter:blur(20px);border:1px solid var(--border-light);border-radius:24px;padding:24px 32px;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.34,1.4,.5,1);box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+#confirm-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.confirm-circle{width:56px;height:56px;border-radius:50%;background:var(--accent-green);display:flex;align-items:center;justify-content:center}
+.confirm-check{width:28px;height:14px;border-left:4px solid #fff;border-bottom:4px solid #fff;transform:rotate(-45deg);margin-top:-4px}
+.confirm-circle.err{background:var(--accent-red)}
+#confirm-text{font-size:15px;font-weight:700;color:var(--text-main)}
+/* PULL TO REFRESH */
+#ptr{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:50;width:30px;height:30px;opacity:0;transition:opacity .2s;pointer-events:none}
+#ptr svg{width:100%;height:100%}
+.ptr-spin{animation:ptrSpin .8s linear infinite}
+@keyframes ptrSpin{to{transform:rotate(360deg)}}
+.demo-pill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:var(--accent-purple);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;display:none}
+.profile-modal-bg{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,0.4);align-items:center;justify-content:center}
+.hwswitch{position:relative;display:inline-block;width:50px;height:28px;flex-shrink:0}
+.hwswitch input{opacity:0;width:0;height:0}
+.hwslider{position:absolute;cursor:pointer;inset:0;background:var(--range-bg);border-radius:28px;transition:.3s;border:1px solid var(--border-light)}
+.hwslider:before{position:absolute;content:"";height:22px;width:22px;left:3px;bottom:2px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2)}
+.hwswitch input:checked+.hwslider{background:var(--accent-green)}
+.hwswitch input:checked+.hwslider:before{transform:translateX(20px)}
+.eng-row{display:flex;justify-content:space-between;font-family:monospace;font-size:14px;margin-bottom:8px;border-bottom:1px dashed var(--border-light);padding-bottom:4px;align-items:center}
+.kalm-row{margin-bottom:10px}
+.kalm-row-lbl{font-size:11px;font-weight:700;margin-bottom:4px}
+.kalm-months{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.kalm-cell{font-size:10px;text-align:center;padding:6px 0;border-radius:6px;background:var(--nav-bg);cursor:pointer;color:var(--text-sub);transition:.15s}
+.kalm-cell.sel{background:var(--accent-green);color:#fff;font-weight:700}
+</style>
 </head>
 <body>
+<div id="boot-overlay" style="position:fixed;inset:0;z-index:9999;background:#34c759;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s ease;font-family:-apple-system,sans-serif">
+<div style="font-size:64px">&#127807;</div>
+<div style="color:#fff;font-size:20px;font-weight:700;margin-top:10px">Szklarnia Pro</div>
+<div id="boot-status" style="color:rgba(255,255,255,.85);font-size:13px;margin-top:24px">Uruchamianie...</div>
+<div style="width:32px;height:32px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;margin-top:16px;animation:ptrSpin .8s linear infinite"></div>
+</div>
+<div class="demo-pill" id="demo-pill">TRYB DEMO (bez ESP32)</div>
+<div id="confirm-toast"><div class="confirm-circle" id="confirm-circle"><div class="confirm-check"></div></div><div id="confirm-text">Gotowe</div></div>
 
-<div class="wrapper">
-    <div class="tab-nav">
-        <div id="btn-pulpit" class="tab-btn active" onclick="zmienZakladke('pulpit')">Pulpit</div>
-        <div id="btn-ustawienia" class="tab-btn" onclick="zmienZakladke('ustawienia')">⚙️ Ustawienia</div>
-    </div>
+<div class="wrapper" id="wrapper">
+<div id="ptr"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg></div>
+<div class="tab-nav">
+<div id="btn-pulpit" class="tab-btn active" onclick="zmienZakladke('pulpit')">Pulpit</div>
+<div id="btn-ustawienia" class="tab-btn" onclick="zmienZakladke('ustawienia')">⚙️ Ustawienia</div>
+</div>
+<div id="service-banner" class="service-banner">🛠 TRYB SERWISOWY AKTYWNY</div>
 
-    <div id="service-banner" class="service-banner">
-        🛠 TRYB SERWISOWY AKTYWNY (DANE NA ŻYWO)
-    </div>
-
-    <div class="tabs-wrapper">
-        <div id="tab-pulpit" class="tab-content active">
-            <div class="status-hero">
-                <div id="hero-icon" class="status-icon">🌿</div>
-                <div id="hero-text" class="status-text" style="color: var(--accent-green);">Wszystko w porządku</div>
-                
-                <div id="fault-unlock-btn" style="display:none; margin-top:15px;">
-                    <button class="btn-test" onclick="odblokujPompe()" style="background:var(--accent-red); color:white; font-size: 16px; padding: 14px;">🛠 Odblokuj system pomp</button>
-                </div>
-
-                <div class="update-badge" onclick="pobierzDaneZESP32()" id="update-badge-btn">
-                    <span id="last-update-text">Sprawdzanie stanu...</span>
-                </div>
-            </div>
-
-            <div class="water-module" id="ui-water-module">
-                <div class="weather-lbl" style="text-align: center; margin-bottom: -4px;">Woda w zbiorniku</div>
-                <div class="tank-mask" id="tank-mask">
-                    <div id="water-height-controller"><div class="wave"></div><div class="wave"></div></div>
-                    <div class="tank-text-overlay">
-                        <span id="dash-water-pct" style="font-size: 32px; font-weight: 800; letter-spacing: -1px;">--%</span>
-                        <span id="dash-water-liters" style="font-size: 13px; font-weight: 700; opacity: 0.9;">-- / -- L</span>
-                        <span id="dash-water-est" style="font-size: 10px; font-weight: 700; color: var(--text-main); opacity: 0.75; margin-top: 4px;">Szacowanie...</span>
-                    </div>
-                </div>
-                <button id="btn-reset-water" class="btn-test" onclick="zresetujLicznikWody()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); width:100%">💦 Zresetuj stan po napełnieniu beczki</button>
-            </div>
-
-            <div class="weather-grid">
-                <div class="weather-card" id="ui-bme-temp"><div class="weather-val skeleton" id="dash-temp">-</div><div class="weather-lbl">Powietrze</div></div>
-                <div class="weather-card" id="ui-bme-hum"><div class="weather-val skeleton" id="dash-hum">-</div><div class="weather-lbl">Wilgotność</div></div>
-                <div class="weather-card" id="ui-ds-temp"><div class="weather-val skeleton" id="dash-water-temp">-</div><div class="weather-lbl">Temp. Wody</div></div>
-                <div class="weather-card" id="ui-light"><div class="weather-val skeleton" id="dash-sun">-</div><div class="weather-lbl">God Słońca</div></div>
-                <div class="weather-card"><div class="weather-val skeleton" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
-                <div class="weather-card" id="ui-bme-pres"><div class="weather-val skeleton" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
-                <div class="weather-card" id="ui-vent" style="display:none;"><div class="weather-val skeleton" id="dash-vent">-</div><div class="weather-lbl">Wentylacja</div></div>
-            </div>
-
-            <h2 id="plants-title">Co dzisiaj rośnie?</h2>
-            <div class="profile-container" id="plants-container">
-                <button class="profile-btn" id="prof-pomidory" onclick="aktywujProfil('pomidory')"><span class="profile-icon">🍅</span>Pomidory</button>
-                <button class="profile-btn" id="prof-ogorki" onclick="aktywujProfil('ogorki')"><span class="profile-icon">🥒</span>Ogórki</button>
-                <button class="profile-btn" id="prof-sadzonki" onclick="aktywujProfil('sadzonki')"><span class="profile-icon">🌱</span>Sadzonki</button>
-                <button class="profile-btn" id="prof-arbuz" onclick="aktywujProfil('arbuz')"><span class="profile-icon">🍉</span>Arbuz</button>
-                <button class="profile-btn" id="prof-borowka" onclick="aktywujProfil('borowka')"><span class="profile-icon">🫐</span>Borówka</button>
-            </div>
-            <div id="pulpit-toast" style="opacity:0; text-align:center; transition:0.3s; font-weight:600; color:var(--accent-green)"></div>
-        </div>
-
-        <div id="tab-ustawienia" class="tab-content">
-            <div class="tab-nav" style="margin-bottom: 20px;">
-                <div id="btn-sub-ogolne" class="tab-btn active" onclick="zmienPodzakladke('ogolne')">Ogólne</div>
-                <div id="btn-sub-zaawansowane" class="tab-btn" onclick="zmienPodzakladke('zaawansowane')">Zaawansowane</div>
-            </div>
-
-            <div id="sub-ogolne" class="sub-content active">
-                <h2>Edycja Profili Upraw</h2>
-                <div class="section-card">
-                    <select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-light); background: var(--input-bg); color: var(--text-main); margin-bottom: 15px; font-size: 14px; outline: none;">
-                        <option value="pomidory">🍅 Pomidory</option><option value="ogorki">🥒 Ogórki</option>
-                        <option value="sadzonki">🌱 Sadzonki</option><option value="arbuz">🍉 Arbuz</option><option value="borowka">🫐 Borówka</option>
-                    </select>
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue);">40%</span></div>
-                    <input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText = this.value + '%'">
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue);">2 min</span></div>
-                    <input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText = this.value + ' min'">
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:15px;"><span>Agresywność Podlewania</span><span id="edit-aggr-val" style="color:var(--accent-blue);">Zbalansowany</span></div>
-                    <input type="range" id="edit-aggr" min="0" max="2" step="1" value="1" oninput="aktualizujEtykieteAgresywnosci(this.value)">
-                    <button id="btn-save-profile" class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top: 20px; width:100%">💾 Zapisz zmiany</button>
-                </div>
-
-                <h2>Lokalizacja i Wygląd</h2>
-                <div class="section-card">
-                    <div class="tab-nav" style="margin-bottom:15px;"><div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div><div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Zewnątrz</div></div>
-                    <div class="tab-nav" style="margin-bottom:0;"><div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div><div id="theme-auto" class="tab-btn" onclick="zmienMotyw('auto')">⚙️ Auto</div><div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div></div>
-                </div>
-
-                <h2 id="title-param-zb">Parametry Zbiornika Wody</h2>
-                <div class="section-card" id="card-param-zb">
-                    <label>Pojemność całkowita (L)</label>
-                    <input type="number" id="tank-vol" class="text-input" value="220" onchange="zapiszParametryZbiornika()">
-                    <label>Wydajność pompy (L/min)</label>
-                    <input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
-                </div>
-
-                <h2>Historia (Logi i Wykresy)</h2>
-                <div class="section-card" style="margin-bottom:20px;">
-                    <div class="chart-container"><canvas id="moistureChart"></canvas></div>
-                    <div class="chart-container" id="chart-temp-box"><canvas id="tempChart"></canvas></div>
-                    <div class="log-container" id="logBox" style="margin-top: 15px;"><div class="log-item" style="color:var(--text-sub); justify-content:center;">Trwa pobieranie...</div></div>
-                    <button class="btn-test" onclick="eksportujCSV()" style="background: rgba(52, 199, 89, 0.1); color: var(--accent-green); margin-top:15px; width:100%">📥 Pobierz raport Excel (.csv)</button>
-                </div>
-                
-                <h2>Zimowanie Szklarni</h2>
-                <div class="section-card">
-                    <button id="btn-wypompuj" class="btn-test" onclick="wypompujWode()" style="background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); margin-bottom: 12px; width:100%">❄️ Wypompuj resztki wody z węży</button>
-                    <button id="btn-hibernuj" class="btn-test" onclick="aktywujHibernacje()" style="background: rgba(255, 59, 48, 0.1); color: var(--accent-red); width:100%">💤 Włącz tryb uśpienia na zimę</button>
-                </div>
-            </div>
-
-            <div id="sub-zaawansowane" class="sub-content">
-                <h2>🛠 Tryb Serwisowy</h2>
-                <div class="section-card">
-                    <p style="font-size: 12px; color: var(--text-sub); margin-top: 0;">Zapobiega uśpieniu procesora i odświeża dane z czujników co 2 sekundy przez 60 minut.</p>
-                    <button id="btn-service-mode" class="btn-test" onclick="toggleServiceMode()" style="background: var(--accent-orange); color: white; width:100%">Włącz Tryb Serwisowy</button>
-                    
-                    <div id="service-tools" style="display:none; margin-top:15px; border-top: 1px dashed var(--border-light); padding-top:15px;">
-                        <div class="eng-data-row"><span>Wolna Pamięć (RAM):</span> <b id="diag-heap">--- KB</b></div>
-                        <button id="btn-force-pump" class="btn-test" onclick="forcePumpRun()" style="background: var(--accent-red); color: white; margin-top: 15px; width:100%">⚠️ Wymuś 5s pompy (Ignoruj Pływak)</button>
-                    </div>
-                </div>
-
-                <h2>Menedżer Urządzeń (Podłączone Czujniki)</h2>
-                <div class="section-card">
-                    <p style="font-size: 11px; color: var(--text-sub); margin-top: 0; line-height: 1.4;">Zaznacz sprzęt, który jest fizycznie podpięty.</p>
-                    <div class="toggle-row"><span>Pływak i Ultradźwięki (JSN-SR04T)</span><label class="switch"><input type="checkbox" id="hw-us" onchange="saveHwConfig()"><span class="slider"></span></label></div>
-                    <div class="toggle-row"><span>Temp. Wody (DS18B20)</span><label class="switch"><input type="checkbox" id="hw-ds" onchange="saveHwConfig()"><span class="slider"></span></label></div>
-                    <div class="toggle-row"><span>Pogoda Powietrza (BME280)</span><label class="switch"><input type="checkbox" id="hw-bme" onchange="saveHwConfig()"><span class="slider"></span></label></div>
-                    <div class="toggle-row"><span>Czujnik Słońca (Fotorezystor)</span><label class="switch"><input type="checkbox" id="hw-light" onchange="saveHwConfig()"><span class="slider"></span></label></div>
-                    <div class="toggle-row" style="border-top: 1px solid var(--range-bg); padding-top:10px;"><span>Aktywna Wentylacja (Siłownik PIN 19)</span><label class="switch"><input type="checkbox" id="hw-vent" onchange="saveHwConfig()"><span class="slider"></span></label></div>
-                </div>
-
-                <h2>Asystent Kalibracji (Live)</h2>
-                <div class="section-card">
-                    <h3 style="margin-top:0; font-size:14px;">🌱 Wilgotność Gleby</h3>
-                    <div class="eng-data-row"><span>Odczyt z czujnika:</span> <b id="live-soil-val">---</b></div>
-                    <div style="display:flex; gap:8px; margin-top:10px;"><button id="btn-soil-dry" class="btn-test" onclick="zapiszGlebe('air')" style="flex:1; background:rgba(255,149,0,0.1); color:var(--accent-orange);">SUCHO</button><button id="btn-soil-wet" class="btn-test" onclick="zapiszGlebe('water')" style="flex:1; background:rgba(0,122,255,0.1); color:var(--accent-blue);">MOKRO</button></div>
-                </div>
-                <div class="section-card" id="card-calib-us">
-                    <h3 style="margin-top:0; font-size:14px;">🛢️ Poziom Wody w Beczce</h3>
-                    <div class="eng-data-row"><span>Odległość tafli:</span> <b id="live-us-val">--- cm</b></div>
-                    <div style="display:flex; gap:8px; margin-top:10px;"><button id="btn-water-empty" class="btn-test" onclick="zapiszWode('empty')" style="flex:1; background:rgba(255,59,48,0.1); color:var(--accent-red);">PUSTA</button><button id="btn-water-full" class="btn-test" onclick="zapiszWode('full')" style="flex:1; background:rgba(52,199,89,0.1); color:var(--accent-green);">PEŁNA</button></div>
-                </div>
-                <div class="section-card" id="card-calib-ldr">
-                    <h3 style="margin-top:0; font-size:14px;">☀️ Światłomierz</h3>
-                    <div class="eng-data-row"><span>Surowe natężenie:</span> <b id="live-light-val">---</b></div>
-                    <button id="btn-calib-light" class="btn-test" onclick="zapiszSwiatlo()" style="margin-top:10px; background:rgba(255,149,0,0.1); color:var(--accent-orange); width:100%">Ustaw jako SŁOŃCE (100%)</button>
-                </div>
-                <div class="section-card" id="card-calib-ds">
-                    <h3 style="margin-top:0; font-size:14px;">🌡️ Korekta Temperatury Wody</h3>
-                    <div style="display:flex; align-items:center; justify-content:space-between;"><span>Przesunięcie (np. -1.5):</span><input type="number" id="calib-tOff" class="eng-input" value="0.0" step="0.1" style="width:70px;"></div>
-                    <button id="btn-calib-toff" class="btn-test" onclick="zapiszKorekteTemp()" style="margin-top:10px; width:100%">💾 Zapisz korektę</button>
-                </div>
-
-                <h2>Wydajność Pompy i Testowanie</h2>
-                <div class="section-card">
-                    <div class="eng-data-row"><span>Napięcie procesora:</span> <b id="eng-voltage">--- V</b></div>
-                    <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums;" id="stopwatch-display">00.0s</div>
-                    <button id="btn-stoper" class="btn-test" onclick="toggleStoper()" style="padding: 16px; font-size: 16px; width:100%">⏱ Asystent Kalibracji (1 Litr)</button>
-                    <p id="stoper-result" style="display:none; color: var(--accent-green); text-align:center; font-weight:800; margin-top: 15px;"></p>
-                    <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-top:25px;"><span>Szybki Test Pompy</span><span id="testDurationVal" style="color:var(--accent-blue);">15s</span></div>
-                    <input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText = this.value + 's'">
-                    <button id="btn-quick-test" class="btn-test" onclick="uruchomTest()" style="width:100%">🚀 Uruchom Test</button>
-                </div>
-
-                <h2>Aktualizacja Firmware (OTA)</h2>
-                <div class="section-card">
-                    <input type="file" id="ota-file" accept=".bin" style="margin-bottom: 15px; width: 100%;">
-                    <button id="btn-ota" class="btn-test" onclick="wgrywajOTA()" style="color: var(--accent-orange); background: rgba(255, 149, 0, 0.1); width:100%">⚡ Wgraj plik .bin</button>
-                    <div id="ota-progress-container" style="display:none; width: 100%; height: 8px; background: var(--range-bg); border-radius: 4px; margin-top: 15px; overflow: hidden;"><div id="ota-progress-bar" style="height: 100%; width: 0%; background: var(--accent-orange); transition: 0.2s;"></div></div>
-                    <div id="ota-status" style="font-size: 12px; font-weight: 600; text-align: center; margin-top: 8px; color: var(--accent-orange);"></div>
-                </div>
-            </div>
-        </div>
-    </div> 
+<div id="tab-pulpit" class="tab-content active">
+<div id="alarm-banner">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:13px;font-weight:700;color:var(--accent-red)">🔔 Zdarzenia pod Twoją nieobecność</div>
+<button onclick="oznaczAlarmyPrzeczytane()" style="font-size:11px;padding:4px 10px;border-radius:12px;border:none;background:var(--accent-red);color:#fff;cursor:pointer">Wyczyść</button>
+</div>
+<div id="alarm-list" style="margin-top:8px"></div>
 </div>
 
+<div class="status-hero">
+<div id="hero-icon" class="status-icon">🌿</div>
+<div id="hero-text" class="status-text" style="color:var(--accent-green)">Wszystko w porządku</div>
+<div id="fault-unlock-btn" style="display:none;margin-top:15px"><button class="btn-test" onclick="odblokujPompe()" style="background:var(--accent-red);color:#fff;font-size:16px;padding:14px">🛠 Odblokuj system pomp</button></div>
+<div class="update-badge" onclick="pobierzDaneZESP32()" id="update-badge-btn"><span class="conn-dot" id="conn-dot"></span><span id="last-update-text">Łączenie...</span></div>
+</div>
+
+<div class="water-module" id="ui-water-module">
+<div class="weather-lbl" style="text-align:center;margin-bottom:-4px">Woda w zbiorniku</div>
+<div class="tank-mask" id="tank-mask">
+<div id="water-height-controller"><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div></div>
+<div class="tank-text-overlay">
+<span id="dash-water-pct" style="font-size:32px;font-weight:800;letter-spacing:-1px">--%</span>
+<span id="dash-water-liters" style="font-size:13px;font-weight:700;opacity:.9">-- / -- L</span>
+<span id="dash-water-est" style="font-size:10px;font-weight:700;opacity:.75;margin-top:4px">Szacowanie...</span>
+</div>
+</div>
+<button id="btn-reset-water" class="btn-test" onclick="zresetujLicznikWody()" style="background:rgba(0,122,255,0.1);color:var(--accent-blue);width:100%">💦 Zresetuj stan po napełnieniu beczki</button>
+</div>
+
+<button class="water-now" id="btn-water-now" onclick="podlejTeraz()">💧 Podlej teraz</button>
+<div class="next-check" id="next-check">Następne sprawdzenie za ok. --</div>
+
+<div class="moist-card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:13px;font-weight:700">🌱 Wilgotność gleby</div>
+<div id="moist-pct" style="font-size:18px;font-weight:800;color:var(--accent-blue)">--%</div>
+</div>
+<div class="moist-track"><div class="moist-fill" id="moist-fill" style="width:0%"></div><div class="moist-thresh" id="moist-thresh" style="left:45%"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-sub);margin-top:6px"><span>Sucho</span><span id="moist-info">Próg podlewania: 45%</span><span>Mokro</span></div>
+</div>
+
+<div class="weather-grid">
+<div class="weather-card" id="ui-bme-temp"><div class="weather-val" id="dash-temp">-</div><div class="weather-lbl">Powietrze</div></div>
+<div class="weather-card" id="ui-bme-hum"><div class="weather-val" id="dash-hum">-</div><div class="weather-lbl">Wilgotność</div></div>
+<div class="weather-card" id="ui-ds-temp"><div class="weather-val" id="dash-water-temp">-</div><div class="weather-lbl">Temp. Wody</div></div>
+<div class="weather-card"><div class="weather-val" id="dash-sun">-</div><div class="weather-lbl">God Słońca</div></div>
+<div class="weather-card"><div class="weather-val" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
+<div class="weather-card" id="ui-bme-pres"><div class="weather-val" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
+</div>
+<div class="section-card" id="sun-card" style="display:flex;justify-content:space-around;padding:12px;margin-bottom:16px">
+<div style="text-align:center"><div style="font-size:18px">☀️</div><div style="font-size:13px;font-weight:700" id="dash-sunrise">--:--</div><div class="weather-lbl">Wschód</div></div>
+<div style="text-align:center"><div style="font-size:18px">🌙</div><div style="font-size:13px;font-weight:700" id="dash-sunset">--:--</div><div class="weather-lbl">Zachód</div></div>
+</div>
+
+<div class="section-card" id="forecast-card" style="display:none">
+<div style="display:flex;align-items:center;gap:14px">
+<div id="forecast-icon" style="font-size:42px">🌤️</div>
+<div style="flex:1"><div id="forecast-text" style="font-size:15px;font-weight:700">--</div><div id="forecast-sub" style="font-size:11px;color:var(--text-sub);margin-top:2px">Prognoza z trendu ciśnienia</div></div>
+<div id="forecast-trend" style="font-size:13px;font-weight:700;color:var(--text-sub)"></div>
+</div>
+</div>
+
+<div class="section-card" id="kal-teaser" onclick="otworzKalendarz()" style="cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:16px">
+<div id="kal-teaser-icon" style="font-size:34px">🌱</div>
+<div style="flex:1"><div style="font-size:11px;color:var(--text-sub);font-weight:700;text-transform:uppercase;margin-bottom:2px">📅 Kalendarz ogrodnika</div><div id="kal-teaser-txt" style="font-size:13px;font-weight:600">Ładowanie...</div></div>
+<div style="color:var(--text-sub);font-size:18px">›</div>
+</div>
+
+<div class="section-card" id="adaptive-card" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13px;font-weight:700">🧠 Uczenie się gleby</div><div id="adaptive-status" style="font-size:11px;color:var(--text-sub);margin-top:2px">Zbieranie danych...</div></div>
+<div style="text-align:right"><div id="adaptive-rate" style="font-size:20px;font-weight:800;color:var(--accent-blue)">-- %/h</div><div style="font-size:10px;color:var(--text-sub)">tempo wysychania</div></div>
+</div>
+<div style="margin-top:10px;height:6px;background:var(--range-bg);border-radius:3px;overflow:hidden"><div id="adaptive-bar" style="height:100%;width:0%;background:var(--accent-green);transition:width .5s"></div></div>
+</div>
+
+<h2 id="plants-title">Co dzisiaj rośnie?</h2>
+<div class="profile-container" id="plants-container"></div>
+</div>
+<div id="tab-ustawienia" class="tab-content">
+<div class="tab-nav" style="margin-bottom:20px">
+<div id="btn-sub-ogolne" class="tab-btn active" onclick="zmienPodzakladke('ogolne')">Ogólne</div>
+<div id="btn-sub-zaawansowane" class="tab-btn" onclick="zmienPodzakladke('zaawansowane')">Zaawansowane</div>
+</div>
+<div id="sub-ogolne" class="sub-content active">
+<h2>Edycja Profili Upraw</h2>
+<div class="section-card">
+<select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-light);background:var(--input-bg);color:var(--text-main);margin-bottom:15px;font-size:14px;outline:none"></select>
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue)">40%</span></div>
+<input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText=this.value+'%'">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:15px"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue)">2 min</span></div>
+<input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText=this.value+' min'">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:15px"><span>Agresywność</span><span id="edit-aggr-val" style="color:var(--accent-blue)">Zbalansowany</span></div>
+<input type="range" id="edit-aggr" min="0" max="2" step="1" value="1" oninput="aktualizujEtykieteAgresywnosci(this.value)">
+<button id="btn-save-profile" class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top:20px;width:100%">💾 Zapisz zmiany</button>
+</div>
+
+<h2>🔔 Progi alarmów</h2>
+<div class="section-card">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Ostrzeż gdy bateria poniżej</span><span id="al-batt-val" style="color:var(--accent-orange)">20%</span></div>
+<input type="range" id="al-batt" min="5" max="50" value="20" oninput="document.getElementById('al-batt-val').innerText=this.value+'%';zapiszProgiAlarmow()">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:15px"><span>Alarm gdy temperatura powyżej</span><span id="al-temp-val" style="color:var(--accent-red)">35°C</span></div>
+<input type="range" id="al-temp" min="25" max="50" value="35" oninput="document.getElementById('al-temp-val').innerText=this.value+'°C';zapiszProgiAlarmow()">
+</div>
+
+<h2>Lokalizacja i Wygląd</h2>
+<div class="section-card">
+<div class="tab-nav" style="margin-bottom:15px"><div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div><div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Zewnątrz</div></div>
+<div class="tab-nav" style="margin-bottom:0"><div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div><div id="theme-auto" class="tab-btn active" onclick="zmienMotyw('auto')">⚙️ Auto</div><div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div></div>
+</div>
+
+<h2>Parametry Zbiornika</h2>
+<div class="section-card">
+<label>Pojemność całkowita (L)</label>
+<input type="number" id="tank-vol" class="text-input" value="220" onchange="zapiszParametryZbiornika()">
+<label>Wydajność pompy (L/min)</label>
+<input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
+</div>
+
+<h2>Zużycie wody</h2>
+<div class="section-card">
+<div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:14px">
+<div><div id="stat-today" style="font-size:22px;font-weight:800;color:var(--accent-blue)">-- L</div><div style="font-size:10px;color:var(--text-sub)">DZIŚ</div></div>
+<div><div id="stat-week" style="font-size:22px;font-weight:800;color:var(--accent-blue)">-- L</div><div style="font-size:10px;color:var(--text-sub)">7 DNI</div></div>
+<div><div id="stat-avg" style="font-size:22px;font-weight:800;color:var(--accent-blue)">-- L</div><div style="font-size:10px;color:var(--text-sub)">ŚR/DZIEŃ</div></div>
+</div>
+<div class="chart-container"><canvas id="waterChart"></canvas></div>
+<div id="water-anomaly" style="display:none;font-size:12px;padding:8px;border-radius:10px;margin-top:10px;text-align:center"></div>
+</div>
+
+<h2>Historia (Wykresy)</h2>
+<div class="section-card" style="margin-bottom:20px">
+<div class="range-btns">
+<div class="range-btn" id="rng-1" onclick="ustawZakres(1)">24h</div>
+<div class="range-btn active" id="rng-7" onclick="ustawZakres(7)">7 dni</div>
+<div class="range-btn" id="rng-30" onclick="ustawZakres(30)">30 dni</div>
+</div>
+<div class="weather-lbl" style="margin-bottom:4px">Wilgotność gleby</div>
+<div class="chart-container"><canvas id="moistureChart"></canvas></div>
+<div class="weather-lbl" style="margin-bottom:4px">Temperatura</div>
+<div class="chart-container"><canvas id="tempChart"></canvas></div>
+<button class="btn-test btn-green" onclick="eksportujCSV()" style="margin-top:15px;width:100%">📥 Pobierz raport (.csv)</button>
+</div>
+</div>
+
+<div id="sub-zaawansowane" class="sub-content">
+<h2>🛠 Tryb Serwisowy</h2>
+<div class="section-card">
+<p style="font-size:12px;color:var(--text-sub);margin-top:0">Odświeża dane co 2 sekundy.</p>
+<button id="btn-service-mode" class="btn-test" onclick="toggleServiceMode()" style="background:var(--accent-orange);color:#fff;width:100%">Włącz Tryb Serwisowy</button>
+</div>
+<h2>Stan połączenia</h2>
+<div class="section-card">
+<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-sub)">Status:</span><b id="conn-status">--</b></div>
+<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-sub)">Ostatnia synchronizacja:</span><b id="conn-last">--</b></div>
+<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-sub)">Wolna pamięć ESP:</span><b id="conn-heap">--</b></div>
+</div>
+<h2>Menedżer Urządzeń</h2>
+<div class="section-card">
+<p style="font-size:11px;color:var(--text-sub);margin-top:0;line-height:1.4">Zaznacz sprzęt fizycznie podpięty do ESP.</p>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Pływak/Ultradźwięki (JSN-SR04T)</span><label class="hwswitch"><input type="checkbox" id="hw-us" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Temp. Wody (DS18B20)</span><label class="hwswitch"><input type="checkbox" id="hw-ds" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Pogoda (BME280)</span><label class="hwswitch"><input type="checkbox" id="hw-bme" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Czujnik Słońca (Fotorezystor)</span><label class="hwswitch"><input type="checkbox" id="hw-light" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;border-top:1px solid var(--range-bg);padding-top:10px"><span>Wentylacja (PIN 19)</span><label class="hwswitch"><input type="checkbox" id="hw-vent" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
+</div>
+
+<h2>Asystent Kalibracji (Live)</h2>
+<div class="section-card">
+<h3 style="margin-top:0;font-size:14px">🌱 Wilgotność Gleby</h3>
+<div class="eng-row"><span>Odczyt z czujnika:</span><b id="live-soil-val">---</b></div>
+<div style="display:flex;gap:8px;margin-top:10px"><button id="btn-soil-dry" class="btn-test" onclick="zapiszGlebe('air')" style="flex:1;background:rgba(255,149,0,0.1);color:var(--accent-orange)">SUCHO</button><button id="btn-soil-wet" class="btn-test" onclick="zapiszGlebe('water')" style="flex:1;background:rgba(0,122,255,0.1);color:var(--accent-blue)">MOKRO</button></div>
+<div id="calib-quality" style="font-size:11px;font-weight:600;margin-top:10px;text-align:center"></div>
+</div>
+<div class="section-card" id="card-calib-us">
+<h3 style="margin-top:0;font-size:14px">🛢️ Poziom Wody w Beczce</h3>
+<div class="eng-row"><span>Odległość tafli:</span><b id="live-us-val">--- cm</b></div>
+<div style="display:flex;gap:8px;margin-top:10px"><button id="btn-water-empty" class="btn-test" onclick="zapiszWode('empty')" style="flex:1;background:rgba(255,59,48,0.1);color:var(--accent-red)">PUSTA</button><button id="btn-water-full" class="btn-test" onclick="zapiszWode('full')" style="flex:1;background:rgba(52,199,89,0.1);color:var(--accent-green)">PEŁNA</button></div>
+</div>
+<div class="section-card" id="card-calib-ldr">
+<h3 style="margin-top:0;font-size:14px">☀️ Światłomierz</h3>
+<div class="eng-row"><span>Surowe natężenie:</span><b id="live-light-val">---</b></div>
+<button id="btn-calib-light" class="btn-test" onclick="zapiszSwiatlo()" style="margin-top:10px;background:rgba(255,149,0,0.1);color:var(--accent-orange);width:100%">Ustaw jako SŁOŃCE (100%)</button>
+</div>
+<div class="section-card" id="card-calib-ds">
+<h3 style="margin-top:0;font-size:14px">🌡️ Korekta Temperatury Wody</h3>
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px">Przesunięcie (np. -1.5):</span><input type="number" id="calib-tOff" value="0.0" step="0.1" style="width:70px;padding:6px;border-radius:8px;border:1px solid var(--border-light);background:var(--input-bg);color:var(--text-main);font-family:monospace;text-align:center"></div>
+<button id="btn-calib-toff" class="btn-test" onclick="zapiszKorekteTemp()" style="margin-top:10px;width:100%">💾 Zapisz korektę</button>
+</div>
+
+<h2>Wydajność Pompy i Test</h2>
+<div class="section-card">
+<div class="eng-row"><span>Napięcie zasilania:</span><b id="eng-voltage">--- V</b></div>
+<div style="font-size:32px;font-weight:800;text-align:center;margin:15px 0;font-variant-numeric:tabular-nums" id="stopwatch-display">00.0s</div>
+<button id="btn-stoper" class="btn-test btn-primary" onclick="toggleStoper()" style="padding:16px;font-size:16px;width:100%">⏱ Asystent Kalibracji (1 Litr)</button>
+<p id="stoper-result" style="display:none;color:var(--accent-green);text-align:center;font-weight:800;margin-top:15px"></p>
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:25px"><span>Szybki Test Pompy</span><span id="testDurationVal" style="color:var(--accent-blue)">15s</span></div>
+<input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText=this.value+'s'">
+<button id="btn-quick-test" class="btn-test" onclick="uruchomTest()" style="width:100%">🚀 Uruchom Test</button>
+</div>
+
+<h2>Zimowanie Szklarni</h2>
+<div class="section-card">
+<button id="btn-wypompuj" class="btn-test" onclick="wypompujWode()" style="background:rgba(0,122,255,0.1);color:var(--accent-blue);margin-bottom:12px;width:100%">❄️ Wypompuj resztki wody z węży</button>
+<button id="btn-hibernuj" class="btn-test" onclick="aktywujHibernacje()" style="background:rgba(255,59,48,0.1);color:var(--accent-red);width:100%">💤 Włącz tryb uśpienia na zimę</button>
+</div>
+
+<h2>Aktualizacja Firmware (OTA)</h2>
+<div class="section-card">
+<input type="file" id="ota-file" accept=".bin" style="margin-bottom:15px;width:100%">
+<button id="btn-ota" class="btn-test" onclick="wgrywajOTA()" style="color:var(--accent-orange);background:rgba(255,149,0,0.1);width:100%">⚡ Wgraj plik .bin</button>
+<div id="ota-progress-container" style="display:none;width:100%;height:8px;background:var(--range-bg);border-radius:4px;margin-top:15px;overflow:hidden"><div id="ota-progress-bar" style="height:100%;width:0%;background:var(--accent-orange);transition:.2s"></div></div>
+<div id="ota-status" style="font-size:12px;font-weight:600;text-align:center;margin-top:8px;color:var(--accent-orange)"></div>
+</div>
+<h2>🔋 Kalibracja napięcia baterii</h2>
+<div class="section-card">
+<div class="eng-row"><span>ESP odczytuje teraz:</span><b id="calib-v-now">--- V</b></div>
+<label style="margin-top:10px">Zmierz multimetrem i wpisz rzeczywiste napięcie:</label>
+<input type="number" id="calib-v-real" class="text-input" placeholder="np. 13.25" step="0.01">
+<button class="btn-test" onclick="zapiszKalibracjeNapiecia()" style="width:100%">💾 Zapisz korekcję napięcia</button>
+<p style="font-size:11px;color:var(--text-sub);margin:8px 0 0">Koryguje błąd tolerancji rezystorów dzielnika.</p>
+</div>
+
+<h2>🧪 Diagnostyka systemu</h2>
+<div class="section-card">
+<button class="btn-test btn-primary" onclick="uruchomDiagnostyke()" style="width:100%">▶️ Sprawdź wszystko</button>
+<div id="diag-results" style="margin-top:12px"></div>
+</div>
+
+<h2>🔄 Reset kalibracji</h2>
+<div class="section-card">
+<button class="btn-test" onclick="resetKalibracji()" style="background:rgba(255,59,48,0.1);color:var(--accent-red);width:100%">Przywróć ustawienia fabryczne</button>
+<p style="font-size:11px;color:var(--text-sub);margin:8px 0 0">Przywraca domyślne wartości kalibracji czujników.</p>
+</div>
+
+
+</div>
+</div>
+</div>
+
+<div id="profile-modal" class="profile-modal-bg">
+<div class="section-card" style="width:90%;max-width:340px;margin:0;max-height:85vh;overflow-y:auto">
+<h2 id="modal-title" style="margin-top:0">Nowa uprawa</h2>
+<label>Emoji</label>
+<div id="emoji-picker" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+<label>Nazwa</label>
+<input type="text" id="new-prof-name" class="text-input" placeholder="np. Papryka" maxlength="20">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Próg wilgotności</span><span id="new-prof-th-val" style="color:var(--accent-blue)">45%</span></div>
+<input type="range" id="new-prof-th" min="0" max="100" value="45" oninput="document.getElementById('new-prof-th-val').innerText=this.value+'%'">
+<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Czas podlewania</span><span id="new-prof-time-val" style="color:var(--accent-blue)">3 min</span></div>
+<input type="range" id="new-prof-time" min="0.5" max="30" step="0.5" value="3" oninput="document.getElementById('new-prof-time-val').innerText=this.value+' min'">
+<div style="display:flex;gap:8px;margin-top:16px">
+<button class="btn-test" onclick="zamknijModal()" style="flex:1;background:var(--nav-bg);color:var(--text-sub)">Anuluj</button>
+<button class="btn-test" id="btn-save-new-prof" onclick="zapiszNowyProfil()" style="flex:1">Zapisz</button>
+</div>
+<button id="btn-delete-prof" class="btn-test" onclick="usunProfil()" style="display:none;margin-top:8px;background:rgba(255,59,48,0.1);color:var(--accent-red);width:100%">🗑 Usuń uprawę</button>
+</div>
+</div>
 <script>
-// --- LOGIKA FRONTENDU Z FILTRAMI WEJŚCIOWYMI I ZAMRAŻANIEM STANÓW ---
-let lockConfig = false, lockTank = false, lockCalib = false, lockAction = false;
+var IS_DEMO=location.hostname.includes('github.io')||location.hostname.includes('localhost')||location.hostname==='127.0.0.1'||location.protocol==='file:';
+var isServiceModeActive=false,lockConfig=false,zakresDni=7,lastDataCache=null;
 
-function ustawStanPrzycisku(btnId, isLocking, originalText, loadingText = "⏳ Przetwarzanie...", inputIds = []) {
-    const btn = btnId ? (document.getElementById(btnId) || document.querySelector(`[onclick*="${btnId}"]`)) : null;
-    inputIds.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) {
-            el.disabled = isLocking;
-            el.style.opacity = isLocking ? "0.5" : "1";
-            el.style.cursor = isLocking ? "not-allowed" : "auto";
-        }
+function genDemoHistory(){var arr=[],now=Math.floor(Date.now()/1000),m=70;for(var i=120;i>=0;i--){var ts=now-i*21600;m-=Math.random()*8;var a=0,p=0;if(m<45){a=1;p=180;m=75+Math.random()*10;}var hr=new Date(ts*1000).getHours();var t=18+Math.sin(hr/24*Math.PI*2)*8+Math.random()*3;arr.push({ts:ts,m:Math.round(Math.max(20,m)),t:Math.round(t*10),h:Math.round(55+Math.random()*20),v:Math.round((12.8+Math.random()*0.8)*100),a:a,p:p});}return arr;}
+var demoHistory=genDemoHistory();
+var DEMO_DATA={cfg_th:45,cfg_time:3,cfg_aggr:1,tank_vol:220,pump_flow:2.0,voltage:13.2,batt_warn:0,raw_adc:2100,raw_light:3500,light:85,water_temp:18.5,t_off:0,us_dist:35,us_max:90,us_min:15,sun_hours:6.5,sr:372,ss:1248,air_val:3200,water_val:1500,fault:0,hibernated:0,outdoors:0,survival:0,pump_sec:1200,temp:24.5,air_hum:62,pressure:1013,water:"OK",service_mode:0,free_heap:210000,vent_state:0,drying_rate:2.8,adaptive_ready:5,forecast:4,press_trend:-2.1,next_check_sec:10800,hw:{us:1,ds:1,bme:1,light:1,vent:0},logs:[{moisture:65,v:13.2,t:24.1,h:62,action:"OK"}]};
+var DEMO_ALARMS=[{type:8,ts:Math.floor(Date.now()/1000)-86400,ack:0},{type:2,ts:Math.floor(Date.now()/1000)-43200,ack:0}];
+var DEMO_PROFILES={pomidory:{name:"Pomidory",icon:"🍅",th:45,time:3,aggr:1,builtin:1},ogorki:{name:"Ogórki",icon:"🥒",th:55,time:4,aggr:1,builtin:1},sadzonki:{name:"Sadzonki",icon:"🌱",th:60,time:1,aggr:2,builtin:1},arbuz:{name:"Arbuz",icon:"🍉",th:50,time:5,aggr:1,builtin:1},borowka:{name:"Borówka",icon:"🫐",th:40,time:2,aggr:0,builtin:1}};
+var profileData={};
+
+function haptyka(p){if(navigator.vibrate&&!IS_DEMO)navigator.vibrate(p);}
+function espFetch(url,opts){
+  if(IS_DEMO){return new Promise(function(res){setTimeout(function(){
+    if(url.indexOf('/data')===0)res({ok:true,json:function(){return Promise.resolve(JSON.parse(JSON.stringify(DEMO_DATA)));}});
+    else if(url.indexOf('/getProfiles')===0)res({ok:true,json:function(){return Promise.resolve(DEMO_PROFILES);}});
+    else if(url.indexOf('/getHistory')===0)res({ok:true,json:function(){return Promise.resolve(demoHistory);}});
+    else if(url.indexOf('/getAlarms')===0)res({ok:true,json:function(){return Promise.resolve(DEMO_ALARMS);}});
+    else res({ok:true,text:function(){return Promise.resolve("OK");},json:function(){return Promise.resolve({});}});
+  },150);});}
+  return fetch(url,opts);
+}
+
+// POTWIERDZENIE - animacja zamiast alert
+function potwierdz(txt,ok){
+  var t=document.getElementById('confirm-toast'),c=document.getElementById('confirm-circle');
+  document.getElementById('confirm-text').innerText=txt||'Gotowe';
+  c.className='confirm-circle'+(ok===false?' err':'');
+  c.innerHTML=ok===false?'<div style="color:#fff;font-size:30px;font-weight:700;line-height:1">!</div>':'<div class="confirm-check"></div>';
+  t.classList.add('show');haptyka(ok===false?[60,40,60]:30);
+  setTimeout(function(){t.classList.remove('show');},1400);
+}
+
+function ustawStanPrzycisku(id,lock,orig,load){load=load||"⏳...";var b=document.getElementById(id);if(!b)return;if(lock){b.dataset.o=b.innerText;b.innerText=load;b.style.opacity=.5;b.style.pointerEvents='none';}else{b.innerText=b.dataset.o||orig;b.style.opacity=1;b.style.pointerEvents='auto';}}
+
+// PROFILE
+function wczytajProfileZESP(){return espFetch('/getProfiles',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){profileData=d;localStorage.setItem('bazaProfili',JSON.stringify(d));renderujPrzyciskiProfili();odswiezListeEdycji();}).catch(function(){var c=localStorage.getItem('bazaProfili');if(c){profileData=JSON.parse(c);renderujPrzyciskiProfili();odswiezListeEdycji();}});}
+function zapiszProfileNaESP(){localStorage.setItem('bazaProfili',JSON.stringify(profileData));if(IS_DEMO){DEMO_PROFILES=JSON.parse(JSON.stringify(profileData));return Promise.resolve();}return fetch('/saveProfiles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(profileData)});}
+function renderujPrzyciskiProfili(){var c=document.getElementById('plants-container');c.innerHTML='';for(var id in profileData){(function(id){var p=profileData[id];var b=document.createElement('button');b.className='profile-btn';b.id='prof-'+id;b.onclick=function(){aktywujProfil(id);};b.innerHTML='<span class="profile-icon">'+(p.icon||'🌿')+'</span>'+p.name;c.appendChild(b);})(id);}var a=document.createElement('button');a.className='profile-btn';a.style.borderStyle='dashed';a.onclick=otworzDodawanieProfilu;a.innerHTML='<span class="profile-icon">➕</span>Dodaj';c.appendChild(a);}
+function odswiezListeEdycji(){var s=document.getElementById('edit-profile-select');if(!s)return;s.innerHTML='';for(var id in profileData){var o=document.createElement('option');o.value=id;o.innerText=(profileData[id].icon||'🌿')+' '+profileData[id].name;s.appendChild(o);}wczytajProfilDoEdycji();}
+function aktywujProfil(id){var p=profileData[id];if(!p)return;document.querySelectorAll('.profile-btn').forEach(function(b){b.classList.remove('selected');});var btn=document.getElementById('prof-'+id);if(btn)btn.classList.add('selected');haptyka(15);espFetch('/save?thPct='+p.th+'&timeSec='+(p.time*60)+'&aggr='+p.aggr).then(function(){potwierdz('Aktywowano: '+p.name);if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Offline',false);});}
+var EMOJI_LIST=['🍅','🥒','🌱','🍉','🫐','🌶️','🥬','🍓','🌽','🥕','🧄','🧅','🍆','🎃','🌻','🌿','🪴','🍇'];
+var edytowanyProfilId=null,wybraneEmoji='🌿';
+function otworzDodawanieProfilu(){edytowanyProfilId=null;document.getElementById('modal-title').innerText='Nowa uprawa';document.getElementById('new-prof-name').value='';document.getElementById('new-prof-th').value=45;document.getElementById('new-prof-th-val').innerText='45%';document.getElementById('new-prof-time').value=3;document.getElementById('new-prof-time-val').innerText='3 min';document.getElementById('btn-delete-prof').style.display='none';renderujEmojiPicker('🌿');document.getElementById('profile-modal').style.display='flex';}
+function renderujEmojiPicker(sel){wybraneEmoji=sel;var p=document.getElementById('emoji-picker');p.innerHTML='';EMOJI_LIST.forEach(function(e){var b=document.createElement('button');b.innerText=e;b.style.cssText='font-size:22px;padding:6px;border-radius:10px;border:2px solid '+(e===sel?'var(--accent-green)':'transparent')+';background:var(--nav-bg);cursor:pointer';b.onclick=function(){renderujEmojiPicker(e);};p.appendChild(b);});}
+function zamknijModal(){document.getElementById('profile-modal').style.display='none';}
+function zapiszNowyProfil(){var name=document.getElementById('new-prof-name').value.trim();if(!name){potwierdz('Podaj nazwę',false);return;}if(!edytowanyProfilId&&Object.keys(profileData).length>=15){potwierdz('Limit 15 upraw',false);return;}var id=edytowanyProfilId||('custom_'+Date.now());profileData[id]={name:name,icon:wybraneEmoji,th:parseInt(document.getElementById('new-prof-th').value),time:parseFloat(document.getElementById('new-prof-time').value),aggr:1,builtin:0};haptyka(15);ustawStanPrzycisku('btn-save-new-prof',true,'Zapisz');zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();zamknijModal();potwierdz('Zapisano uprawę');}).catch(function(){potwierdz('Zapisano lokalnie',false);}).finally(function(){ustawStanPrzycisku('btn-save-new-prof',false,'Zapisz');});}
+function usunProfil(){if(!edytowanyProfilId)return;if(!confirm('Usunąć tę uprawę?'))return;delete profileData[edytowanyProfilId];haptyka([30,30]);zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();zamknijModal();potwierdz('Usunięto');});}
+function aktualizujEtykieteAgresywnosci(v){var e=["Oszczędny","Zbalansowany","Precyzyjny"];document.getElementById('edit-aggr-val').innerText=e[v];}
+function wczytajProfilDoEdycji(){var id=document.getElementById('edit-profile-select').value;var p=profileData[id];if(!p)return;document.getElementById('edit-th').value=p.th;document.getElementById('edit-th-val').innerText=p.th+'%';document.getElementById('edit-time').value=p.time;document.getElementById('edit-time-val').innerText=p.time+' min';document.getElementById('edit-aggr').value=p.aggr!==undefined?p.aggr:1;aktualizujEtykieteAgresywnosci(document.getElementById('edit-aggr').value);}
+function zapiszEdytowanyProfil(){if(lockConfig)return;lockConfig=true;haptyka(15);var id=document.getElementById('edit-profile-select').value;profileData[id].th=parseInt(document.getElementById('edit-th').value);profileData[id].time=parseFloat(document.getElementById('edit-time').value);profileData[id].aggr=parseInt(document.getElementById('edit-aggr').value);ustawStanPrzycisku('btn-save-profile',true,"💾 Zapisz zmiany","⏳ Zapis...");zapiszProfileNaESP().then(function(){return espFetch('/save?thPct='+profileData[id].th+'&timeSec='+(profileData[id].time*60)+'&aggr='+profileData[id].aggr);}).then(function(){renderujPrzyciskiProfili();potwierdz('Zapisano: '+profileData[id].name);}).catch(function(){potwierdz('Offline',false);}).finally(function(){lockConfig=false;ustawStanPrzycisku('btn-save-profile',false,"💾 Zapisz zmiany");});}
+// PROGI ALARMÓW
+function zapiszProgiAlarmow(){var b=document.getElementById('al-batt').value,t=document.getElementById('al-temp').value;localStorage.setItem('progiAlarmow',JSON.stringify({batt:b,temp:t}));}
+function wczytajProgiAlarmow(){var c=localStorage.getItem('progiAlarmow');if(c){var p=JSON.parse(c);document.getElementById('al-batt').value=p.batt;document.getElementById('al-batt-val').innerText=p.batt+'%';document.getElementById('al-temp').value=p.temp;document.getElementById('al-temp-val').innerText=p.temp+'°C';}}
+
+// POBIERANIE DANYCH
+var lastFetchMs=0;
+function pobierzDaneZESP32(){if(Date.now()-lastFetchMs<500)return;lastFetchMs=Date.now();espFetch('/data',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){lastDataCache=d;localStorage.setItem('lastESPData',JSON.stringify({data:d,timestamp:Date.now()}));renderujDane(d,Date.now(),IS_DEMO);ustawPolaczenie(true,Date.now(),d.free_heap);}).catch(function(){var c=localStorage.getItem('lastESPData');if(c){var p=JSON.parse(c);renderujDane(p.data,p.timestamp,true);}ustawPolaczenie(false);});}
+
+function ustawPolaczenie(ok,ts,heap){
+  var dot=document.getElementById('conn-dot');
+  if(dot)dot.className='conn-dot'+(ok?'':' off');
+  var cs=document.getElementById('conn-status');if(cs)cs.innerText=ok?'Połączono 🟢':'Brak połączenia 🔴';
+  var cl=document.getElementById('conn-last');if(cl&&ts)cl.innerText='przed chwilą';
+  var ch=document.getElementById('conn-heap');if(ch&&heap)ch.innerText=(heap/1024).toFixed(1)+' KB';
+}
+
+function formatMin(m){if(m===undefined||isNaN(m))return'--:--';return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+function formatCzas(sec){if(!sec)return'--';var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);if(h>0)return h+'h '+(m>0?m+'min':'');return m+' min';}
+function obliczWilgotnosc(d){if(d.raw_adc===undefined||d.air_val===undefined||d.water_val===undefined){if(d.logs&&d.logs.length)return d.logs[d.logs.length-1].moisture;return null;}var pct=(d.raw_adc-d.air_val)/(d.water_val-d.air_val)*100;return Math.max(0,Math.min(100,Math.round(pct)));}
+
+function renderujDane(d,timestamp,demo){
+  document.getElementById("dash-temp").innerText=(d.temp!==undefined)?d.temp.toFixed(1)+"°":"-";
+  document.getElementById("dash-hum").innerText=(d.air_hum!==undefined)?d.air_hum.toFixed(0)+"%":"-";
+  document.getElementById("dash-pres").innerText=(d.pressure>0)?d.pressure.toFixed(0)+" hPa":"-";
+  document.getElementById("dash-water-temp").innerText=(d.water_temp>0)?d.water_temp.toFixed(1)+"°":"-";
+  document.getElementById("dash-sun").innerText=(d.sun_hours!==undefined)?d.sun_hours+" h":"-";
+  document.getElementById("dash-sunrise").innerText=formatMin(d.sr);
+  document.getElementById("dash-sunset").innerText=formatMin(d.ss);
+
+  if(d.voltage){var bp=Math.max(0,Math.min(100,Math.round(((d.voltage-11.5)/2.1)*100)));document.getElementById("dash-batt").innerText=bp+"%";}
+
+  // WILGOTNOŚĆ GLEBY (pasek)
+  var moist=obliczWilgotnosc(d);
+  if(moist!==null){
+    document.getElementById('moist-pct').innerText=moist+'%';
+    document.getElementById('moist-fill').style.width=moist+'%';
+    var th=d.cfg_th||45;
+    document.getElementById('moist-thresh').style.left=th+'%';
+    document.getElementById('moist-info').innerText='Próg podlewania: '+th+'%';
+    document.getElementById('moist-fill').style.background=moist<th?'linear-gradient(90deg,#ff9f0a,#ff6b22)':'linear-gradient(90deg,#5ac8fa,var(--accent-blue))';
+  }
+
+  // NASTĘPNE SPRAWDZENIE
+  if(d.next_check_sec!==undefined)document.getElementById('next-check').innerText='Następne sprawdzenie za ok. '+formatCzas(d.next_check_sec);
+
+  // WODA
+  if(d.us_dist!==undefined&&d.us_max&&d.us_min){
+    var pct=Math.max(0,Math.min(100,Math.round(100-(((d.us_dist-d.us_min)/(d.us_max-d.us_min))*100))));
+    var liters=(pct/100)*(d.tank_vol||220);
+    document.getElementById("water-height-controller").style.bottom=(-800+(120*(pct/100)))+"px";
+    document.getElementById("dash-water-pct").innerText=pct+"%";
+    document.getElementById("dash-water-liters").innerText=Math.round(liters)+" / "+(d.tank_vol||220)+" L";
+    var days=Math.floor(liters/12);
+    document.getElementById("dash-water-est").innerText=days>14?"Zapas na ponad 2 tyg.":"Wystarczy na ok. "+days+" dni";
+    document.getElementById("dash-water-pct").style.color=pct<=15?"var(--accent-red)":"var(--text-main)";
+    pct<=15?document.getElementById("tank-mask").classList.add("alert"):document.getElementById("tank-mask").classList.remove("alert");
+  }
+
+  // STATUS HERO
+  var hI=document.getElementById("hero-icon"),hT=document.getElementById("hero-text"),uB=document.getElementById("fault-unlock-btn"),pC=document.getElementById("plants-container"),pT=document.getElementById("plants-title");
+  uB.style.display="none";pC.style.display="flex";pT.style.display="block";hI.classList.remove("pulse-alert");
+  var progi=JSON.parse(localStorage.getItem('progiAlarmow')||'{"batt":20,"temp":35}');
+  var battPct=d.voltage?Math.max(0,Math.min(100,Math.round(((d.voltage-11.5)/2.1)*100))):100;
+  if(d.fault===1){hI.innerText="🔥";hI.classList.add("pulse-alert");hT.innerText="AWARIA POMPY!";hT.style.color="var(--accent-red)";uB.style.display="block";pC.style.display="none";pT.style.display="none";}
+  else if(d.water==="EMPTY"){hI.innerText="⚠️";hI.classList.add("pulse-alert");hT.innerText="Dolej wody do beczki!";hT.style.color="var(--accent-red)";}
+  else if(battPct<progi.batt){hI.innerText="🔋";hI.classList.add("pulse-alert");hT.innerText="Niski poziom baterii";hT.style.color="var(--accent-orange)";}
+  else if(d.temp!==undefined&&d.temp>progi.temp){hI.innerText="🌡️";hI.classList.add("pulse-alert");hT.innerText="Wysoka temperatura";hT.style.color="var(--accent-orange)";}
+  else{hI.innerText="🌿";hT.innerText="Wszystko w porządku";hT.style.color="var(--accent-green)";}
+
+  document.getElementById("last-update-text").innerText=(demo?"Demo":"Połączono");
+
+  // ADAPTACYJNY
+  if(d.adaptive_ready!==undefined){var card=document.getElementById("adaptive-card"),ready=d.adaptive_ready,rate=d.drying_rate||0;if(ready>=1){card.style.display="block";document.getElementById("adaptive-rate").innerText=rate.toFixed(1)+" %/h";document.getElementById("adaptive-bar").style.width=(ready/5*100)+"%";document.getElementById("adaptive-status").innerText=ready<2?"Uczenie się... ("+ready+"/5)":(ready<5?"Aktywne ("+ready+"/5)":"✅ W pełni nauczony");}else card.style.display="none";}
+
+  renderujPrognoze(d);
+  aktualizujLiveKalibracje(d);
+  renderujKalendarzTeaser();
+  wczytajStatystykiWody(d.pump_flow);
+}
+
+// PODLEJ TERAZ
+function podlejTeraz(){
+  var sec=180;
+  var sel=document.querySelector('.profile-btn.selected');
+  if(lastDataCache&&lastDataCache.cfg_time)sec=Math.round(lastDataCache.cfg_time*60);
+  if(!confirm('Podlać teraz przez '+Math.round(sec/60*10)/10+' min?'))return;
+  haptyka([30,30]);var b=document.getElementById('btn-water-now');b.disabled=true;b.innerText='🌊 Podlewanie...';
+  espFetch('/test?sec='+sec).then(function(r){if(!r.ok)throw 0;potwierdz('Podlewanie zakończone');}).catch(function(){potwierdz('Odmowa / brak wody',false);}).finally(function(){b.disabled=false;b.innerText='💧 Podlej teraz';if(!IS_DEMO)pobierzDaneZESP32();});
+}
+
+// PROGNOZA
+var PROGNOZA={1:{icon:'☀️',txt:'Słonecznie',k:'var(--accent-orange)'},2:{icon:'🌤️',txt:'Stabilna pogoda',k:'var(--accent-blue)'},3:{icon:'⛅',txt:'Zmienne warunki',k:'var(--text-sub)'},4:{icon:'🌧️',txt:'Możliwy deszcz',k:'var(--accent-blue)'},5:{icon:'⛈️',txt:'Nadchodzi burza',k:'var(--accent-red)'}};
+function renderujPrognoze(d){var card=document.getElementById('forecast-card');if(!d.forecast||!PROGNOZA[d.forecast]){card.style.display='none';return;}var p=PROGNOZA[d.forecast];card.style.display='block';document.getElementById('forecast-icon').innerText=p.icon;var t=document.getElementById('forecast-text');t.innerText=p.txt;t.style.color=p.k;if(d.press_trend!==undefined){var tr=d.press_trend,s=tr>0.5?'↑':(tr<-0.5?'↓':'→');document.getElementById('forecast-trend').innerText=s+' '+Math.abs(tr).toFixed(1)+' hPa';}document.getElementById('forecast-sub').innerText=(d.forecast>=4&&d.outdoors===1)?'Podlewanie może zostać wstrzymane':'Prognoza z trendu ciśnienia';}
+
+// ALARMY
+var ALARM_NAZWY={2:{txt:'Pusty zbiornik wody',icon:'⚠️'},6:{txt:'Awaria pompy',icon:'🔥'},8:{txt:'Słaba bateria',icon:'🔋'}};
+function wczytajAlarmy(){espFetch('/getAlarms',{cache:'no-store'}).then(function(r){return r.json();}).then(function(al){var np=al.filter(function(a){return a.ack===0;});var b=document.getElementById('alarm-banner'),l=document.getElementById('alarm-list');if(np.length===0){b.style.display='none';return;}b.style.display='block';l.innerHTML='';np.slice().reverse().forEach(function(a){var info=ALARM_NAZWY[a.type]||{txt:'Zdarzenie',icon:'•'};var k=a.ts>1000000000?new Date(a.ts*1000).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';l.innerHTML+='<div style="font-size:12px;padding:4px 0">'+info.icon+' '+info.txt+' <span style="color:var(--text-sub)">'+k+'</span></div>';});}).catch(function(){});}
+function oznaczAlarmyPrzeczytane(){haptyka(15);if(IS_DEMO){DEMO_ALARMS.forEach(function(a){a.ack=1;});document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');return;}fetch('/ackAlarms').then(function(){document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');});}
+// STATYSTYKI WODY + WYKRESY (z zakresem)
+function filtrujHistorie(hist){if(!hist)return[];var teraz=Math.floor(Date.now()/1000),granica=teraz-zakresDni*86400;var f=hist.filter(function(e){return e.ts>=granica||e.ts<1000000000;});return f.length?f:hist;}
+function wczytajStatystykiWody(pumpFlow){
+  espFetch('/getHistory',{cache:'no-store'}).then(function(r){return r.json();}).then(function(hist){
+    if(!hist||!hist.length)return;
+    var flow=pumpFlow||2.0,perDay={};
+    hist.forEach(function(e){if(!e.p||e.ts<1000000000)return;var k=new Date(e.ts*1000).toISOString().slice(0,10);perDay[k]=(perDay[k]||0)+(e.p/60)*flow;});
+    var dni=Object.keys(perDay).sort(),litry=dni.map(function(k){return perDay[k];});
+    var dzis=new Date().toISOString().slice(0,10);
+    document.getElementById('stat-today').innerText=(perDay[dzis]||0).toFixed(1)+' L';
+    document.getElementById('stat-week').innerText=dni.slice(-7).reduce(function(s,k){return s+perDay[k];},0).toFixed(0)+' L';
+    var avg=litry.length?litry.reduce(function(a,b){return a+b;},0)/litry.length:0;
+    document.getElementById('stat-avg').innerText=avg.toFixed(1)+' L';
+    rysujSlupki('waterChart',litry.slice(-14));
+    var box=document.getElementById('water-anomaly');
+    if(avg>0&&(perDay[dzis]||0)>avg*2.5&&litry.length>3){box.style.display='block';box.style.background='rgba(255,59,48,0.12)';box.style.color='var(--accent-red)';box.innerText='⚠️ Zużycie dziś znacznie wyższe — sprawdź wyciek';}else box.style.display='none';
+    var fhist=filtrujHistorie(hist);
+    var rs=getComputedStyle(document.documentElement);
+    rysujLinie('moistureChart',fhist.map(function(e){return e.m;}),rs.getPropertyValue('--accent-blue').trim()||'#007aff',0,100);
+    rysujLinie('tempChart',fhist.map(function(e){return e.t/10;}),rs.getPropertyValue('--accent-red').trim()||'#ff3b30',0,50);
+  }).catch(function(){});
+}
+function ustawZakres(d){zakresDni=d;['1','7','30'].forEach(function(x){document.getElementById('rng-'+x).classList.remove('active');});document.getElementById('rng-'+d).classList.add('active');haptyka(10);wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);}
+function rysujSlupki(id,dane){var c=document.getElementById(id);if(!c)return;var ctx=c.getContext('2d'),r=c.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,r.width,r.height);if(!dane.length)return;var max=Math.max.apply(null,dane.concat([1])),bw=(r.width-20)/dane.length,col=getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim()||'#007aff';dane.forEach(function(v,i){var h=(v/max)*(r.height-20),x=10+i*bw,y=r.height-10-h;ctx.fillStyle=col;if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x+2,y,Math.max(1,bw-4),h,3);ctx.fill();}else ctx.fillRect(x+2,y,Math.max(1,bw-4),h);});}
+function rysujLinie(id,arr,col,minV,maxV){var c=document.getElementById(id);if(!c)return;var ctx=c.getContext('2d'),r=c.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;ctx.scale(dpr,dpr);var dW=r.width-20,dH=r.height-20;ctx.clearRect(0,0,r.width,r.height);if(!arr.length)return;var sX=dW/Math.max(1,arr.length-1);ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.lineJoin='round';arr.forEach(function(v,i){var b=Math.max(minV,Math.min(v,maxV)),p=(b-minV)/(maxV-minV),x=10+i*sX,y=10+dH-p*dH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();}
+function eksportujCSV(){espFetch('/getHistory').then(function(r){return r.json();}).then(function(hist){if(!hist||!hist.length){potwierdz('Brak danych',false);return;}var csv='data:text/csv;charset=utf-8,Czas,Wilgotnosc_%,Temp_C,Wilg_pow_%,Napiecie_V,Pompa_s\n';hist.forEach(function(e){var d=e.ts>1000000000?new Date(e.ts*1000).toLocaleString('pl-PL'):'-';csv+=d+','+e.m+','+(e.t/10).toFixed(1)+','+e.h+','+(e.v/100).toFixed(2)+','+(e.p||0)+'\n';});var l=document.createElement('a');l.href=encodeURI(csv);l.download='szklarnia_historia.csv';document.body.appendChild(l);l.click();document.body.removeChild(l);potwierdz('Pobrano raport');}); }
+
+// NAWIGACJA
+function zmienZakladke(t){['pulpit','ustawienia'].forEach(function(i){document.getElementById('btn-'+i).classList.remove('active');document.getElementById('tab-'+i).classList.remove('active');});document.getElementById('btn-'+t).classList.add('active');document.getElementById('tab-'+t).classList.add('active');if(t==='ustawienia')setTimeout(function(){wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);},100);}
+function zmienPodzakladke(t){['ogolne','zaawansowane'].forEach(function(i){document.getElementById('btn-sub-'+i).classList.remove('active');document.getElementById('sub-'+i).classList.remove('active');});document.getElementById('btn-sub-'+t).classList.add('active');document.getElementById('sub-'+t).classList.add('active');}
+function zmienMotyw(m){['light','auto','dark'].forEach(function(i){document.getElementById('theme-'+i).classList.remove('active');});document.getElementById('theme-'+m).classList.add('active');if(m==='auto'){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('theme');}else{document.documentElement.setAttribute('data-theme',m);localStorage.setItem('theme',m);}setTimeout(function(){wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);},50);}
+function ustawLokalizacje(o){document.getElementById('loc-in').classList.remove('active');document.getElementById('loc-out').classList.remove('active');document.getElementById(o===1?'loc-out':'loc-in').classList.add('active');espFetch('/location?outdoors='+o);}
+function zresetujLicznikWody(){if(!confirm("Wyzerować licznik?"))return;espFetch('/resetWater').then(function(){potwierdz('Wyzerowano');});}
+function odblokujPompe(){if(!confirm("Odblokować?"))return;espFetch('/resetFault').then(function(){potwierdz('Odblokowano');});}
+function zapiszParametryZbiornika(){espFetch('/tank?vol='+document.getElementById('tank-vol').value+'&flow='+document.getElementById('pump-flow').value).then(function(){potwierdz('Zapisano parametry');});}
+function toggleServiceMode(){isServiceModeActive=!isServiceModeActive;document.getElementById('service-banner').style.display=isServiceModeActive?'block':'none';document.getElementById('btn-service-mode').innerText=isServiceModeActive?'Wyłącz Tryb Serwisowy':'Włącz Tryb Serwisowy';}
+
+// PULL TO REFRESH
+(function(){var startY=0,pulling=false,ptr=document.getElementById('ptr');
+window.addEventListener('touchstart',function(e){if(window.scrollY===0&&document.getElementById('tab-pulpit').classList.contains('active'))startY=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchmove',function(e){if(startY===0)return;var dy=e.touches[0].clientY-startY;if(dy>0&&dy<120){pulling=true;if(ptr){ptr.style.opacity=Math.min(1,dy/70);ptr.style.transform='translateX(-50%) translateY('+Math.min(dy,70)+'px)';}}},{passive:true});
+window.addEventListener('touchend',function(e){if(pulling){var dy=e.changedTouches[0].clientY-startY;if(dy>60){if(ptr){ptr.querySelector('svg').classList.add('ptr-spin');}pobierzDaneZESP32();setTimeout(function(){if(ptr){ptr.style.opacity=0;ptr.querySelector('svg').classList.remove('ptr-spin');}},800);}else if(ptr)ptr.style.opacity=0;}startY=0;pulling=false;});})();
+
+// BOOT
+(function(){var st=localStorage.getItem('theme');if(st)document.documentElement.setAttribute('data-theme',st);if(IS_DEMO)document.getElementById('demo-pill').style.display='block';wczytajProgiAlarmow();var ov=document.getElementById('boot-overlay'),s=document.getElementById('boot-status');function hide(){ov.style.opacity=0;setTimeout(function(){ov.style.display='none';},500);}function start(){wczytajProfileZESP();wczytajAlarmy();pobierzDaneZESP32();if(s)s.textContent='Gotowe!';setTimeout(hide,400);}
+if(IS_DEMO){if(s)s.textContent='Tryb demo...';setTimeout(function(){if(s)s.textContent='Ładowanie danych...';},700);setTimeout(start,1400);}
+else{if('serviceWorker'in navigator&&location.protocol!=='file:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}var att=0;(function tryC(){att++;if(att===2&&s)s.textContent='Łączenie...';fetch('/data',{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(){start();}).catch(function(){if(att<8)setTimeout(tryC,700);else{if(s)s.textContent='Tryb offline';start();}});})();}
+})();
+window.addEventListener('resize',function(){wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);});
+
+// ============ KALIBRACJA I NARZĘDZIA (przywrócone z oryginału) ============
+var liveSoil=0,liveUs=0,liveLight=0,lockCalib=false,lockAction=false;
+var stoperRunning=false,stoperStart=0,stoperInt=null;
+
+// Aktualizacja wartości live w renderujDane - wywoływana z głównego render
+function aktualizujLiveKalibracje(d){
+  liveSoil=d.raw_adc;liveUs=d.us_dist;liveLight=d.raw_light;
+  var s=document.getElementById('live-soil-val');if(s)s.innerText=liveSoil||'---';
+  var u=document.getElementById('live-us-val');if(u)u.innerText=(liveUs!==undefined?liveUs+' cm':'--- cm');
+  var l=document.getElementById('live-light-val');if(l)l.innerText=liveLight||'---';
+  var v=document.getElementById('eng-voltage');if(v&&d.voltage)v.innerText=d.voltage.toFixed(2)+' V';
+  if(d.t_off!==undefined){var t=document.getElementById('calib-tOff');if(t&&document.activeElement!==t)t.value=d.t_off;}
+  // menedżer urządzeń
+  if(d.hw){['us','ds','bme','light','vent'].forEach(function(k){var el=document.getElementById('hw-'+k);if(el)el.checked=d.hw[k]===1;});}
+  aktualizujLiveProcent(d);
+}
+
+function zapiszGlebe(typ){if(lockCalib)return;lockCalib=true;haptyka(15);var bid=(typ==='air')?'btn-soil-dry':'btn-soil-wet';ustawStanPrzycisku(bid,true,(typ==='air')?'SUCHO':'MOKRO');espFetch('/calibrate?'+typ+'='+liveSoil).then(function(){potwierdz('Skalibrowano glebę');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku(bid,false,(typ==='air')?'SUCHO':'MOKRO');});}
+function zapiszWode(typ){if(lockCalib)return;lockCalib=true;haptyka(15);var bid=(typ==='empty')?'btn-water-empty':'btn-water-full';var pk=(typ==='empty')?'usMax':'usMin';ustawStanPrzycisku(bid,true,(typ==='empty')?'PUSTA':'PEŁNA');espFetch('/calibrateExtras?'+pk+'='+liveUs).then(function(){potwierdz('Poziom beczki zapisany');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku(bid,false,(typ==='empty')?'PUSTA':'PEŁNA');});}
+function zapiszSwiatlo(){if(lockCalib)return;lockCalib=true;haptyka(15);ustawStanPrzycisku('btn-calib-light',true,'Ustaw jako SŁOŃCE (100%)');espFetch('/calibrateExtras?lMax='+liveLight).then(function(){potwierdz('Skalibrowano światłomierz');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku('btn-calib-light',false,'Ustaw jako SŁOŃCE (100%)');});}
+function zapiszKorekteTemp(){if(lockCalib)return;lockCalib=true;haptyka(15);var t=document.getElementById('calib-tOff').value;ustawStanPrzycisku('btn-calib-toff',true,'💾 Zapisz korektę','⏳ Zapis...');espFetch('/calibrateExtras?tOff='+t).then(function(){potwierdz('Zapisano przesunięcie');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku('btn-calib-toff',false,'💾 Zapisz korektę');});}
+
+function saveHwConfig(){haptyka(15);var q='/hwConfig?us='+(document.getElementById('hw-us').checked?1:0)+'&ds='+(document.getElementById('hw-ds').checked?1:0)+'&bme='+(document.getElementById('hw-bme').checked?1:0)+'&light='+(document.getElementById('hw-light').checked?1:0)+'&vent='+(document.getElementById('hw-vent').checked?1:0);espFetch(q).then(function(){potwierdz('Zapisano sprzęt');if(!IS_DEMO)pobierzDaneZESP32();});}
+
+function toggleStoper(){var b=document.getElementById('btn-stoper'),d=document.getElementById('stopwatch-display'),r=document.getElementById('stoper-result');if(!stoperRunning){stoperStart=Date.now();stoperRunning=true;b.innerText='🛑 Zatrzymaj (mam 1 Litr)';b.style.background='var(--accent-red)';b.style.color='#fff';r.style.display='none';stoperInt=setInterval(function(){d.innerText=((Date.now()-stoperStart)/1000).toFixed(1)+'s';},100);haptyka(15);}else{clearInterval(stoperInt);stoperRunning=false;b.innerText='⏱ Asystent Kalibracji (1 Litr)';b.style.background='var(--accent-blue)';var f=(Date.now()-stoperStart)/1000,lpm=60/f;r.innerText='Wydajność pompy: '+lpm.toFixed(2)+' L/min';r.style.display='block';document.getElementById('pump-flow').value=lpm.toFixed(2);zapiszParametryZbiornika();haptyka([50,100,50]);}}
+
+function uruchomTest(){if(lockAction)return;lockAction=true;haptyka(15);var sec=document.getElementById('testSlider').value;ustawStanPrzycisku('btn-quick-test',true,'🚀 Uruchom Test','🌊 Praca pompy ('+sec+'s)...');espFetch('/test?sec='+sec).then(function(r){if(!r.ok)throw 0;potwierdz('Test pompy zakończony');}).catch(function(){potwierdz('Odmowa przekaźnika',false);}).finally(function(){lockAction=false;ustawStanPrzycisku('btn-quick-test',false,'🚀 Uruchom Test');if(!IS_DEMO)pobierzDaneZESP32();});}
+
+function wypompujWode(){if(lockAction)return;haptyka([50,50,50]);if(!confirm('Wymusić opróżnianie węży?'))return;lockAction=true;ustawStanPrzycisku('btn-wypompuj',true,'❄️ Wypompuj resztki wody z węży','🌊 Pompowanie...');espFetch('/drain').then(function(){potwierdz('Układ opróżniony');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockAction=false;ustawStanPrzycisku('btn-wypompuj',false,'❄️ Wypompuj resztki wody z węży');});}
+function aktywujHibernacje(){if(lockAction)return;haptyka([100,100,100]);if(!confirm('Uśpić urządzenie na zimę?'))return;lockAction=true;espFetch('/hibernate').then(function(){potwierdz('Urządzenie uśpione');}).finally(function(){lockAction=false;});}
+
+function wgrywajOTA(){var f=document.getElementById('ota-file').files[0];if(!f||!f.name.endsWith('.bin')){potwierdz('Wybierz plik .bin',false);return;}if(IS_DEMO){potwierdz('OTA niedostępne w demo',false);return;}haptyka([20,50,20]);var s=document.getElementById('ota-status'),bar=document.getElementById('ota-progress-bar');s.innerText='Łączenie...';document.getElementById('ota-progress-container').style.display='block';bar.style.width='0%';var fd=new FormData();fd.append('update',f,f.name);var xhr=new XMLHttpRequest();xhr.open('POST','/update',true);xhr.upload.addEventListener('progress',function(e){if(e.lengthComputable){var p=Math.round(e.loaded/e.total*100);bar.style.width=p+'%';s.innerText='Przesyłanie: '+p+'%';}});xhr.onload=function(){if(xhr.status===200){s.innerText='✅ Sukces! Restart...';bar.style.background='var(--accent-green)';haptyka([50,100,50]);}else s.innerText='❌ Błąd';};xhr.send(fd);}
+
+
+// Baza ogrodnicza - klimat Polski (strefa 6, Polska centralna)
+// Miesiące 1-12. Szklarnia zwykle 2-4 tyg wcześniej dla siewu/sadzenia.
+var BAZA_ROSLIN = {
+  pomidor:{name:"Pomidor",icon:"🍅",grunt:{siew:[],sadzenie:[5,6],zbiory:[7,8,9,10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[3,4],sadzenie:[4,5],zbiory:[7,8,9,10,11],pielegnacja:[5,6,7,8,9,10]}},
+  ogorek:{name:"Ogórek",icon:"🥒",grunt:{siew:[5,6],sadzenie:[5,6],zbiory:[7,8,9],pielegnacja:[6,7,8]},szklarnia:{siew:[3,4],sadzenie:[4,5],zbiory:[6,7,8,9],pielegnacja:[5,6,7,8]}},
+  papryka:{name:"Papryka",icon:"🌶️",grunt:{siew:[],sadzenie:[5,6],zbiory:[8,9,10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[2,3],sadzenie:[4,5],zbiory:[7,8,9,10],pielegnacja:[5,6,7,8,9]}},
+  salata:{name:"Sałata",icon:"🥬",grunt:{siew:[3,4,5,6,7,8],sadzenie:[4,5,6],zbiory:[5,6,7,8,9,10],pielegnacja:[4,5,6,7,8,9]},szklarnia:{siew:[2,3,9,10],sadzenie:[3,4],zbiory:[4,5,10,11],pielegnacja:[3,4,10]}},
+  marchew:{name:"Marchew",icon:"🥕",grunt:{siew:[3,4,5,6],sadzenie:[],zbiory:[7,8,9,10],pielegnacja:[5,6,7,8]},szklarnia:{siew:[2,3],sadzenie:[],zbiory:[6,7],pielegnacja:[4,5,6]}},
+  rzodkiewka:{name:"Rzodkiewka",icon:"🔴",grunt:{siew:[3,4,5,6,7,8,9],sadzenie:[],zbiory:[4,5,6,7,8,9,10],pielegnacja:[4,5,6,7,8,9]},szklarnia:{siew:[2,3,10],sadzenie:[],zbiory:[3,4,11],pielegnacja:[3,4]}},
+  fasola:{name:"Fasola",icon:"🫘",grunt:{siew:[5,6],sadzenie:[],zbiory:[7,8,9],pielegnacja:[6,7,8]},szklarnia:{siew:[4,5],sadzenie:[],zbiory:[6,7,8],pielegnacja:[5,6,7]}},
+  groch:{name:"Groch",icon:"🟢",grunt:{siew:[3,4,5],sadzenie:[],zbiory:[6,7,8],pielegnacja:[5,6,7]},szklarnia:{siew:[2,3],sadzenie:[],zbiory:[5,6],pielegnacja:[4,5]}},
+  cebula:{name:"Cebula",icon:"🧅",grunt:{siew:[3,4],sadzenie:[3,4],zbiory:[7,8],pielegnacja:[5,6,7]},szklarnia:{siew:[2,3],sadzenie:[3],zbiory:[6,7],pielegnacja:[4,5,6]}},
+  czosnek:{name:"Czosnek",icon:"🧄",grunt:{siew:[],sadzenie:[3,4,10,11],zbiory:[7,8],pielegnacja:[5,6]},szklarnia:{siew:[],sadzenie:[2,3],zbiory:[6,7],pielegnacja:[4,5]}},
+  burak:{name:"Burak ćwikłowy",icon:"🟣",grunt:{siew:[4,5,6],sadzenie:[],zbiory:[8,9,10],pielegnacja:[6,7,8]},szklarnia:{siew:[3,4],sadzenie:[],zbiory:[7,8],pielegnacja:[5,6,7]}},
+  dynia:{name:"Dynia",icon:"🎃",grunt:{siew:[5],sadzenie:[5,6],zbiory:[9,10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[4,5],sadzenie:[5],zbiory:[8,9],pielegnacja:[6,7,8]}},
+  cukinia:{name:"Cukinia",icon:"🥒",grunt:{siew:[5],sadzenie:[5,6],zbiory:[7,8,9],pielegnacja:[6,7,8]},szklarnia:{siew:[4],sadzenie:[5],zbiory:[6,7,8,9],pielegnacja:[5,6,7,8]}},
+  kapusta:{name:"Kapusta",icon:"🥬",grunt:{siew:[3,4,5],sadzenie:[5,6],zbiory:[8,9,10,11],pielegnacja:[6,7,8,9]},szklarnia:{siew:[2,3],sadzenie:[4,5],zbiory:[7,8],pielegnacja:[5,6,7]}},
+  brokul:{name:"Brokuł",icon:"🥦",grunt:{siew:[3,4,5],sadzenie:[5,6],zbiory:[7,8,9,10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[2,3],sadzenie:[4],zbiory:[6,7],pielegnacja:[4,5,6]}},
+  kalafior:{name:"Kalafior",icon:"🥦",grunt:{siew:[3,4,5],sadzenie:[5,6],zbiory:[7,8,9,10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[2,3],sadzenie:[4],zbiory:[6,7],pielegnacja:[4,5,6]}},
+  por:{name:"Por",icon:"🥬",grunt:{siew:[3,4],sadzenie:[5,6],zbiory:[9,10,11],pielegnacja:[6,7,8,9]},szklarnia:{siew:[2,3],sadzenie:[4,5],zbiory:[8,9],pielegnacja:[5,6,7]}},
+  seler:{name:"Seler",icon:"🥬",grunt:{siew:[],sadzenie:[5],zbiory:[10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[2,3],sadzenie:[4,5],zbiory:[9,10],pielegnacja:[5,6,7,8]}},
+  pietruszka:{name:"Pietruszka",icon:"🌿",grunt:{siew:[3,4],sadzenie:[],zbiory:[8,9,10],pielegnacja:[5,6,7]},szklarnia:{siew:[2,3],sadzenie:[],zbiory:[7,8],pielegnacja:[4,5,6]}},
+  koper:{name:"Koper",icon:"🌿",grunt:{siew:[4,5,6,7,8],sadzenie:[],zbiory:[6,7,8,9],pielegnacja:[5,6,7,8]},szklarnia:{siew:[3,4],sadzenie:[],zbiory:[5,6],pielegnacja:[4,5]}},
+  szpinak:{name:"Szpinak",icon:"🥬",grunt:{siew:[3,4,8,9],sadzenie:[],zbiory:[5,6,10,11],pielegnacja:[4,5,9,10]},szklarnia:{siew:[2,3,9],sadzenie:[],zbiory:[4,5,10],pielegnacja:[3,4,9]}},
+  truskawka:{name:"Truskawka",icon:"🍓",grunt:{siew:[],sadzenie:[7,8,9],zbiory:[6,7],pielegnacja:[4,5,8,9]},szklarnia:{siew:[],sadzenie:[8,9],zbiory:[5,6],pielegnacja:[3,4,9]}},
+  arbuz:{name:"Arbuz",icon:"🍉",grunt:{siew:[],sadzenie:[5,6],zbiory:[8,9],pielegnacja:[6,7,8]},szklarnia:{siew:[4],sadzenie:[5],zbiory:[8,9],pielegnacja:[5,6,7,8]}},
+  melon:{name:"Melon",icon:"🍈",grunt:{siew:[],sadzenie:[5,6],zbiory:[8,9],pielegnacja:[6,7,8]},szklarnia:{siew:[4],sadzenie:[5],zbiory:[8,9],pielegnacja:[5,6,7,8]}},
+  borowka:{name:"Borówka",icon:"🫐",grunt:{siew:[],sadzenie:[4,5,9,10],zbiory:[7,8],pielegnacja:[3,4,5,6]},szklarnia:{siew:[],sadzenie:[3,4],zbiory:[6,7],pielegnacja:[3,4,5]}},
+  bazylia:{name:"Bazylia",icon:"🌿",grunt:{siew:[5],sadzenie:[5,6],zbiory:[6,7,8,9],pielegnacja:[6,7,8]},szklarnia:{siew:[3,4],sadzenie:[4,5],zbiory:[5,6,7,8,9],pielegnacja:[4,5,6,7,8]}},
+  rukola:{name:"Rukola",icon:"🥬",grunt:{siew:[4,5,6,7,8,9],sadzenie:[],zbiory:[5,6,7,8,9,10],pielegnacja:[5,6,7,8,9]},szklarnia:{siew:[3,4,9,10],sadzenie:[],zbiory:[4,5,10,11],pielegnacja:[3,4,10]}},
+  ziemniak:{name:"Ziemniak",icon:"🥔",grunt:{siew:[],sadzenie:[4,5],zbiory:[7,8,9],pielegnacja:[5,6,7]},szklarnia:{siew:[],sadzenie:[3,4],zbiory:[6,7],pielegnacja:[4,5,6]}},
+  dynia_makaronowa:{name:"Kabaczek",icon:"🥒",grunt:{siew:[5],sadzenie:[5,6],zbiory:[8,9,10],pielegnacja:[6,7,8,9]},szklarnia:{siew:[4],sadzenie:[5],zbiory:[7,8,9],pielegnacja:[5,6,7,8]}},
+  rzepa:{name:"Rzepa",icon:"⚪",grunt:{siew:[4,5,7,8],sadzenie:[],zbiory:[6,7,9,10],pielegnacja:[5,6,8,9]},szklarnia:{siew:[3,9],sadzenie:[],zbiory:[5,11],pielegnacja:[4,10]}}
+};
+
+
+// ============ KALENDARZ OGRODNIKA ============
+var KAL_AKCJE={siew:{txt:"siew",icon:"🌱",k:"var(--accent-green)"},sadzenie:{txt:"sadzenie",icon:"🪴",k:"var(--accent-blue)"},zbiory:{txt:"zbiory",icon:"🧺",k:"var(--accent-orange)"},pielegnacja:{txt:"pielęgnacja",icon:"✂️",k:"var(--accent-purple)"}};
+var MIESIACE=["","styczeń","luty","marzec","kwiecień","maj","czerwiec","lipiec","sierpień","wrzesień","październik","listopad","grudzień"];
+
+// czy szklarnia czy grunt - z ostatnich danych (outdoors)
+function trybUprawy(){return (lastDataCache&&lastDataCache.outdoors===1)?'grunt':'szklarnia';}
+
+// własne rośliny z localStorage
+function wczytajWlasneRosliny(){try{return JSON.parse(localStorage.getItem('wlasneRosliny')||'{}');}catch(e){return {};}}
+function pelnaBaza(){var b=JSON.parse(JSON.stringify(BAZA_ROSLIN));var w=wczytajWlasneRosliny();for(var k in w)b[k]=w[k];return b;}
+
+// co dziś robić - zwraca listę {roslina, akcja}
+function coDzisRobic(miesiac,tryb){
+  var baza=pelnaBaza(),wynik=[];
+  for(var id in baza){var r=baza[id];if(!r[tryb])continue;
+    ['siew','sadzenie','zbiory','pielegnacja'].forEach(function(akc){
+      if(r[tryb][akc]&&r[tryb][akc].indexOf(miesiac)>=0)wynik.push({id:id,name:r.name,icon:r.icon,akcja:akc});
     });
-    if(!btn) return;
-    if(isLocking) {
-        btn.dataset.originalText = originalText || btn.innerText;
-        btn.innerText = loadingText;
-        btn.style.opacity = "0.5";
-        btn.style.pointerEvents = "none";
-    } else {
-        btn.innerText = btn.dataset.originalText || originalText;
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
+  }
+  return wynik;
+}
+
+// teaser na pulpicie - losowa ciekawostka
+function renderujKalendarzTeaser(){
+  var m=new Date().getMonth()+1,tryb=trybUprawy();
+  var lista=coDzisRobic(m,tryb);
+  var card=document.getElementById('kal-teaser');
+  if(!card)return;
+  if(lista.length===0){card.querySelector('#kal-teaser-txt').innerText='W '+MIESIACE[m]+' brak typowych prac '+(tryb==='szklarnia'?'w szklarni':'w gruncie');card.querySelector('#kal-teaser-icon').innerText='🌙';return;}
+  // priorytet: siew > sadzenie > zbiory
+  var pri=lista.filter(function(x){return x.akcja==='siew';});
+  if(pri.length===0)pri=lista.filter(function(x){return x.akcja==='sadzenie';});
+  if(pri.length===0)pri=lista;
+  var wyb=pri[Math.floor(Math.random()*pri.length)];
+  var a=KAL_AKCJE[wyb.akcja];
+  card.querySelector('#kal-teaser-icon').innerText=wyb.icon;
+  card.querySelector('#kal-teaser-txt').innerHTML='Dziś dobry czas na <b style="color:'+a.k+'">'+a.txt+'</b>: '+wyb.name+(lista.length>1?' <span style="color:var(--text-sub)">+'+(lista.length-1)+' więcej</span>':'');
+}
+
+// pełny ekran kalendarza
+var kalMiesiac=new Date().getMonth()+1, kalTryb=null;
+function otworzKalendarz(){kalMiesiac=new Date().getMonth()+1;kalTryb=trybUprawy();document.getElementById('kal-modal').style.display='flex';renderujPelnyKalendarz();}
+function zamknijKalendarz(){document.getElementById('kal-modal').style.display='none';}
+function kalZmienMiesiac(d){kalMiesiac+=d;if(kalMiesiac<1)kalMiesiac=12;if(kalMiesiac>12)kalMiesiac=1;renderujPelnyKalendarz();}
+function kalZmienTryb(t){kalTryb=t;document.getElementById('kal-tryb-grunt').classList.toggle('active',t==='grunt');document.getElementById('kal-tryb-szkl').classList.toggle('active',t==='szklarnia');renderujPelnyKalendarz();}
+function renderujPelnyKalendarz(){
+  document.getElementById('kal-miesiac-txt').innerText=MIESIACE[kalMiesiac].charAt(0).toUpperCase()+MIESIACE[kalMiesiac].slice(1);
+  document.getElementById('kal-tryb-grunt').classList.toggle('active',kalTryb==='grunt');
+  document.getElementById('kal-tryb-szkl').classList.toggle('active',kalTryb==='szklarnia');
+  var lista=coDzisRobic(kalMiesiac,kalTryb);
+  var box=document.getElementById('kal-lista');box.innerHTML='';
+  if(lista.length===0){box.innerHTML='<div style="text-align:center;color:var(--text-sub);padding:20px;font-size:13px">🌙 W tym miesiącu brak typowych prac</div>';return;}
+  ['siew','sadzenie','zbiory','pielegnacja'].forEach(function(akc){
+    var grupa=lista.filter(function(x){return x.akcja===akc;});
+    if(grupa.length===0)return;
+    var a=KAL_AKCJE[akc];
+    var h='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:'+a.k+';text-transform:uppercase;margin-bottom:8px">'+a.icon+' '+a.txt+'</div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+    grupa.forEach(function(x){h+='<span style="background:var(--nav-bg);border-radius:12px;padding:6px 12px;font-size:13px;font-weight:600">'+x.icon+' '+x.name+'</span>';});
+    h+='</div></div>';box.innerHTML+=h;
+  });
+}
+
+// dodawanie własnej rośliny do kalendarza
+function otworzDodajRosline(){zbudujSiatkeMiesiecy();document.getElementById('kal-add-modal').style.display='flex';document.getElementById('kal-add-name').value='';['siew','sadzenie','zbiory','pielegnacja'].forEach(function(akc){for(var m=1;m<=12;m++){var el=document.getElementById('kalm-'+akc+'-'+m);if(el)el.classList.remove('sel');}});}
+function zamknijDodajRosline(){document.getElementById('kal-add-modal').style.display='none';}
+function kalToggleMies(akc,m){document.getElementById('kalm-'+akc+'-'+m).classList.toggle('sel');}
+function zapiszWlasnaRosline(){
+  var name=document.getElementById('kal-add-name').value.trim();
+  if(!name){potwierdz('Podaj nazwę',false);return;}
+  var def={name:name,icon:'🌿',grunt:{siew:[],sadzenie:[],zbiory:[],pielegnacja:[]},szklarnia:{siew:[],sadzenie:[],zbiory:[],pielegnacja:[]}};
+  // odczyt zaznaczonych miesięcy (te same dla grunt i szklarnia - uproszczenie dla własnych)
+  ['siew','sadzenie','zbiory','pielegnacja'].forEach(function(akc){for(var m=1;m<=12;m++){var el=document.getElementById('kalm-'+akc+'-'+m);if(el&&el.classList.contains('sel')){def.grunt[akc].push(m);def.szklarnia[akc].push(m);}}});
+  var w=wczytajWlasneRosliny();w['wl_'+Date.now()]=def;localStorage.setItem('wlasneRosliny',JSON.stringify(w));
+  haptyka(15);potwierdz('Dodano: '+name);zamknijDodajRosline();renderujPelnyKalendarz();renderujKalendarzTeaser();
+}
+
+
+// Budowa siatki miesięcy w modalu dodawania rośliny
+function zbudujSiatkeMiesiecy(){
+  var grid=document.getElementById('kal-add-grid');if(!grid||grid.dataset.built)return;
+  var akcje=[['siew','🌱 Siew'],['sadzenie','🪴 Sadzenie'],['zbiory','🧺 Zbiory'],['pielegnacja','✂️ Pielęgnacja']];
+  var msk=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+  var h='';
+  akcje.forEach(function(a){h+='<div class="kalm-row"><div class="kalm-row-lbl">'+a[1]+'</div><div class="kalm-months">';for(var m=1;m<=12;m++){h+='<div class="kalm-cell" id="kalm-'+a[0]+'-'+m+'" onclick="kalToggleMies(\''+a[0]+'\','+m+')">'+msk[m-1]+'</div>';}h+='</div></div>';});
+  grid.innerHTML=h;grid.dataset.built='1';
+}
+
+
+// ============ ULEPSZENIA KALIBRACJI + DIAGNOSTYKA ============
+// Live % przy kalibracji gleby + wskaźnik jakości
+function aktualizujLiveProcent(d){
+  var s=document.getElementById('live-soil-val');
+  if(s&&d.raw_adc!==undefined){var pct=obliczWilgotnosc(d);s.innerText=d.raw_adc+(pct!==null?' → '+pct+'%':'');}
+  // jakość kalibracji gleby
+  if(d.air_val!==undefined&&d.water_val!==undefined){
+    var rozp=Math.abs(d.air_val-d.water_val);
+    var q=document.getElementById('calib-quality');
+    if(q){if(rozp<500){q.innerText='⚠️ Mała rozpiętość ('+rozp+') — sprawdź czujnik';q.style.color='var(--accent-orange)';}else{q.innerText='✅ Kalibracja OK (rozpiętość '+rozp+')';q.style.color='var(--accent-green)';}}
+  }
+  // napięcie w karcie kalibracji
+  var vn=document.getElementById('calib-v-now');if(vn&&d.voltage)vn.innerText=d.voltage.toFixed(2)+' V';
+}
+
+function zapiszKalibracjeNapiecia(){
+  var real=parseFloat(document.getElementById('calib-v-real').value);
+  if(!real||real<5||real>20){potwierdz('Wpisz poprawne napięcie',false);return;}
+  haptyka(15);
+  // ESP endpoint /calibrateVoltage?real=13.25 (do dodania po stronie ESP)
+  espFetch('/calibrateVoltage?real='+real).then(function(){potwierdz('Zapisano korekcję napięcia');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd (dodaj endpoint na ESP)',false);});
+}
+
+function resetKalibracji(){
+  if(!confirm('Przywrócić fabryczne wartości kalibracji?'))return;
+  haptyka([50,50,50]);
+  espFetch('/resetCalib').then(function(){potwierdz('Przywrócono fabryczne');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd (dodaj endpoint na ESP)',false);});
+}
+
+function uruchomDiagnostyke(){
+  haptyka(15);
+  var box=document.getElementById('diag-results');box.innerHTML='<div style="text-align:center;color:var(--text-sub);font-size:13px;padding:10px">⏳ Sprawdzanie...</div>';
+  var d=lastDataCache;
+  setTimeout(function(){
+    if(!d){box.innerHTML='<div style="color:var(--accent-red);font-size:13px">Brak danych — odśwież najpierw</div>';return;}
+    var testy=[];
+    if(d.hw){
+      if(d.hw.bme)testy.push(['BME280 (pogoda)',d.temp>-40&&d.temp<80&&d.pressure>800]);
+      if(d.hw.ds)testy.push(['DS18B20 (temp wody)',d.water_temp>0||d.water_temp===0]);
+      if(d.hw.us)testy.push(['JSN-SR04T (ultradźwięki)',d.us_dist>0&&d.us_dist<400]);
+      if(d.hw.light)testy.push(['Fotorezystor',d.raw_light>=0&&d.raw_light<=4095]);
     }
+    testy.push(['Czujnik wilgotności',d.raw_adc>0&&d.raw_adc<4095]);
+    testy.push(['Pływak zbiornika',d.water==='OK'||d.water==='EMPTY']);
+    testy.push(['Napięcie zasilania',d.voltage>10&&d.voltage<16]);
+    testy.push(['Pamięć ESP',d.free_heap>20000]);
+    var h='';
+    testy.forEach(function(t){h+='<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span>'+t[0]+'</span><b style="color:'+(t[1]?'var(--accent-green)':'var(--accent-red)')+'">'+(t[1]?'✅ OK':'❌ Błąd')+'</b></div>';});
+    var bledy=testy.filter(function(t){return !t[1];}).length;
+    h+='<div style="text-align:center;margin-top:12px;font-weight:700;color:'+(bledy===0?'var(--accent-green)':'var(--accent-orange)')+'">'+(bledy===0?'✅ Wszystko sprawne':'⚠️ Problemów: '+bledy)+'</div>';
+    box.innerHTML=h;haptyka(bledy===0?30:[60,40,60]);
+  },800);
 }
 
-function zapiszEdytowanyProfil() {
-    if(lockConfig) return; lockConfig = true; haptyka(15);
-    const id = document.getElementById('edit-profile-select').value;
-    const th = document.getElementById('edit-th').value;
-    const time = document.getElementById('edit-time').value;
-    const aggr = document.getElementById('edit-aggr').value;
-    
-    profileData[id].th = th; profileData[id].time = time; profileData[id].aggr = aggr;
-    localStorage.setItem('bazaProfili', JSON.stringify(profileData));
-    
-    ustawStanPrzycisku('btn-save-profile', true, "💾 Zapisz zmiany", "⏳ Zapisywanie...", ['edit-profile-select', 'edit-th', 'edit-time', 'edit-aggr']);
-    
-    fetch(`/save?thPct=${th}&timeSec=${time * 60}&aggr=${aggr}`)
-    .then(() => { alert(`✅ Zapisano pomyślnie: ${profileData[id].name}`); pobierzDaneZESP32(); })
-    .catch(() => alert("⚠️ Tryb Offline (Zapisano lokalnie)"))
-    .finally(() => { lockConfig = false; ustawStanPrzycisku('btn-save-profile', false, null, null, ['edit-profile-select', 'edit-th', 'edit-time', 'edit-aggr']); });
-}
-
-function zapiszParametryZbiornika() {
-    if(lockTank) return; lockTank = true; haptyka(10);
-    const vol = document.getElementById('tank-vol').value;
-    const flow = document.getElementById('pump-flow').value;
-    ustawStanPrzycisku(null, true, null, null, ['tank-vol', 'pump-flow']);
-    
-    fetch(`/tank?vol=${vol}&flow=${flow}`)
-    .then(() => { pobierzDaneZESP32(); })
-    .catch(() => console.log("Offline"))
-    .finally(() => { lockTank = false; ustawStanPrzycisku(null, false, null, null, ['tank-vol', 'pump-flow']); });
-}
-
-function zapiszGlebe(typ) {
-    if(lockCalib) return; lockCalib = true; haptyka(15);
-    let btnId = (typ === 'air') ? 'btn-soil-dry' : 'btn-soil-wet';
-    ustawStanPrzycisku(btnId, true, (typ === 'air') ? "SUCHO" : "MOKRO");
-    
-    fetch(`/calibrate?${typ}=${liveSoil}`)
-    .then(() => { alert("✅ Skalibrowano pomyślnie."); pobierzDaneZESP32(); })
-    .catch(() => alert("❌ Błąd połączenia."))
-    .finally(() => { lockCalib = false; ustawStanPrzycisku(btnId, false); });
-}
-
-function zapiszWode(typ) {
-    if(lockCalib) return; lockCalib = true; haptyka(15);
-    let btnId = (typ === 'empty') ? 'btn-water-empty' : 'btn-water-full';
-    let pKey = (typ === 'empty') ? 'usMax' : 'usMin';
-    ustawStanPrzycisku(btnId, true, (typ === 'empty') ? "PUSTA" : "PEŁNA");
-    
-    fetch(`/calibrateExtras?${pKey}=${liveUs}`)
-    .then(() => { alert("✅ Poziom beczki zaktualizowany."); pobierzDaneZESP32(); })
-    .catch(() => alert("❌ Błąd połączenia."))
-    .finally(() => { lockCalib = false; ustawStanPrzycisku(btnId, false); });
-}
-
-function zapiszSwiatlo() { 
-    if(lockCalib) return; lockCalib = true; haptyka(15);
-    ustawStanPrzycisku('btn-calib-light', true, "Usetaw jako SŁOŃCE (100%)");
-    fetch(`/calibrateExtras?lMax=${liveLight}`)
-    .then(() => { alert("✅ Skalibrowano światłomierz."); pobierzDaneZESP32(); })
-    .catch(() => alert("❌ Błąd"))
-    .finally(() => { lockCalib = false; ustawStanPrzycisku('btn-calib-light', false); });
-}
-
-function zapiszKorekteTemp() { 
-    if(lockCalib) return; lockCalib = true; haptyka(15);
-    const tOff = document.getElementById('calib-tOff').value; 
-    ustawStanPrzycisku('btn-calib-toff', true, "💾 Zapisz korektę", "⏳ Zapis...", ['calib-tOff']);
-    fetch(`/calibrateExtras?tOff=${tOff}`)
-    .then(() => { alert("✅ Zapisano przesunięcie."); pobierzDaneZESP32(); })
-    .catch(() => alert("❌ Błąd"))
-    .finally(() => { lockCalib = false; ustawStanPrzycisku('btn-calib-toff', false, null, null, ['calib-tOff']); });
-}
-
-function zresetujLicznikWody() { 
-    if(lockAction) return; haptyka([30, 30, 30]); if(!confirm("Wyzerować licznik zużycia wody?")) return;
-    lockAction = true; ustawStanPrzycisku('btn-reset-water', true, "💦 Zresetuj stan po napełnieniu beczki");
-    fetch('/resetWater').then(() => { alert("✅ Wyzerowano."); pobierzDaneZESP32(); }).catch(() => alert("❌ Błąd")).finally(() => { lockAction = false; ustawStanPrzycisku('btn-reset-water', false); });
-}
-
-function wypompujWode() { 
-    if(lockAction) return; haptyka([50, 50, 50]); if(!confirm("Wymusić opróżnianie linii węży?")) return;
-    lockAction = true; ustawStanPrzycisku('btn-wypompuj', true, "❄️ Wypompuj resztki wody z węży", "🌊 Pompowanie...");
-    fetch('/drain').then(() => { alert("❄️ Układ opróżniony."); pobierzDaneZESP32(); }).catch(() => alert("❌ Błąd")).finally(() => { lockAction = false; ustawStanPrzycisku('btn-wypompuj', false); });
-}
-
-function uruchomTest() { 
-    if(lockAction) return; lockAction = true; haptyka(15); const sec = document.getElementById("testSlider").value; 
-    ustawStanPrzycisku('btn-quick-test', true, "🚀 Uruchom Test", `🌊 Praca pompy (${sec}s)...`, ['testSlider']);
-    fetch(`/test?sec=${sec}`).then(r => { if(!r.ok) throw new Error(); alert("🌊 Test pompy zakończony."); }).catch(() => alert("❌ Odmowa przekaźnika."))
-    .finally(() => { lockAction = false; ustawStanPrzycisku('btn-quick-test', false, null, null, ['testSlider']); pobierzDaneZESP32(); }); 
-}
-
-function odblokujPompe() { 
-    if(lockAction) return; haptyka([50, 50, 50]); if(!confirm("Odblokować system po usunięciu awarii?")) return;
-    lockAction = true; fetch('/resetFault').then(() => { alert("✅ Odblokowano."); pobierzDaneZESP32(); }).finally(() => lockAction = false); 
-}
-
-function aktywujHibernacje() { 
-    if(lockAction) return; haptyka([100, 100, 100]); if(!confirm("Uśpić urządzenie na zimę?")) return;
-    lockAction = true; fetch('/hibernate').then(() => alert("❄️ Urządzenie uśpione.")).finally(() => lockAction = false); 
-}
-
-function toggleServiceMode() {
-    if(lockAction) return; lockAction = true; haptyka([50, 50, 50]);
-    let newState = isServiceModeActive ? 0 : 1;
-    ustawStanPrzycisku("btn-service-mode", true, isServiceModeActive ? "Wyłącz Tryb Serwisowy" : "Włącz Tryb Serwisowy");
-    fetch(`/serviceMode?state=${newState}`).then(() => pobierzDaneZESP32()).finally(() => { lockAction = false; ustawStanPrzycisku("btn-service-mode", false); });
-}
-
-function forcePumpRun() {
-    haptyka([100, 50, 100]); if(!confirm("To zignoruje pływak. Uruchomić?")) return;
-    fetch(`/test?sec=5&force=1`).then(() => alert("Wymuszono 5s pracy.")).catch(() => alert("❌ Błąd"));
-}
-
-function saveHwConfig() {
-    haptyka(15);
-    const us = document.getElementById("hw-us").checked ? 1 : 0; const ds = document.getElementById("hw-ds").checked ? 1 : 0;
-    const bme = document.getElementById("hw-bme").checked ? 1 : 0; const light = document.getElementById("hw-light").checked ? 1 : 0;
-    const vent = document.getElementById("hw-vent").checked ? 1 : 0;
-    fetch(`/hwConfig?us=${us}&ds=${ds}&bme=${bme}&light=${light}&vent=${vent}`).then(() => pobierzDaneZESP32());
-}
-
-function ustawLokalizacje(isOutdoors) {
-    if(lockConfig) return; lockConfig = true; haptyka(15);
-    document.getElementById('loc-in').classList.remove('active'); document.getElementById('loc-out').classList.remove('active');
-    isOutdoors === 1 ? document.getElementById('loc-out').classList.add('active') : document.getElementById('loc-in').classList.add('active');
-    fetch(`/location?outdoors=${isOutdoors}`).finally(() => lockConfig = false);
-}
-
-// --- STANDARDOWA KONTROLA INTERFEJSU (Wykresy, Zegar, Rysowanie) ---
-function aktualizujEtykieteAgresywnosci(val) { const etykiety = ["Oszczędny", "Zbalansowany", "Precyzyjny"]; document.getElementById('edit-aggr-val').innerText = etykiety[val]; }
-function aktywujProfil(id) { ustawProfilZapisz(profileData[id].th, profileData[id].time, profileData[id].aggr, 'prof-' + id, profileData[id].name); }
-function wczytajProfilDoEdycji() {
-    const p = profileData[document.getElementById('edit-profile-select').value];
-    document.getElementById('edit-th').value = p.th; document.getElementById('edit-th-val').innerText = p.th + '%';
-    document.getElementById('edit-time').value = p.time; document.getElementById('edit-time-val').innerText = p.time + ' min';
-    document.getElementById('edit-aggr').value = p.aggr !== undefined ? p.aggr : 1; aktualizujEtykieteAgresywnosci(document.getElementById('edit-aggr').value);
-}
-function zmienMotyw(m) {
-    ['light', 'auto', 'dark'].forEach(i => document.getElementById('theme-' + i).classList.remove('active')); document.getElementById('theme-' + m).classList.add('active');
-    if (m === 'auto') { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('theme'); } else { document.documentElement.setAttribute('data-theme', m); localStorage.setItem('theme', m); }
-    const c = localStorage.getItem('lastESPData'); if(c) { try { const p = JSON.parse(c); if(p.data.logs) rysujWykresy(p.data.logs); }catch(e){} }
-}
-function zmienZakladke(t) { ['pulpit', 'ustawienia'].forEach(i => { document.getElementById('btn-' + i).classList.remove('active'); document.getElementById('tab-' + i).classList.remove('active'); }); document.getElementById('btn-' + t).classList.add('active'); document.getElementById('tab-' + t).classList.add('active'); }
-function zmienPodzakladke(t) { ['ogolne', 'zaawansowane'].forEach(i => { document.getElementById('btn-sub-' + i).classList.remove('active'); document.getElementById('sub-' + i).classList.remove('active'); }); document.getElementById('btn-sub-' + t).classList.add('active'); document.getElementById('sub-' + t).classList.add('active'); }
-
-function wyliczZegarAstronomiczny() {
-    const lat = 52.0, lon = 19.0; const now = new Date(); const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-    const gamma = (2 * Math.PI / 365) * (dayOfYear - 1 + 0.5);
-    const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
-    const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
-    const ha = Math.acos((Math.cos(90.833 * Math.PI / 180) / (Math.cos(lat * Math.PI / 180) * Math.cos(decl))) - Math.tan(lat * Math.PI / 180) * Math.tan(decl));
-    let s = Math.round(720 - 4 * (lon + ha * 180 / Math.PI) - eqTime - now.getTimezoneOffset());
-    let e = Math.round(720 - 4 * (lon - ha * 180 / Math.PI) - eqTime - now.getTimezoneOffset());
-    return { sr: s < 0 ? s+1440 : s, ss: e >= 1440 ? e-1440 : e };
-}
-
-function pobierzDaneZESP32() {
-    if(!isServiceModeActive) { const b = document.getElementById('update-badge-btn'); if(b) b.classList.add('syncing'); }
-    fetch('/data').then(r => r.json()).then(data => {
-        localStorage.setItem('lastESPData', JSON.stringify({ data: data, timestamp: Date.now() })); renderujDane(data, Date.now(), false);
-    }).catch(() => {
-        const c = localStorage.getItem('lastESPData'), ds = wyliczZegarAstronomiczny();
-        if(!c) renderujDane({temp: 32.5, air_hum: 88, pressure: 1012.5, voltage: 3.95, pump_sec: 450, fault: 0, survival: 0, water: "OK", outdoors: 0, water_temp: 18.5, sun_hours: 6.5, tank_vol: 220, pump_flow: 2.0, cfg_time: 2, cfg_aggr: 1, sr: ds.sr, ss: ds.ss, batt_warn: 0, us_max: 90, us_dist: 45, raw_adc: 2100, raw_light: 3500, service_mode: 0, free_heap: 45000, hw: {us:1, ds:1, bme:1, light:1, vent:0}, logs: [{moisture: 42, v: 3.95, t: 32.1, h: 88, action: "BLOKADA (SAUNA)"}]}, Date.now(), true);
-        else renderujDane(JSON.parse(c).data, JSON.parse(c).timestamp, true);
-    }).finally(() => { const b = document.getElementById('update-badge-btn'); if(b && !isServiceModeActive) setTimeout(() => b.classList.remove('syncing'), 500); });
-}
-
-function renderujDane(data, timestamp, demo = false) {
-    document.querySelectorAll('.weather-val').forEach(el => el.classList.remove('skeleton'));
-    liveSoil = data.raw_adc; liveUs = data.us_dist; liveLight = data.raw_light;
-    document.getElementById('live-soil-val').innerText = liveSoil || "---";
-    document.getElementById('live-us-val').innerText = (liveUs !== undefined) ? liveUs + " cm" : "--- cm";
-    document.getElementById('live-light-val').innerText = liveLight || "---";
-    if(data.t_off !== undefined) document.getElementById("calib-tOff").value = data.t_off;
-
-    if(data.hw) {
-        document.getElementById("hw-us").checked = data.hw.us === 1; document.getElementById("hw-ds").checked = data.hw.ds === 1;
-        document.getElementById("hw-bme").checked = data.hw.bme === 1; document.getElementById("hw-light").checked = data.hw.light === 1;
-        document.getElementById("hw-vent").checked = data.hw.vent === 1;
-        document.getElementById("ui-water-module").style.display = data.hw.us ? "flex" : "none";
-        document.getElementById("card-param-zb").style.display = data.hw.us ? "block" : "none";
-        document.getElementById("title-param-zb").style.display = data.hw.us ? "block" : "none";
-        document.getElementById("card-calib-us").style.display = data.hw.us ? "block" : "none";
-        document.getElementById("ui-ds-temp").style.display = data.hw.ds ? "block" : "none";
-        document.getElementById("card-calib-ds").style.display = data.hw.ds ? "block" : "none";
-        document.getElementById("ui-bme-temp").style.display = data.hw.bme ? "block" : "none";
-        document.getElementById("ui-bme-hum").style.display = data.hw.bme ? "block" : "none";
-        document.getElementById("ui-bme-pres").style.display = data.hw.bme ? "block" : "none";
-        document.getElementById("chart-temp-box").style.display = data.hw.bme ? "block" : "none";
-        document.getElementById("ui-light").style.display = data.hw.light ? "block" : "none";
-        document.getElementById("card-calib-ldr").style.display = data.hw.light ? "block" : "none";
-        document.getElementById("ui-vent").style.display = data.hw.vent ? "block" : "none";
-        if(data.hw.vent) document.getElementById("dash-vent").innerText = (data.vent_state == 1) ? "OTWARTE" : "ZAMKNIĘTE";
-    }
-
-    if(data.service_mode !== undefined) {
-        isServiceModeActive = (data.service_mode == 1); const sBanner = document.getElementById("service-banner"), sTools = document.getElementById("service-tools"), sBtn = document.getElementById("btn-service-mode");
-        if(isServiceModeActive) {
-            sBanner.style.display = "block"; sTools.style.display = "block"; sBtn.innerText = "Wyłącz Tryb Serwisowy"; sBtn.style.background = "var(--text-sub)";
-            document.getElementById("diag-heap").innerText = (data.free_heap / 1024).toFixed(1) + " KB";
-            if(!servicePollingInterval && !demo) servicePollingInterval = setInterval(pobierzDaneZESP32, 2000);
-        } else {
-            sBanner.style.display = "none"; sTools.style.display = "none"; sBtn.innerText = "Włącz Tryb Serwisowy"; sBtn.style.background = "var(--accent-orange)";
-            if(servicePollingInterval) { clearInterval(servicePollingInterval); servicePollingInterval = null; }
-        }
-    }
-
-    if(data.cfg_th !== undefined && data.cfg_time !== undefined && data.cfg_aggr !== undefined && !lockConfig) zaktualizujUIZESP(data.cfg_th, data.cfg_time, data.cfg_aggr);
-    
-    document.getElementById("dash-temp").innerText = (data.temp !== undefined) ? data.temp.toFixed(1) + "°" : "-";
-    document.getElementById("dash-hum").innerText = (data.air_hum !== undefined) ? data.air_hum.toFixed(0) + "%" : "-";
-    document.getElementById("dash-pres").innerText = (data.pressure !== undefined && data.pressure > 0) ? data.pressure.toFixed(0) + " hPa" : "-";
-    document.getElementById("dash-water-temp").innerText = (data.water_temp && data.water_temp > 0) ? data.water_temp.toFixed(1) + "°" : "-";
-    document.getElementById("dash-sun").innerText = (data.sun_hours !== undefined) ? data.sun_hours + " h" : "-";
-    document.getElementById("dash-sunrise").innerText = formatujMinuty(data.sr); document.getElementById("dash-sunset").innerText = formatujMinuty(data.ss);
-
-    if(data.pump_sec !== undefined && data.hw && data.hw.us) {
-        let tVol = data.tank_vol || 220, fRate = data.pump_flow || 2.0, remLiters = 0, pct = 0;
-        if (data.us_dist !== undefined && data.us_dist > 0 && data.us_max !== undefined && data.us_min !== undefined) {
-            pct = Math.max(0, Math.min(100, Math.round(100 - (((data.us_dist - data.us_min) / (data.us_max - data.us_min)) * 100)))); remLiters = (pct / 100.0) * tVol;
-        } else {
-            remLiters = Math.max(0, tVol - ((data.pump_sec / 60) * fRate)); pct = Math.max(0, Math.min(100, Math.round((remLiters / tVol) * 100)));
-        }
-        document.getElementById("water-height-controller").style.bottom = (-800 + (100 * (pct / 100))) + "px";
-        document.getElementById("dash-water-pct").innerText = pct + "%"; document.getElementById("dash-water-liters").innerText = Math.round(remLiters) + " / " + tVol + " L";
-        let estStr = "Brak danych";
-        if (document.querySelector('.profile-btn.selected') && data.cfg_time) {
-            let litersPerDay = ((data.cfg_aggr == 2) ? 4 : (data.cfg_aggr == 1 ? 3 : 2)) * (data.cfg_time * fRate);
-            if (litersPerDay > 0) { let days = Math.floor(remLiters / litersPerDay); estStr = days > 14 ? "Zapas na ponad 2 tyg." : (days > 1 ? `Wystarczy na ok. ${days} dni` : (days === 1 ? `Wystarczy na 1 dzień` : `Woda się kończy!`)); }
-        }
-        document.getElementById("dash-water-est").innerText = estStr; document.getElementById("dash-water-pct").style.color = pct <= 15 ? "var(--accent-red)" : "var(--text-main)";
-        pct <= 15 ? document.getElementById("tank-mask").classList.add("alert") : document.getElementById("tank-mask").classList.remove("alert");
-    }
-
-    if(data.outdoors !== undefined) {
-        document.getElementById('loc-in').classList.remove('active'); document.getElementById('loc-out').classList.remove('active');
-        data.outdoors === 1 ? document.getElementById('loc-out').classList.add('active') : document.getElementById('loc-in').classList.add('active');
-    }
-
-    if (data.voltage) {
-        document.getElementById("eng-voltage").innerText = data.voltage.toFixed(3) + " V";
-        let pct = Math.max(0, Math.min(100, Math.round(((data.voltage - 3.2) / 1.0) * 100)));
-        document.getElementById("dash-batt").innerText = (data.voltage >= 4.4 ? "⚡ " : "") + pct + "%";
-    }
-
-    document.getElementById("last-update-text").innerText = isServiceModeActive ? "Połączono (Live Data 🟢)" : (timestamp ? `Aktualizacja: ${sformatujCzas(timestamp)}` : "Przed chwilą") + (demo ? " (Demo)" : "");
-
-    const hI = document.getElementById("hero-icon"), hT = document.getElementById("hero-text"), uB = document.getElementById("fault-unlock-btn"), pC = document.getElementById("plants-container"), pT = document.getElementById("plants-title");
-    uB.style.display = "none"; pC.style.display = "flex"; pT.style.display = "block";
-
-    if(data.batt_warn === 1) { hI.innerText = "🔋"; hI.classList.add("pulse-alert"); hT.innerText = "Spadek pojemności Aku!"; hT.style.color = "var(--accent-orange)"; }
-    else if(data.survival === 1) { hI.innerText = "🔋"; hI.classList.add("pulse-alert"); hT.innerText = "Tryb przetrwania (Słaba Bateria)"; hT.style.color = "var(--accent-orange)"; }
-    else if(data.fault === 1) { hI.innerText = "🔥"; hI.classList.add("pulse-alert"); hT.innerText = "AWARIA POMPY!"; hT.style.color = "var(--accent-red)"; uB.style.display = "block"; pC.style.display = "none"; pT.style.display = "none"; }
-    else if(data.water === "EMPTY") { hI.innerText = "⚠️"; hI.classList.add("pulse-alert"); hT.innerText = "Dolej wody do beczki!"; hT.style.color = "var(--accent-red)"; }
-    else if(data.hibernated === 1) { hI.innerText = "❄️"; hI.classList.remove("pulse-alert"); hT.innerText = "System zhibernowany"; hT.style.color = "var(--accent-blue)"; pC.style.display = "none"; pT.style.display = "none"; }
-    else { hI.innerText = "🌿"; hI.classList.remove("pulse-alert"); hT.innerText = "Wszystko w porządku"; hT.style.color = "var(--accent-green)"; }
-
-    const logBox = document.getElementById("logBox"); logBox.innerHTML = "";
-    if(!data.logs || data.logs.length === 0) logBox.innerHTML = "<div class='log-item' style='justify-content:center;'>Brak wpisów.</div>";
-    else {
-        [...data.logs].reverse().forEach(log => {
-            let cls = "bg-ok", a = log.action;
-            if(a==="PODLANO") cls="bg-water"; if(a==="BRAK WODY!"||a==="AWARIA POMPY!") cls="bg-error";
-            if(a==="ZA GORĄCO"||a==="BLOKADA (SŁOŃCE)"||a==="BLOKADA (BURZA)"||a==="TRYB SURVIVAL") cls="bg-warn"; 
-            if(a==="RĘCZNE") cls="bg-manual"; if(a==="NOCNY SEN") cls="bg-sleep"; if(a==="ZIMNA WODA") cls="bg-cold"; if(a==="BLOKADA (SAUNA)") cls="bg-sauna"; 
-            logBox.innerHTML += `<div class='log-item'><span>Wilg: <b>${log.moisture}%</b></span><span class='log-badge ${cls}'>${a}</span></div>`;
-        }); rysujWykresy(data.logs);
-    }
-}
-
-let servicePollingInterval = null;
-function formatujMinuty(m) { if(!m || isNaN(m)) return "-"; return Math.floor(m / 60).toString().padStart(2, '0') + ":" + (m % 60).toString().padStart(2, '0'); }
-function sformatujCzas(t) { let m = Math.floor((Date.now() - t) / 60000); if (m < 1) return "przed chwilą"; if (m < 60) return `${m} min temu`; return `${Math.floor(m / 60)} godz. temu`; }
-
-function rysujProstyWykres(id, arr, col, minV, maxV) {
-    const c = document.getElementById(id); if(!c) return; const ctx = c.getContext('2d'); const r = c.parentElement.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-    c.width = r.width * dpr; c.height = r.height * dpr; ctx.scale(dpr, dpr); const dW = r.width - 20, dH = r.height - 20; ctx.clearRect(0, 0, r.width, r.height);
-    if(arr.length === 0) return; const sX = dW / Math.max(1, arr.length - 1);
-    ctx.beginPath(); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.lineJoin = 'round';
-    arr.forEach((v, i) => { let b = Math.max(minV, Math.min(v, maxV)); const p = (b - minV) / (maxV - minV); const x = 10 + (i * sX), y = 10 + dH - (p * dH); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }); ctx.stroke();
-    ctx.fillStyle = col; arr.forEach((v, i) => { let b = Math.max(minV, Math.min(v, maxV)); const p = (b - minV) / (maxV - minV); const x = 10 + (i * sX), y = 10 + dH - (p * dH); ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); });
-}
-function rysujWykresy(logi) {
-    const d = [...logi].reverse(), rs = getComputedStyle(document.documentElement);
-    rysujProstyWykres('moistureChart', d.map(l => l.moisture), rs.getPropertyValue('--accent-blue').trim()||'#007aff', 0, 100);
-    rysujProstyWykres('tempChart', d.map(l => l.t || 20), rs.getPropertyValue('--accent-red').trim()||'#ff3b30', 0, 50);
-}
-function toggleStoper() {
-    const b = document.getElementById('btn-stoper'), d = document.getElementById('stopwatch-display'), r = document.getElementById('stoper-result');
-    if(!stoperRunning) {
-        stoperStartTime = Date.now(); stoperRunning = true; b.innerText = "🛑 Zatrzymaj (Mam pełny 1 Litr)"; b.style.background = "var(--accent-red)"; b.style.color = "white"; r.style.display = "none";
-        stoperInterval = setInterval(() => { d.innerText = ((Date.now() - stoperStartTime) / 1000).toFixed(1) + "s"; }, 100); haptyka(15);
-    } else {
-        clearInterval(stoperInterval); stoperRunning = false; b.innerText = "⏱ Start Stopera"; b.style.background = "var(--accent-blue)";
-        let f = (Date.now() - stoperStartTime) / 1000; let l = 60 / f; r.innerText = `Wydajność pompy: ${l.toFixed(2)} L/min`; r.style.display = "block";
-        document.getElementById('pump-flow').value = l.toFixed(2); zapiszParametryZbiornika(); haptyka([50, 100, 50]);
-    }
-}
-function eksportujCSV() {
-    const c = localStorage.getItem('lastESPData'); if(!c) return alert("Brak danych."); const logs = JSON.parse(c).data.logs; if(!logs) return;
-    let csv = "data:text/csv;charset=utf-8,ID,Wilgotnosc_Pct,Temperatura_C,Wilgotnosc_Powietrza_Pct,Napiecie_V,Akcja\n"; 
-    logs.forEach((l, i) => csv += `${i + 1},${l.moisture},${l.t || "-"},${l.h || "-"},${l.v || "-"},${l.action}\n`);
-    const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "szklarnia_raport.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
-}
-function wgrywajOTA() {
-    const f = document.getElementById('ota-file').files[0]; if(!f || !f.name.endsWith('.bin')) return alert("Wybierz plik .bin!"); haptyka([20, 50, 20]);
-    const s = document.getElementById('ota-status'), bar = document.getElementById('ota-progress-bar');
-    s.innerText = "Łączenie..."; document.getElementById('ota-progress-container').style.display = "block"; bar.style.width = "0%";
-    const fd = new FormData(); fd.append("update", f, f.name); const xhr = new XMLHttpRequest(); xhr.open("POST", "/update", true);
-    xhr.upload.addEventListener("progress", e => { if (e.lengthComputable) { bar.style.width = (e.loaded / e.total) * 100 + "%"; s.innerText = `Przesyłanie: ${Math.round((e.loaded / e.total) * 100)}%`; }});
-    xhr.onload = () => { if (xhr.status === 200) { s.innerText = "✅ Sukces! Restart..."; bar.style.background = "var(--accent-green)"; haptyka([50, 100, 50, 100, 50]); } else s.innerText = "❌ Błąd."; }; xhr.send(fd);
-}
-window.addEventListener('resize', () => { const c = localStorage.getItem('lastESPData'); if(c) { try { const p = JSON.parse(c); if(p.data.logs) rysujWykresy(p.data.logs); }catch(e){} } });
 </script>
+<div id="kal-modal" class="profile-modal-bg">
+<div class="section-card" style="width:92%;max-width:380px;margin:0;max-height:88vh;overflow-y:auto">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h2 style="margin:0">📅 Kalendarz ogrodnika</h2><button onclick="zamknijKalendarz()" style="border:none;background:var(--nav-bg);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;color:var(--text-main)">✕</button></div>
+<div class="tab-nav" style="margin-bottom:14px"><div id="kal-tryb-szkl" class="tab-btn active" onclick="kalZmienTryb('szklarnia')">🏠 Szklarnia</div><div id="kal-tryb-grunt" class="tab-btn" onclick="kalZmienTryb('grunt')">🌍 Grunt</div></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><button onclick="kalZmienMiesiac(-1)" style="border:none;background:var(--nav-bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text-main)">‹</button><div id="kal-miesiac-txt" style="font-size:17px;font-weight:800">Maj</div><button onclick="kalZmienMiesiac(1)" style="border:none;background:var(--nav-bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text-main)">›</button></div>
+<div id="kal-lista"></div>
+<button class="btn-test" onclick="otworzDodajRosline()" style="margin-top:10px;width:100%;border:1px dashed var(--border-light);background:transparent;color:var(--text-sub)">➕ Dodaj własną roślinę</button>
+</div>
+</div>
+
+<div id="kal-add-modal" class="profile-modal-bg" style="z-index:5500">
+<div class="section-card" style="width:92%;max-width:380px;margin:0;max-height:88vh;overflow-y:auto">
+<h2 style="margin-top:0">Własna roślina</h2>
+<label>Nazwa</label>
+<input type="text" id="kal-add-name" class="text-input" placeholder="np. Szczypiorek" maxlength="24">
+<p style="font-size:11px;color:var(--text-sub);margin:0 0 12px">Zaznacz miesiące dla każdej czynności:</p>
+<div id="kal-add-grid"></div>
+<div style="display:flex;gap:8px;margin-top:16px"><button class="btn-test" onclick="zamknijDodajRosline()" style="flex:1;background:var(--nav-bg);color:var(--text-sub)">Anuluj</button><button class="btn-test" onclick="zapiszWlasnaRosline()" style="flex:1">Zapisz</button></div>
+</div>
+</div>
+
 </body>
 </html>
