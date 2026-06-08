@@ -149,12 +149,11 @@ body.modal-open{overflow:hidden;touch-action:none}
 
 <div class="section-card" id="kal-teaser" onclick="otworzKalendarz()" style="cursor:pointer;margin-bottom:16px;border:1px solid var(--border-light)">
 <div style="display:flex;align-items:center;gap:14px">
-<div id="kal-teaser-icon" style="font-size:34px">🌱</div>
-<div style="flex:1"><div style="font-size:11px;color:var(--text-sub);font-weight:700;text-transform:uppercase;margin-bottom:2px">📅 Dziś w kalendarzu biodynamicznym</div><div id="kal-teaser-txt" style="font-size:13px;font-weight:600">Ładowanie...</div></div>
+<div id="kal-teaser-icon" style="font-size:30px">🌱</div>
+<div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--text-sub);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:1px">Kalendarz biodynamiczny</div><div id="kal-teaser-txt" style="font-size:13px;font-weight:600">Ładowanie...</div></div>
 <div style="color:var(--text-sub);font-size:18px">›</div>
 </div>
-<div id="kal-suggest" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-light);font-size:12px;font-weight:600"></div>
-<div id="kal-warn" style="display:none;margin-top:8px;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:600"></div>
+<div id="kal-chips" style="display:none;gap:6px;margin-top:10px;flex-wrap:wrap"></div>
 </div>
 <div class="water-module" id="ui-water-module">
 <div class="weather-lbl" style="text-align:center;margin-bottom:-4px">Woda w zbiorniku</div>
@@ -1091,74 +1090,98 @@ function renderujThunTeaser(){
   var teraz=new Date(),mies=teraz.getMonth()+1,dzien=teraz.getDate(),godz=teraz.getHours(),rok=teraz.getFullYear();
   var k=thunKlucz(rok,mies),dObj=THUN[k]?THUN[k][dzien]:null;
   var ic=card.querySelector('#kal-teaser-icon'),tx=card.querySelector('#kal-teaser-txt');
-  var sug=document.getElementById('kal-suggest'),wrn=document.getElementById('kal-warn');
+  var chips=document.getElementById('kal-chips');
   var typ=null;
   if(dObj&&dObj.ok&&dObj.ok.length>0){
     typ=thunTypTeraz(dObj,godz);var info=THUN_TYP[typ];
-    if(info){ic.innerText=info.icon;tx.innerHTML='Dziś dzień <b style="color:'+info.k+'">'+info.nazwa.toLowerCase()+'owy</b> — sprzyja: '+info.rosliny.split(',').slice(0,3).join(', ');}
+    if(info){ic.innerText=info.icon;tx.innerHTML='Dziś dzień <b style="color:'+info.k+'">'+info.nazwa.toLowerCase()+'owy</b>';}
   }else{ic.innerText='🌙';tx.innerHTML=THUN_OGOLNE[mies]||'Kalendarz biodynamiczny Thun';}
-  // SUGESTIA PODLEWANIA: typ dnia + wilgotność gleby z czujnika
-  if(sug){
-    sug.style.display='none';
-    if(typ&&lastDataCache){
-      var moist=obliczWilgotnosc(lastDataCache),prog=lastDataCache.cfg_th||45;
-      if(moist!==null){
-        var sucha=moist<prog;
-        if((typ==='L'||typ==='O')&&sucha){
-          sug.style.display='block';sug.style.color='var(--accent-green)';
-          sug.innerHTML='💧 Gleba sucha ('+moist+'%), a dziś dzień '+(typ==='L'?'liściowy':'owocowy')+' (żywioł '+(typ==='L'?'wody':'ciepła')+') — biodynamicznie dobry moment na podlewanie.';
-        }else if((typ==='K'||typ==='W')&&sucha){
-          sug.style.display='block';sug.style.color='var(--text-sub)';
-          sug.innerHTML='🌙 Gleba sucha ('+moist+'%), ale dziś dzień '+(typ==='K'?'korzeniowy':'kwiatowy')+'. Wg Thun lepszy na podlewanie będzie najbliższy dzień liściowy/owocowy — chyba że rośliny pilnie potrzebują wody.';
-        }else if(!sucha){
-          sug.style.display='block';sug.style.color='var(--text-sub)';
-          sug.innerHTML='✅ Wilgotność gleby OK ('+moist+'%) — podlewanie na razie zbędne.';
-        }
-      }
+  // KOMPAKTOWE CHIPY - krótkie, wizualne podsumowania
+  if(!chips)return;
+  var lista=[];
+  function chip(emoji,tekst,kolor,tlo){return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;background:'+tlo+';color:'+kolor+'">'+emoji+' '+tekst+'</span>';}
+  // 1. Sugestia podlewania (skrócona do chipa)
+  if(typ&&lastDataCache){
+    var moist=obliczWilgotnosc(lastDataCache),prog=lastDataCache.cfg_th||45;
+    if(moist!==null){
+      var sucha=moist<prog;
+      if((typ==='L'||typ==='O')&&sucha)lista.push(chip('💧','Dobry dzień na podlewanie','var(--accent-green)','rgba(52,199,89,0.12)'));
+      else if((typ==='K'||typ==='W')&&sucha)lista.push(chip('🌱','Gleba sucha — lepszy dzień liściowy','var(--accent-orange)','rgba(255,149,0,0.12)'));
+      else if(!sucha)lista.push(chip('✅','Wilgotność OK','var(--text-sub)','var(--nav-bg)'));
     }
   }
-  // OSTRZEŻENIE POGODOWE: prognoza Thun (B/W) zestawiona z ciśnieniem BME280
-  if(wrn){
-    wrn.style.display='none';
-    if(dObj&&dObj.prog){
-      var zagr=[];
-      if(dObj.prog.indexOf('B')>=0)zagr.push('burze');
-      if(dObj.prog.indexOf('W')>=0)zagr.push('wichury');
-      if(zagr.length>0){
-        var spadek=lastDataCache&&lastDataCache.press_trend!==undefined&&lastDataCache.press_trend<-1;
-        wrn.style.display='block';
-        if(spadek){
-          wrn.style.background='rgba(255,59,48,0.12)';wrn.style.color='var(--accent-red)';
-          wrn.innerHTML='⛈️ Kalendarz wskazuje '+zagr.join(' i ')+', a ciśnienie realnie spada ('+lastDataCache.press_trend.toFixed(1)+' hPa) — podwyższone ryzyko niepogody.';
-        }else{
-          wrn.style.background='rgba(255,149,0,0.12)';wrn.style.color='var(--accent-orange)';
-          wrn.innerHTML='🌬️ Kalendarz wskazuje dziś skłonność do: '+zagr.join(', ')+'. (ciśnienie na razie stabilne)';
-        }
-      }
+  // 2. Ostrzeżenie pogodowe (skrócone do chipa)
+  if(dObj&&dObj.prog){
+    var zagr=[];
+    if(dObj.prog.indexOf('B')>=0)zagr.push('burze');
+    if(dObj.prog.indexOf('W')>=0)zagr.push('wichury');
+    if(zagr.length>0){
+      var spadek=lastDataCache&&lastDataCache.press_trend!==undefined&&lastDataCache.press_trend<-1;
+      if(spadek)lista.push(chip('⛈️','Ryzyko: '+zagr.join(', '),'var(--accent-red)','rgba(255,59,48,0.12)'));
+      else lista.push(chip('🌬️','Możliwe '+zagr.join(', '),'var(--accent-orange)','rgba(255,149,0,0.12)'));
     }
   }
+  if(lista.length>0){chips.innerHTML=lista.join('');chips.style.display='flex';}
+  else chips.style.display='none';
 }
 
 // Pełny ekran
 var thunMies=new Date().getMonth()+1, thunRok=new Date().getFullYear();
 function otworzKalendarz(){thunMies=new Date().getMonth()+1;thunRok=new Date().getFullYear();pokazModal('kal-modal');renderujThunPelny();podlaczSwipeKalendarz();}
 function zamknijKalendarz(){ukryjModal('kal-modal');}
-function thunZmienMiesiac(d){thunMies+=d;if(thunMies<1){thunMies=12;thunRok--;}if(thunMies>12){thunMies=1;thunRok++;}renderujThunPelny();}
+function thunZmienMiesiac(d){
+  var box=document.getElementById('kal-lista');
+  if(!box){_thunApplyMonth(d);renderujThunPelny();return;}
+  // wysuń obecną treść w bok (w kierunku przeciwnym do nadejścia nowej)
+  box.style.transition='transform .18s ease, opacity .18s ease';
+  box.style.transform='translateX('+(d>0?-30:30)+'px)';
+  box.style.opacity='0';
+  setTimeout(function(){
+    _thunApplyMonth(d);
+    renderujThunPelny();
+    // ustaw poza ekranem po stronie nadejścia, potem wjedź na miejsce
+    box.style.transition='none';
+    box.style.transform='translateX('+(d>0?30:-30)+'px)';
+    box.style.opacity='0';
+    // wymuś reflow by transition zadziałało
+    void box.offsetWidth;
+    box.style.transition='transform .22s ease, opacity .22s ease';
+    box.style.transform='translateX(0)';
+    box.style.opacity='1';
+  },180);
+}
+function _thunApplyMonth(d){thunMies+=d;if(thunMies<1){thunMies=12;thunRok--;}if(thunMies>12){thunMies=1;thunRok++;}}
 var thunSwipeBound=false;
 function podlaczSwipeKalendarz(){
   if(thunSwipeBound)return;
   var strefa=document.getElementById('kal-modal');if(!strefa)return;
-  var x0=null,y0=null,t0=0;
-  strefa.addEventListener('touchstart',function(e){var t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();},{passive:true});
+  var box=document.getElementById('kal-lista');
+  var x0=null,y0=null,t0=0,poziomy=false;
+  strefa.addEventListener('touchstart',function(e){var t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();poziomy=false;},{passive:true});
+  strefa.addEventListener('touchmove',function(e){
+    if(x0===null||!box)return;
+    var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    // ustal czy gest jest poziomy (raz na gest)
+    if(!poziomy&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.5)poziomy=true;
+    if(poziomy){
+      // lista podąża za palcem z oporem (połowa dystansu)
+      box.style.transition='none';
+      box.style.transform='translateX('+(dx*0.4)+'px)';
+      box.style.opacity=String(Math.max(0.45,1-Math.abs(dx)/400));
+    }
+  },{passive:true});
   strefa.addEventListener('touchend',function(e){
     if(x0===null)return;
     var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
-    // poziomy gest: wystarczająco długi w X, krótki w Y, w rozsądnym czasie
-    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.8&&dt<600){
+    if(poziomy&&Math.abs(dx)>55&&dt<700){
       if(dx<0){thunZmienMiesiac(1);}else{thunZmienMiesiac(-1);}
       haptyka(10);
+    }else if(poziomy&&box){
+      // za słaby gest - płynny powrót na miejsce
+      box.style.transition='transform .2s ease, opacity .2s ease';
+      box.style.transform='translateX(0)';box.style.opacity='1';
     }
-    x0=null;y0=null;
+    x0=null;y0=null;poziomy=false;
   },{passive:true});
   thunSwipeBound=true;
 }
