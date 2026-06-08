@@ -599,7 +599,7 @@ function toggleServiceMode(){isServiceModeActive=!isServiceModeActive;document.g
 
 // PULL TO REFRESH
 (function(){var startY=0,pulling=false,ptr=document.getElementById('ptr');
-window.addEventListener('touchstart',function(e){if(window.scrollY===0&&document.getElementById('tab-pulpit').classList.contains('active'))startY=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchstart',function(e){if(window.scrollY===0&&document.getElementById('tab-pulpit').classList.contains('active')&&!document.body.classList.contains('modal-open'))startY=e.touches[0].clientY;},{passive:true});
 window.addEventListener('touchmove',function(e){if(startY===0)return;var dy=e.touches[0].clientY-startY;if(dy>0&&dy<120){pulling=true;if(ptr){ptr.style.opacity=Math.min(1,dy/70);ptr.style.transform='translateX(-50%) translateY('+Math.min(dy,70)+'px)';}}},{passive:true});
 window.addEventListener('touchend',function(e){if(pulling){var dy=e.changedTouches[0].clientY-startY;if(dy>60){if(ptr){ptr.querySelector('svg').classList.add('ptr-spin');}pobierzDaneZESP32();setTimeout(function(){if(ptr){ptr.style.opacity=0;ptr.querySelector('svg').classList.remove('ptr-spin');}},800);}else if(ptr)ptr.style.opacity=0;}startY=0;pulling=false;});})();
 
@@ -1154,34 +1154,36 @@ function _thunApplyMonth(d){thunMies+=d;if(thunMies<1){thunMies=12;thunRok--;}if
 var thunSwipeBound=false;
 function podlaczSwipeKalendarz(){
   if(thunSwipeBound)return;
-  var strefa=document.getElementById('kal-modal');if(!strefa)return;
+  var strefa=document.getElementById('kal-lista-wrap');if(!strefa)return;
   var box=document.getElementById('kal-lista');
-  var x0=null,y0=null,t0=0,poziomy=false;
-  strefa.addEventListener('touchstart',function(e){var t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();poziomy=false;},{passive:true});
+  var x0=null,y0=null,t0=0,kierunek=0; // 0=nieustalony, 1=poziomy, -1=pionowy
+  function resetBox(){if(box){box.style.transition='transform .2s ease, opacity .2s ease';box.style.transform='translateX(0)';box.style.opacity='1';}}
+  strefa.addEventListener('touchstart',function(e){var t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();kierunek=0;},{passive:true});
   strefa.addEventListener('touchmove',function(e){
     if(x0===null||!box)return;
     var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
-    // ustal czy gest jest poziomy (raz na gest)
-    if(!poziomy&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.5)poziomy=true;
-    if(poziomy){
-      // lista podąża za palcem z oporem (połowa dystansu)
+    // ustal kierunek RAZ, gdy ruch przekroczy próg
+    if(kierunek===0&&(Math.abs(dx)>12||Math.abs(dy)>12)){
+      kierunek=(Math.abs(dx)>Math.abs(dy)*1.3)?1:-1;
+    }
+    if(kierunek===1){
+      // poziomy gest - lista podąża za palcem
       box.style.transition='none';
       box.style.transform='translateX('+(dx*0.4)+'px)';
       box.style.opacity=String(Math.max(0.45,1-Math.abs(dx)/400));
     }
+    // kierunek===-1 (pionowy): nie ruszamy listy w bok, pozwalamy na normalny scroll
   },{passive:true});
   strefa.addEventListener('touchend',function(e){
     if(x0===null)return;
     var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
-    if(poziomy&&Math.abs(dx)>55&&dt<700){
+    if(kierunek===1&&Math.abs(dx)>55&&dt<700){
       if(dx<0){thunZmienMiesiac(1);}else{thunZmienMiesiac(-1);}
       haptyka(10);
-    }else if(poziomy&&box){
-      // za słaby gest - płynny powrót na miejsce
-      box.style.transition='transform .2s ease, opacity .2s ease';
-      box.style.transform='translateX(0)';box.style.opacity='1';
+    }else if(kierunek===1){
+      resetBox(); // poziomy ale za słaby - wróć na miejsce
     }
-    x0=null;y0=null;poziomy=false;
+    x0=null;y0=null;kierunek=0;
   },{passive:true});
   thunSwipeBound=true;
 }
@@ -1299,11 +1301,11 @@ function uruchomDiagnostyke(){
 
 </script>
 <div id="kal-modal" class="profile-modal-bg">
-<div class="section-card" style="width:92%;max-width:400px;margin:0;max-height:88vh;overflow-y:auto">
+<div class="section-card" style="width:92%;max-width:400px;margin:0;max-height:88vh;overflow-y:auto;overflow-x:hidden">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><h2 style="margin:0">📅 Kalendarz biodynamiczny</h2><button onclick="zamknijKalendarz()" style="border:none;background:var(--nav-bg);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;color:var(--text-main)">✕</button></div>
 <div style="font-size:11px;color:var(--text-sub);margin-bottom:14px">wg Marii Thun — „Dni Siewu" 2026 · <span style="opacity:.8">przesuń ↔ by zmienić miesiąc</span></div>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><button onclick="thunZmienMiesiac(-1)" style="border:none;background:var(--nav-bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text-main)">‹</button><div id="kal-miesiac-txt" style="font-size:17px;font-weight:800">—</div><button onclick="thunZmienMiesiac(1)" style="border:none;background:var(--nav-bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text-main)">›</button></div>
-<div id="kal-lista"></div>
+<div id="kal-lista-wrap" style="overflow:hidden"><div id="kal-lista"></div></div>
 </div>
 </div>
 
