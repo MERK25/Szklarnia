@@ -1,1319 +1,334 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Szklarnia Pro</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Szklarnia">
-<meta name="theme-color" content="#34c759">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<style>
-:root{--html-bg:#e5e5ea;--bg-gradient:linear-gradient(135deg,#e5e5ea 0%,#f2f2f7 100%);--glass-bg:rgba(255,255,255,0.65);--glass-card:rgba(255,255,255,0.8);--text-main:#1c1c1e;--text-sub:#636366;--accent-green:#34c759;--accent-blue:#007aff;--accent-red:#ff3b30;--accent-orange:#ff9500;--accent-purple:#af52de;--accent-cyan:#32ade6;--border-light:rgba(255,255,255,0.5);--shadow-soft:0 10px 40px rgba(0,0,0,0.04);--input-bg:#fff;--nav-bg:rgba(0,0,0,0.06);--range-bg:rgba(0,0,0,0.05);--profile-sel-bg:rgba(52,199,89,0.05);--card-solid:#ffffff}
-:root[data-theme="dark"]{--html-bg:#000;--bg-gradient:linear-gradient(135deg,#000 0%,#1c1c1e 100%);--glass-bg:rgba(28,28,30,0.4);--glass-card:rgba(44,44,46,0.6);--text-main:#fff;--text-sub:#aeaea2;--accent-green:#30d158;--accent-blue:#0a84ff;--accent-red:#ff453a;--accent-orange:#ff9f0a;--accent-purple:#bf5af2;--accent-cyan:#64d2ff;--border-light:rgba(255,255,255,0.05);--shadow-soft:0 10px 40px rgba(0,0,0,0.3);--input-bg:rgba(28,28,30,0.6);--nav-bg:rgba(255,255,255,0.1);--range-bg:rgba(255,255,255,0.1);--profile-sel-bg:rgba(48,209,88,0.15);--card-solid:#2c2c2e}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--html-bg:#000;--bg-gradient:linear-gradient(135deg,#000 0%,#1c1c1e 100%);--glass-bg:rgba(28,28,30,0.4);--glass-card:rgba(44,44,46,0.6);--text-main:#fff;--text-sub:#aeaea2;--accent-green:#30d158;--accent-blue:#0a84ff;--accent-red:#ff453a;--accent-orange:#ff9f0a;--accent-purple:#bf5af2;--accent-cyan:#64d2ff;--border-light:rgba(255,255,255,0.05);--shadow-soft:0 10px 40px rgba(0,0,0,0.3);--input-bg:rgba(28,28,30,0.6);--nav-bg:rgba(255,255,255,0.1);--range-bg:rgba(255,255,255,0.1);--profile-sel-bg:rgba(48,209,88,0.15);--card-solid:#2c2c2e}}
-html{background:var(--html-bg);transition:background .3s}
-body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-gradient);margin:0;padding:16px;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;color:var(--text-main);-webkit-font-smoothing:antialiased;box-sizing:border-box}
-.wrapper{width:100%;max-width:410px;margin-top:20px;background:var(--glass-bg);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--border-light);border-radius:38px;padding:24px;box-shadow:var(--shadow-soft);box-sizing:border-box;position:relative}
-.tab-nav{display:flex;background:var(--nav-bg);border-radius:14px;padding:4px;margin-bottom:24px;position:relative;z-index:10;user-select:none;-webkit-user-select:none}
-.tab-btn{flex:1;padding:10px;text-align:center;border-radius:10px;font-size:14px;font-weight:600;color:var(--text-sub);cursor:pointer;transition:all .3s}
-.tab-btn.active{background:var(--glass-card);color:var(--text-main);box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.tab-content{display:none;animation:fadeIn .4s ease}
-.tab-content.active{display:block}
-.sub-content{display:none;animation:fadeIn .4s ease}
-.sub-content.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-.status-hero{text-align:center;padding:10px 0 16px}
-.status-icon{font-size:54px;margin-bottom:8px;display:inline-block}
-.status-text{font-size:22px;font-weight:800;letter-spacing:-.5px}
-.update-badge{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:6px 14px;background:var(--nav-bg);border:.5px solid var(--border-light);border-radius:20px;font-size:11px;font-weight:600;color:var(--text-sub);cursor:pointer}
-.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-green);display:inline-block}
-.conn-dot.off{background:var(--accent-red)}
-.pulse-alert{animation:pulseAlert 1.2s infinite ease-in-out;color:var(--accent-red)}
-@keyframes pulseAlert{0%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.8}100%{transform:scale(1);opacity:1}}
-.service-banner{background:var(--accent-orange);color:#fff;text-align:center;padding:10px;border-radius:12px;font-weight:800;font-size:14px;margin-bottom:20px;display:none}
-.weather-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.weather-card{flex:1 1 calc(33.333% - 8px);min-width:90px;background:var(--glass-card);border:1px solid var(--border-light);border-radius:20px;padding:12px 4px;text-align:center;box-sizing:border-box}
-.weather-val{font-size:19px;font-weight:800;margin-bottom:2px;min-height:22px}
-.weather-lbl{font-size:9px;color:var(--text-sub);font-weight:700;text-transform:uppercase}
-h2{font-size:13px;margin:0 0 10px 4px;color:var(--text-sub);text-transform:uppercase;font-weight:700}
-.section-card{background:var(--glass-card);border:1px solid var(--border-light);border-radius:22px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow-soft);box-sizing:border-box}
-.profile-container{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}
-.profile-btn{flex:1 1 calc(33.333% - 6px);min-width:90px;background:var(--glass-card);border:1px solid var(--border-light);border-radius:16px;padding:14px 4px;font-size:13px;font-weight:600;color:var(--text-main);cursor:pointer;box-sizing:border-box;transition:all .2s}
-.profile-btn:active{transform:scale(.95)}
-.profile-btn.selected{border-color:var(--accent-green);background:var(--profile-sel-bg)}
-.profile-icon{font-size:26px;display:block;margin-bottom:6px}
-label{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
-input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:5px;background:var(--range-bg);outline:none;margin:12px 0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;border:.5px solid rgba(0,0,0,0.04)}
-.text-input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-light);background:var(--input-bg);color:var(--text-main);font-size:14px;outline:none;box-sizing:border-box;margin-bottom:15px}
-.btn-test{display:block;width:100%;padding:12px;border:none;border-radius:18px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;background:rgba(0,122,255,0.1);color:var(--accent-blue);margin-top:8px}
-.btn-test:active{transform:scale(.96)}
-.chart-container{position:relative;height:100px;width:100%;margin-bottom:10px;background:rgba(0,0,0,0.02);border-radius:12px;overflow:hidden;padding:5px;box-sizing:border-box}
-canvas{display:block;width:100%;height:100%}
-.btn-primary{background:var(--accent-blue);color:#fff}
-.btn-green{background:var(--accent-green);color:#fff}
-/* WODA - 4 koła, spowolnione, pierwsze 70% */
-.water-module{background:var(--glass-card);border:1px solid var(--border-light);border-radius:22px;padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:12px}
-.tank-mask{position:relative;width:100%;height:120px;background:var(--range-bg);border-radius:20px;overflow:hidden;box-shadow:inset 0 4px 10px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.05);isolation:isolate}
-#water-height-controller{position:absolute;bottom:-800px;left:50%;width:800px;height:800px;transform:translateX(-50%);transition:bottom 1.5s cubic-bezier(.25,.8,.25,1)}
-.wave{position:absolute;width:100%;height:100%;background:linear-gradient(180deg,#5ac8fa 0%,var(--accent-blue) 100%);border-radius:38%;bottom:0;left:0;animation:spinWave 9s linear infinite;opacity:.7}
-.wave:nth-child(2){opacity:.5;border-radius:42%;animation-duration:12s;animation-direction:reverse}
-.wave:nth-child(3){opacity:.65;border-radius:40%;animation-duration:15s}
-.wave:nth-child(4){opacity:.4;border-radius:45%;animation-duration:19s;animation-direction:reverse}
-.tank-mask.alert .wave{background:linear-gradient(180deg,#ff6b22 0%,var(--accent-red) 100%)}
-@keyframes spinWave{100%{transform:rotate(360deg)}}
-.tank-text-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10;pointer-events:none;color:var(--text-main);text-shadow:0 2px 10px rgba(255,255,255,0.8)}
-/* PASEK WILGOTNOŚCI */
-.moist-card{background:var(--glass-card);border:1px solid var(--border-light);border-radius:22px;padding:16px;margin-bottom:16px}
-.moist-track{position:relative;height:14px;background:var(--range-bg);border-radius:8px;overflow:hidden;margin-top:10px}
-.moist-fill{position:absolute;left:0;top:0;height:100%;border-radius:8px;transition:width .8s cubic-bezier(.34,1.2,.5,1);background:linear-gradient(90deg,#5ac8fa,var(--accent-blue))}
-.moist-thresh{position:absolute;top:-3px;width:2px;height:20px;background:var(--accent-orange);z-index:5}
-/* PRZYCISK PODLEJ */
-.water-now{width:100%;padding:16px;border:none;border-radius:20px;font-size:16px;font-weight:800;background:linear-gradient(135deg,#5ac8fa,var(--accent-blue));color:#fff;cursor:pointer;transition:.2s;box-shadow:0 6px 20px rgba(0,122,255,0.25);margin-bottom:16px}
-.water-now:active{transform:scale(.97)}
-.water-now:disabled{opacity:.5}
-/* NASTĘPNE SPRAWDZENIE */
-.next-check{text-align:center;font-size:12px;color:var(--text-sub);font-weight:600;margin:-6px 0 16px}
-/* ALARM BANNER */
-#alarm-banner{display:none;background:rgba(255,59,48,0.12);border:1px solid var(--accent-red);border-radius:16px;padding:14px;margin-bottom:16px}
-/* PROGI ALARMÓW + ZAKRES */
-.range-btns{display:flex;gap:6px;background:var(--nav-bg);border-radius:12px;padding:4px;margin-bottom:12px}
-.range-btn{flex:1;padding:7px;text-align:center;border-radius:9px;font-size:12px;font-weight:600;color:var(--text-sub);cursor:pointer}
-.range-btn.active{background:var(--glass-card);color:var(--text-main)}
-/* TOAST POTWIERDZENIA */
-#confirm-toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.8);z-index:7000;background:var(--glass-card);backdrop-filter:blur(20px);border:1px solid var(--border-light);border-radius:24px;padding:24px 32px;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.34,1.4,.5,1);box-shadow:0 20px 60px rgba(0,0,0,0.2)}
-#confirm-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.confirm-circle{width:56px;height:56px;border-radius:50%;background:var(--accent-green);display:flex;align-items:center;justify-content:center}
-.confirm-check{width:28px;height:14px;border-left:4px solid #fff;border-bottom:4px solid #fff;transform:rotate(-45deg);margin-top:-4px}
-.confirm-circle.err{background:var(--accent-red)}
-#confirm-text{font-size:15px;font-weight:700;color:var(--text-main)}
-/* PULL TO REFRESH */
-#ptr{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:50;width:30px;height:30px;opacity:0;transition:opacity .2s;pointer-events:none}
-#ptr svg{width:100%;height:100%}
-.ptr-spin{animation:ptrSpin .8s linear infinite}
-@keyframes ptrSpin{to{transform:rotate(360deg)}}
-.demo-pill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:8000;background:var(--accent-purple);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;display:none}
-.profile-modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:6000;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;overscroll-behavior:contain;padding:16px;box-sizing:border-box}
-body.modal-open{overflow:hidden;touch-action:none}
-.profile-modal-bg .section-card{background:var(--card-solid);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
-.hwswitch{position:relative;display:inline-block;width:50px;height:28px;flex-shrink:0}
-.hwswitch input{opacity:0;width:0;height:0}
-.hwslider{position:absolute;cursor:pointer;inset:0;background:var(--range-bg);border-radius:28px;transition:.3s;border:1px solid var(--border-light)}
-.hwslider:before{position:absolute;content:"";height:22px;width:22px;left:3px;bottom:2px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2)}
-.hwswitch input:checked+.hwslider{background:var(--accent-green)}
-.hwswitch input:checked+.hwslider:before{transform:translateX(20px)}
-.eng-row{display:flex;justify-content:space-between;font-family:monospace;font-size:14px;margin-bottom:8px;border-bottom:1px dashed var(--border-light);padding-bottom:4px;align-items:center}
-.kalm-row{margin-bottom:10px}
-.kalm-row-lbl{font-size:11px;font-weight:700;margin-bottom:4px}
-.kalm-months{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
-.kalm-cell{font-size:10px;text-align:center;padding:6px 0;border-radius:6px;background:var(--nav-bg);cursor:pointer;color:var(--text-sub);transition:.15s}
-.kalm-cell.sel{background:var(--accent-green);color:#fff;font-weight:700}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalendarz Biodynamiczny</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Biodynamika">
+
+    <style>
+        /* =========================================
+           STYLES (style.css)
+        ========================================= */
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --text-primary: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --accent-green: #34c759;
+            --accent-blue: #007aff;
+            --border-color: rgba(60, 60, 67, 0.36);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+        }
+
+        .ios-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 0.5px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .ios-header h1 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .ios-button {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            font-size: 17px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .ios-button:active {
+            opacity: 0.5;
+        }
+
+        .ios-button.block {
+            background: var(--accent-blue);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-weight: 600;
+            margin-top: 20px;
+            border-radius: 12px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .day {
+            background: var(--card-bg);
+            border-radius: 12px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: 400;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
+        }
+
+        .day:active {
+            transform: scale(0.92);
+        }
+
+        .day.empty {
+            background: transparent;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .day .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-top: 4px;
+        }
+
+        .dot.korzen { background-color: #a2845e; }
+        .dot.kwiat { background-color: #ffcc00; }
+        .dot.lisc { background-color: var(--accent-green); }
+        .dot.owoc { background-color: #ff3b30; }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            width: 80%;
+            max-width: 320px;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: scale(1);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal.hidden .modal-content {
+            transform: scale(0.9);
+        }
+
+        .modal-content h2 {
+            margin: 0 0 15px 0;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .modal-body p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .details-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 10px !important;
+        }
+    </style>
 </head>
 <body>
-<div id="boot-overlay" style="position:fixed;inset:0;z-index:9999;background:#34c759;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s ease;font-family:-apple-system,sans-serif">
-<div style="font-size:64px">&#127807;</div>
-<div style="color:#fff;font-size:20px;font-weight:700;margin-top:10px">Szklarnia Pro</div>
-<div id="boot-status" style="color:rgba(255,255,255,.85);font-size:13px;margin-top:24px">Uruchamianie...</div>
-<div style="width:32px;height:32px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;margin-top:16px;animation:ptrSpin .8s linear infinite"></div>
-</div>
-<div class="demo-pill" id="demo-pill">TRYB DEMO (bez ESP32)</div>
-<div id="confirm-toast"><div class="confirm-circle" id="confirm-circle"><div class="confirm-check"></div></div><div id="confirm-text">Gotowe</div></div>
 
-<div class="wrapper" id="wrapper">
-<div id="ptr"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg></div>
-<div class="tab-nav">
-<div id="btn-pulpit" class="tab-btn active" onclick="zmienZakladke('pulpit')">Pulpit</div>
-<div id="btn-ustawienia" class="tab-btn" onclick="zmienZakladke('ustawienia')">⚙️ Ustawienia</div>
-</div>
-<div id="service-banner" class="service-banner">🛠 TRYB SERWISOWY AKTYWNY</div>
-
-<div id="tab-pulpit" class="tab-content active">
-<div id="alarm-banner">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<div style="font-size:13px;font-weight:700;color:var(--accent-red)">🔔 Zdarzenia pod Twoją nieobecność</div>
-<button onclick="oznaczAlarmyPrzeczytane()" style="font-size:11px;padding:4px 10px;border-radius:12px;border:none;background:var(--accent-red);color:#fff;cursor:pointer">Wyczyść</button>
-</div>
-<div id="alarm-list" style="margin-top:8px"></div>
-</div>
-
-<div class="status-hero">
-<div id="hero-icon" class="status-icon">🌿</div>
-<div id="hero-text" class="status-text" style="color:var(--accent-green)">Wszystko w porządku</div>
-<div id="fault-unlock-btn" style="display:none;margin-top:15px"><button class="btn-test" onclick="odblokujPompe()" style="background:var(--accent-red);color:#fff;font-size:16px;padding:14px">🛠 Odblokuj system pomp</button></div>
-<div class="update-badge" onclick="pobierzDaneZESP32()" id="update-badge-btn"><span class="conn-dot" id="conn-dot"></span><span id="last-update-text">Łączenie...</span></div>
-</div>
-
-<div class="section-card" id="kal-teaser" onclick="otworzKalendarz()" style="cursor:pointer;margin-bottom:16px;border:1px solid var(--border-light)">
-<div style="display:flex;align-items:center;gap:14px">
-<div id="kal-teaser-icon" style="font-size:30px">🌱</div>
-<div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--text-sub);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:1px">Kalendarz biodynamiczny</div><div id="kal-teaser-txt" style="font-size:13px;font-weight:600">Ładowanie...</div></div>
-<div style="color:var(--text-sub);font-size:18px">›</div>
-</div>
-<div id="kal-chips" style="display:none;gap:6px;margin-top:10px;flex-wrap:wrap"></div>
-</div>
-<div class="water-module" id="ui-water-module">
-<div class="weather-lbl" style="text-align:center;margin-bottom:-4px">Woda w zbiorniku</div>
-<div class="tank-mask" id="tank-mask">
-<div id="water-height-controller"><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div></div>
-<div class="tank-text-overlay">
-<span id="dash-water-pct" style="font-size:32px;font-weight:800;letter-spacing:-1px">--%</span>
-<span id="dash-water-liters" style="font-size:13px;font-weight:700;opacity:.9">-- / -- L</span>
-<span id="dash-water-est" style="font-size:10px;font-weight:700;opacity:.75;margin-top:4px">Szacowanie...</span>
-</div>
-</div>
-<button id="btn-reset-water" class="btn-test" onclick="zresetujLicznikWody()" style="background:rgba(0,122,255,0.1);color:var(--accent-blue);width:100%">💦 Zresetuj stan po napełnieniu beczki</button>
-</div>
-
-<button class="water-now" id="btn-water-now" onclick="podlejTeraz()">💧 Podlej teraz</button>
-<div class="next-check" id="next-check">Następne sprawdzenie za ok. --</div>
-
-<div class="moist-card">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<div style="font-size:13px;font-weight:700">🌱 Wilgotność gleby</div>
-<div id="moist-pct" style="font-size:18px;font-weight:800;color:var(--accent-blue)">--%</div>
-</div>
-<div class="moist-track"><div class="moist-fill" id="moist-fill" style="width:0%"></div><div class="moist-thresh" id="moist-thresh" style="left:45%"></div></div>
-<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-sub);margin-top:6px"><span>Sucho</span><span id="moist-info">Próg podlewania: 45%</span><span>Mokro</span></div>
-</div>
-
-<div class="weather-grid">
-<div class="weather-card" id="ui-bme-temp"><div class="weather-val" id="dash-temp">-</div><div class="weather-lbl">Powietrze</div></div>
-<div class="weather-card" id="ui-bme-hum"><div class="weather-val" id="dash-hum">-</div><div class="weather-lbl">Wilgotność</div></div>
-<div class="weather-card" id="ui-ds-temp"><div class="weather-val" id="dash-water-temp">-</div><div class="weather-lbl">Temp. Wody</div></div>
-<div class="weather-card"><div class="weather-val" id="dash-sun">-</div><div class="weather-lbl">God Słońca</div></div>
-<div class="weather-card"><div class="weather-val" id="dash-batt">-</div><div class="weather-lbl">Bateria</div></div>
-<div class="weather-card" id="ui-bme-pres"><div class="weather-val" id="dash-pres">-</div><div class="weather-lbl">Ciśnienie</div></div>
-</div>
-<div class="section-card" id="sun-card" style="display:flex;justify-content:space-around;padding:12px;margin-bottom:16px">
-<div style="text-align:center"><div style="font-size:18px">☀️</div><div style="font-size:13px;font-weight:700" id="dash-sunrise">--:--</div><div class="weather-lbl">Wschód</div></div>
-<div style="text-align:center"><div style="font-size:18px">🌙</div><div style="font-size:13px;font-weight:700" id="dash-sunset">--:--</div><div class="weather-lbl">Zachód</div></div>
-</div>
-
-<div class="section-card" id="forecast-card" style="display:none">
-<div style="display:flex;align-items:center;gap:14px">
-<div id="forecast-icon" style="font-size:42px">🌤️</div>
-<div style="flex:1"><div id="forecast-text" style="font-size:15px;font-weight:700">--</div><div id="forecast-sub" style="font-size:11px;color:var(--text-sub);margin-top:2px">Prognoza z trendu ciśnienia</div></div>
-<div id="forecast-trend" style="font-size:13px;font-weight:700;color:var(--text-sub)"></div>
-</div>
-</div>
-
-
-<div class="section-card" id="adaptive-card" style="display:none">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<div><div style="font-size:13px;font-weight:700">🧠 Uczenie się gleby</div><div id="adaptive-status" style="font-size:11px;color:var(--text-sub);margin-top:2px">Zbieranie danych...</div></div>
-<div style="text-align:right"><div id="adaptive-rate" style="font-size:20px;font-weight:800;color:var(--accent-blue)">-- %/h</div><div style="font-size:10px;color:var(--text-sub)">tempo wysychania</div></div>
-</div>
-<div style="margin-top:10px;height:6px;background:var(--range-bg);border-radius:3px;overflow:hidden"><div id="adaptive-bar" style="height:100%;width:0%;background:var(--accent-green);transition:width .5s"></div></div>
-</div>
-
-<h2 id="plants-title">Co dzisiaj rośnie?</h2>
-<div class="profile-container" id="plants-container"></div>
-</div>
-<div id="tab-ustawienia" class="tab-content">
-<div class="tab-nav" style="margin-bottom:20px">
-<div id="btn-sub-ogolne" class="tab-btn active" onclick="zmienPodzakladke('ogolne')">Ogólne</div>
-<div id="btn-sub-zaawansowane" class="tab-btn" onclick="zmienPodzakladke('zaawansowane')">Zaawansowane</div>
-</div>
-<div id="sub-ogolne" class="sub-content active">
-<h2>Edycja Profili Upraw</h2>
-<div class="section-card">
-<select id="edit-profile-select" onchange="wczytajProfilDoEdycji()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-light);background:var(--input-bg);color:var(--text-main);margin-bottom:15px;font-size:14px;outline:none"></select>
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Wilgotność aktywacji</span><span id="edit-th-val" style="color:var(--accent-blue)">40%</span></div>
-<input type="range" id="edit-th" min="0" max="100" value="40" oninput="document.getElementById('edit-th-val').innerText=this.value+'%'">
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:15px"><span>Czas podlewania</span><span id="edit-time-val" style="color:var(--accent-blue)">2 min</span></div>
-<input type="range" id="edit-time" min="0.5" max="30" step="0.5" value="2" oninput="document.getElementById('edit-time-val').innerText=this.value+' min'">
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:15px"><span>Częstotliwość sprawdzania</span><span id="edit-aggr-val" style="color:var(--accent-blue)">Zbalansowany</span></div>
-<input type="range" id="edit-aggr" min="0" max="2" step="1" value="1" oninput="aktualizujEtykieteAgresywnosci(this.value)">
-<div id="edit-aggr-desc" style="font-size:11px;color:var(--text-sub);margin-top:6px;line-height:1.4">Jak często system budzi się, by zmierzyć glebę. Częściej = dokładniej, ale większe zużycie baterii. Przy niskim napięciu system i tak automatycznie oszczędza.</div>
-<button id="btn-save-profile" class="btn-test" onclick="zapiszEdytowanyProfil()" style="margin-top:20px;width:100%">💾 Zapisz zmiany</button>
-<button id="btn-delete-edit-prof" class="btn-test" onclick="usunProfilZEdycji()" style="display:none;margin-top:8px;width:100%;background:rgba(255,59,48,0.1);color:var(--accent-red)">🗑 Usuń tę uprawę</button>
-</div>
-
-<h2>🔔 Progi alarmów</h2>
-<div class="section-card">
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Ostrzeż gdy bateria poniżej</span><span id="al-batt-val" style="color:var(--accent-orange)">20%</span></div>
-<input type="range" id="al-batt" min="5" max="50" value="20" oninput="document.getElementById('al-batt-val').innerText=this.value+'%';zapiszProgiAlarmow()">
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:15px"><span>Alarm gdy temperatura powyżej</span><span id="al-temp-val" style="color:var(--accent-red)">35°C</span></div>
-<input type="range" id="al-temp" min="25" max="50" value="35" oninput="document.getElementById('al-temp-val').innerText=this.value+'°C';zapiszProgiAlarmow()">
-</div>
-
-<h2>Lokalizacja i Wygląd</h2>
-<div class="section-card">
-<div class="tab-nav" style="margin-bottom:15px"><div id="loc-in" class="tab-btn active" onclick="ustawLokalizacje(0)">Szklarnia</div><div id="loc-out" class="tab-btn" onclick="ustawLokalizacje(1)">Zewnątrz</div></div>
-<div class="tab-nav" style="margin-bottom:0"><div id="theme-light" class="tab-btn" onclick="zmienMotyw('light')">☀️ Jasny</div><div id="theme-auto" class="tab-btn active" onclick="zmienMotyw('auto')">⚙️ Auto</div><div id="theme-dark" class="tab-btn" onclick="zmienMotyw('dark')">🌙 Ciemny</div></div>
-</div>
-
-<h2>Parametry Zbiornika</h2>
-<div class="section-card">
-<label>Pojemność całkowita (L)</label>
-<input type="number" id="tank-vol" class="text-input" value="220" onchange="zapiszParametryZbiornika()">
-<label>Wydajność pompy (L/min)</label>
-<input type="number" id="pump-flow" class="text-input" value="2.0" step="0.1" onchange="zapiszParametryZbiornika()">
-</div>
-
-<h2>Zużycie wody</h2>
-<div class="section-card">
-<div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:14px">
-<div><div id="stat-today" style="font-size:22px;font-weight:800;color:var(--accent-blue)">-- L</div><div style="font-size:10px;color:var(--text-sub)">DZIŚ</div></div>
-<div><div id="stat-week" style="font-size:22px;font-weight:800;color:var(--accent-blue)">-- L</div><div style="font-size:10px;color:var(--text-sub)">7 DNI</div></div>
-<div><div id="stat-avg" style="font-size:22px;font-weight:800;color:var(--accent-blue)">-- L</div><div style="font-size:10px;color:var(--text-sub)">ŚR/DZIEŃ</div></div>
-</div>
-<div class="chart-container"><canvas id="waterChart"></canvas></div>
-<div id="water-anomaly" style="display:none;font-size:12px;padding:8px;border-radius:10px;margin-top:10px;text-align:center"></div>
-</div>
-
-<h2>Historia (Wykresy)</h2>
-<div class="section-card" style="margin-bottom:20px">
-<div class="range-btns">
-<div class="range-btn" id="rng-1" onclick="ustawZakres(1)">24h</div>
-<div class="range-btn active" id="rng-7" onclick="ustawZakres(7)">7 dni</div>
-<div class="range-btn" id="rng-30" onclick="ustawZakres(30)">30 dni</div>
-</div>
-<div class="weather-lbl" style="margin-bottom:4px">Wilgotność gleby</div>
-<div class="chart-container"><canvas id="moistureChart"></canvas></div>
-<div class="weather-lbl" style="margin-bottom:4px">Temperatura</div>
-<div class="chart-container"><canvas id="tempChart"></canvas></div>
-<button class="btn-test btn-green" onclick="eksportujCSV()" style="margin-top:15px;width:100%">📥 Pobierz raport (.csv)</button>
-</div>
-</div>
-
-<div id="sub-zaawansowane" class="sub-content">
-<h2>🛠 Tryb Serwisowy</h2>
-<div class="section-card">
-<p style="font-size:12px;color:var(--text-sub);margin-top:0">Odświeża dane co 2 sekundy.</p>
-<button id="btn-service-mode" class="btn-test" onclick="toggleServiceMode()" style="background:var(--accent-orange);color:#fff;width:100%">Włącz Tryb Serwisowy</button>
-</div>
-<h2>Stan połączenia</h2>
-<div class="section-card">
-<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-sub)">Status:</span><b id="conn-status">--</b></div>
-<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-sub)">Ostatnia synchronizacja:</span><b id="conn-last">--</b></div>
-<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text-sub)">Wolna pamięć ESP:</span><b id="conn-heap">--</b></div>
-</div>
-<h2>Menedżer Urządzeń</h2>
-<div class="section-card">
-<p style="font-size:11px;color:var(--text-sub);margin-top:0;line-height:1.4">Zaznacz sprzęt fizycznie podpięty do ESP.</p>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Pływak/Ultradźwięki (JSN-SR04T)</span><label class="hwswitch"><input type="checkbox" id="hw-us" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Temp. Wody (DS18B20)</span><label class="hwswitch"><input type="checkbox" id="hw-ds" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Pogoda (BME280)</span><label class="hwswitch"><input type="checkbox" id="hw-bme" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600"><span>Czujnik Słońca (Fotorezystor)</span><label class="hwswitch"><input type="checkbox" id="hw-light" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
-<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;border-top:1px solid var(--range-bg);padding-top:10px"><span>Wentylacja (PIN 19)</span><label class="hwswitch"><input type="checkbox" id="hw-vent" onchange="saveHwConfig()"><span class="hwslider"></span></label></div>
-</div>
-
-<h2>Asystent Kalibracji (Live)</h2>
-<div class="section-card">
-<h3 style="margin-top:0;font-size:14px">🌱 Wilgotność Gleby</h3>
-<div class="eng-row"><span>Odczyt z czujnika:</span><b id="live-soil-val">---</b></div>
-<div style="display:flex;gap:8px;margin-top:10px"><button id="btn-soil-dry" class="btn-test" onclick="zapiszGlebe('air')" style="flex:1;background:rgba(255,149,0,0.1);color:var(--accent-orange)">SUCHO</button><button id="btn-soil-wet" class="btn-test" onclick="zapiszGlebe('water')" style="flex:1;background:rgba(0,122,255,0.1);color:var(--accent-blue)">MOKRO</button></div>
-<div id="calib-quality" style="font-size:11px;font-weight:600;margin-top:10px;text-align:center"></div>
-</div>
-<div class="section-card" id="card-calib-us">
-<h3 style="margin-top:0;font-size:14px">🛢️ Poziom Wody w Beczce</h3>
-<div class="eng-row"><span>Odległość tafli:</span><b id="live-us-val">--- cm</b></div>
-<div style="display:flex;gap:8px;margin-top:10px"><button id="btn-water-empty" class="btn-test" onclick="zapiszWode('empty')" style="flex:1;background:rgba(255,59,48,0.1);color:var(--accent-red)">PUSTA</button><button id="btn-water-full" class="btn-test" onclick="zapiszWode('full')" style="flex:1;background:rgba(52,199,89,0.1);color:var(--accent-green)">PEŁNA</button></div>
-</div>
-<div class="section-card" id="card-calib-ldr">
-<h3 style="margin-top:0;font-size:14px">☀️ Światłomierz</h3>
-<div class="eng-row"><span>Surowe natężenie:</span><b id="live-light-val">---</b></div>
-<button id="btn-calib-light" class="btn-test" onclick="zapiszSwiatlo()" style="margin-top:10px;background:rgba(255,149,0,0.1);color:var(--accent-orange);width:100%">Ustaw jako SŁOŃCE (100%)</button>
-</div>
-<div class="section-card" id="card-calib-ds">
-<h3 style="margin-top:0;font-size:14px">🌡️ Korekta Temperatury Wody</h3>
-<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px">Przesunięcie (np. -1.5):</span><input type="number" id="calib-tOff" value="0.0" step="0.1" style="width:70px;padding:6px;border-radius:8px;border:1px solid var(--border-light);background:var(--input-bg);color:var(--text-main);font-family:monospace;text-align:center"></div>
-<button id="btn-calib-toff" class="btn-test" onclick="zapiszKorekteTemp()" style="margin-top:10px;width:100%">💾 Zapisz korektę</button>
-</div>
-
-<h2>Wydajność Pompy i Test</h2>
-<div class="section-card">
-<div class="eng-row"><span>Napięcie zasilania:</span><b id="eng-voltage">--- V</b></div>
-<div style="font-size:32px;font-weight:800;text-align:center;margin:15px 0;font-variant-numeric:tabular-nums" id="stopwatch-display">00.0s</div>
-<button id="btn-stoper" class="btn-test btn-primary" onclick="toggleStoper()" style="padding:16px;font-size:16px;width:100%">⏱ Asystent Kalibracji (1 Litr)</button>
-<p id="stoper-result" style="display:none;color:var(--accent-green);text-align:center;font-weight:800;margin-top:15px"></p>
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-top:25px"><span>Szybki Test Pompy</span><span id="testDurationVal" style="color:var(--accent-blue)">15s</span></div>
-<input type="range" id="testSlider" min="5" max="60" value="15" oninput="document.getElementById('testDurationVal').innerText=this.value+'s'">
-<button id="btn-quick-test" class="btn-test" onclick="uruchomTest()" style="width:100%">🚀 Uruchom Test</button>
-</div>
-
-<h2>Zimowanie Szklarni</h2>
-<div class="section-card">
-<button id="btn-wypompuj" class="btn-test" onclick="wypompujWode()" style="background:rgba(0,122,255,0.1);color:var(--accent-blue);margin-bottom:12px;width:100%">❄️ Wypompuj resztki wody z węży</button>
-<button id="btn-hibernuj" class="btn-test" onclick="aktywujHibernacje()" style="background:rgba(255,59,48,0.1);color:var(--accent-red);width:100%">💤 Włącz tryb uśpienia na zimę</button>
-</div>
-
-<h2>Aktualizacja Firmware (OTA)</h2>
-<div class="section-card">
-<input type="file" id="ota-file" accept=".bin" style="margin-bottom:15px;width:100%">
-<button id="btn-ota" class="btn-test" onclick="wgrywajOTA()" style="color:var(--accent-orange);background:rgba(255,149,0,0.1);width:100%">⚡ Wgraj plik .bin</button>
-<div id="ota-progress-container" style="display:none;width:100%;height:8px;background:var(--range-bg);border-radius:4px;margin-top:15px;overflow:hidden"><div id="ota-progress-bar" style="height:100%;width:0%;background:var(--accent-orange);transition:.2s"></div></div>
-<div id="ota-status" style="font-size:12px;font-weight:600;text-align:center;margin-top:8px;color:var(--accent-orange)"></div>
-</div>
-<h2>🔋 Kalibracja napięcia baterii</h2>
-<div class="section-card">
-<div class="eng-row"><span>ESP odczytuje teraz:</span><b id="calib-v-now">--- V</b></div>
-<label style="margin-top:10px">Zmierz multimetrem i wpisz rzeczywiste napięcie:</label>
-<input type="number" id="calib-v-real" class="text-input" placeholder="np. 13.25" step="0.01">
-<button class="btn-test" onclick="zapiszKalibracjeNapiecia()" style="width:100%">💾 Zapisz korekcję napięcia</button>
-<p style="font-size:11px;color:var(--text-sub);margin:8px 0 0">Koryguje błąd tolerancji rezystorów dzielnika.</p>
-</div>
-
-<h2>🧪 Diagnostyka systemu</h2>
-<div class="section-card">
-<button class="btn-test btn-primary" onclick="uruchomDiagnostyke()" style="width:100%">▶️ Sprawdź wszystko</button>
-<div id="diag-results" style="margin-top:12px"></div>
-</div>
-
-<h2>🔄 Reset kalibracji</h2>
-<div class="section-card">
-<button class="btn-test" onclick="resetKalibracji()" style="background:rgba(255,59,48,0.1);color:var(--accent-red);width:100%">Przywróć ustawienia fabryczne</button>
-<p style="font-size:11px;color:var(--text-sub);margin:8px 0 0">Przywraca domyślne wartości kalibracji czujników.</p>
-</div>
-
-
-</div>
-</div>
-</div>
-
-<div id="profile-modal" class="profile-modal-bg">
-<div class="section-card" style="width:90%;max-width:340px;margin:0;max-height:85vh;overflow-y:auto">
-<h2 id="modal-title" style="margin-top:0">Nowa uprawa</h2>
-<label>Emoji</label>
-<div id="emoji-picker" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
-<input type="text" id="custom-emoji-input" class="text-input" placeholder="…lub wpisz własne emoji" maxlength="4" style="margin-bottom:12px;text-align:center;font-size:18px" oninput="ustawWlasneEmoji(this.value)">
-<label>Nazwa</label>
-<input type="text" id="new-prof-name" class="text-input" placeholder="np. Papryka" maxlength="20">
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Próg wilgotności</span><span id="new-prof-th-val" style="color:var(--accent-blue)">45%</span></div>
-<input type="range" id="new-prof-th" min="0" max="100" value="45" oninput="document.getElementById('new-prof-th-val').innerText=this.value+'%'">
-<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600"><span>Czas podlewania</span><span id="new-prof-time-val" style="color:var(--accent-blue)">3 min</span></div>
-<input type="range" id="new-prof-time" min="0.5" max="30" step="0.5" value="3" oninput="document.getElementById('new-prof-time-val').innerText=this.value+' min'">
-<div style="display:flex;gap:8px;margin-top:16px">
-<button class="btn-test" onclick="zamknijModal()" style="flex:1;background:var(--nav-bg);color:var(--text-sub)">Anuluj</button>
-<button class="btn-test" id="btn-save-new-prof" onclick="zapiszNowyProfil()" style="flex:1">Zapisz</button>
-</div>
-<button id="btn-delete-prof" class="btn-test" onclick="usunProfil()" style="display:none;margin-top:8px;background:rgba(255,59,48,0.1);color:var(--accent-red);width:100%">🗑 Usuń uprawę</button>
-</div>
-</div>
-<script>
-var IS_DEMO=location.hostname.includes('github.io')||location.hostname.includes('localhost')||location.hostname==='127.0.0.1'||location.protocol==='file:';
-var isServiceModeActive=false,lockConfig=false,zakresDni=7,lastDataCache=null,nieobsluzoneAlarmy=[];
-
-function genDemoHistory(){var arr=[],now=Math.floor(Date.now()/1000),m=70;for(var i=120;i>=0;i--){var ts=now-i*21600;m-=Math.random()*8;var a=0,p=0;if(m<45){a=1;p=180;m=75+Math.random()*10;}var hr=new Date(ts*1000).getHours();var t=18+Math.sin(hr/24*Math.PI*2)*8+Math.random()*3;arr.push({ts:ts,m:Math.round(Math.max(20,m)),t:Math.round(t*10),h:Math.round(55+Math.random()*20),v:Math.round((12.8+Math.random()*0.8)*100),a:a,p:p});}return arr;}
-var demoHistory=genDemoHistory();
-var DEMO_DATA={cfg_th:45,cfg_time:3,cfg_aggr:1,tank_vol:220,pump_flow:2.0,voltage:13.2,batt_warn:0,raw_adc:2100,raw_light:3500,light:85,water_temp:18.5,t_off:0,us_dist:35,us_max:90,us_min:15,sun_hours:6.5,sr:372,ss:1248,air_val:3200,water_val:1500,fault:0,hibernated:0,outdoors:0,survival:0,pump_sec:1200,temp:24.5,air_hum:62,pressure:1013,water:"OK",service_mode:0,free_heap:210000,vent_state:0,drying_rate:2.8,adaptive_ready:5,forecast:4,press_trend:-2.1,next_check_sec:10800,hw:{us:1,ds:1,bme:1,light:1,vent:0},logs:[{moisture:65,v:13.2,t:24.1,h:62,action:"OK"}]};
-var DEMO_ALARMS=[{type:8,ts:Math.floor(Date.now()/1000)-86400,ack:0},{type:2,ts:Math.floor(Date.now()/1000)-43200,ack:0}];
-var DEMO_PROFILES={pomidory:{name:"Pomidory",icon:"🍅",th:45,time:3,aggr:1,builtin:1},ogorki:{name:"Ogórki",icon:"🥒",th:55,time:4,aggr:1,builtin:1},sadzonki:{name:"Sadzonki",icon:"🌱",th:60,time:1,aggr:2,builtin:1},arbuz:{name:"Arbuz",icon:"🍉",th:50,time:5,aggr:1,builtin:1},borowka:{name:"Borówka",icon:"🫐",th:40,time:2,aggr:0,builtin:1}};
-var profileData={};
-
-function haptyka(p){if(navigator.vibrate&&!IS_DEMO)navigator.vibrate(p);}
-function liczbaOtwartychModali(){return document.querySelectorAll('.profile-modal-bg.otwarty').length;}
-function pokazModal(id){var m=document.getElementById(id);if(!m)return;m.style.display='flex';m.classList.add('otwarty');document.body.classList.add('modal-open');}
-function ukryjModal(id){var m=document.getElementById(id);if(!m)return;m.style.display='none';m.classList.remove('otwarty');if(liczbaOtwartychModali()===0)document.body.classList.remove('modal-open');}
-
-function espFetch(url,opts){
-  if(IS_DEMO){return new Promise(function(res){setTimeout(function(){
-    if(url.indexOf('/data')===0)res({ok:true,json:function(){return Promise.resolve(JSON.parse(JSON.stringify(DEMO_DATA)));}});
-    else if(url.indexOf('/getProfiles')===0)res({ok:true,json:function(){return Promise.resolve(DEMO_PROFILES);}});
-    else if(url.indexOf('/getHistory')===0)res({ok:true,json:function(){return Promise.resolve(demoHistory);}});
-    else if(url.indexOf('/getAlarms')===0)res({ok:true,json:function(){return Promise.resolve(DEMO_ALARMS);}});
-    else res({ok:true,text:function(){return Promise.resolve("OK");},json:function(){return Promise.resolve({});}});
-  },150);});}
-  return fetch(url,opts);
-}
-
-// POTWIERDZENIE - animacja zamiast alert
-function potwierdz(txt,ok){
-  var t=document.getElementById('confirm-toast'),c=document.getElementById('confirm-circle');
-  document.getElementById('confirm-text').innerText=txt||'Gotowe';
-  c.className='confirm-circle'+(ok===false?' err':'');
-  c.innerHTML=ok===false?'<div style="color:#fff;font-size:30px;font-weight:700;line-height:1">!</div>':'<div class="confirm-check"></div>';
-  t.classList.add('show');haptyka(ok===false?[60,40,60]:30);
-  setTimeout(function(){t.classList.remove('show');},1400);
-}
-
-function ustawStanPrzycisku(id,lock,orig,load){load=load||"⏳...";var b=document.getElementById(id);if(!b)return;if(lock){b.dataset.o=b.innerText;b.innerText=load;b.style.opacity=.5;b.style.pointerEvents='none';}else{b.innerText=b.dataset.o||orig;b.style.opacity=1;b.style.pointerEvents='auto';}}
-
-// PROFILE
-function wczytajProfileZESP(){return espFetch('/getProfiles',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){profileData=d;localStorage.setItem('bazaProfili',JSON.stringify(d));renderujPrzyciskiProfili();odswiezListeEdycji();}).catch(function(){var c=localStorage.getItem('bazaProfili');if(c){profileData=JSON.parse(c);renderujPrzyciskiProfili();odswiezListeEdycji();}});}
-function zapiszProfileNaESP(){localStorage.setItem('bazaProfili',JSON.stringify(profileData));if(IS_DEMO){DEMO_PROFILES=JSON.parse(JSON.stringify(profileData));return Promise.resolve();}return fetch('/saveProfiles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(profileData)});}
-function renderujPrzyciskiProfili(){var c=document.getElementById('plants-container');c.innerHTML='';for(var id in profileData){(function(id){var p=profileData[id];var b=document.createElement('button');b.className='profile-btn';b.id='prof-'+id;b.onclick=function(){aktywujProfil(id);};b.innerHTML='<span class="profile-icon">'+(p.icon||'🌿')+'</span>'+p.name;c.appendChild(b);})(id);}var a=document.createElement('button');a.className='profile-btn';a.style.borderStyle='dashed';a.onclick=otworzDodawanieProfilu;a.innerHTML='<span class="profile-icon">➕</span>Dodaj';c.appendChild(a);}
-function odswiezListeEdycji(){var s=document.getElementById('edit-profile-select');if(!s)return;s.innerHTML='';for(var id in profileData){var o=document.createElement('option');o.value=id;o.innerText=(profileData[id].icon||'🌿')+' '+profileData[id].name;s.appendChild(o);}wczytajProfilDoEdycji();}
-function aktywujProfil(id){var p=profileData[id];if(!p)return;document.querySelectorAll('.profile-btn').forEach(function(b){b.classList.remove('selected');});var btn=document.getElementById('prof-'+id);if(btn)btn.classList.add('selected');haptyka(15);espFetch('/save?thPct='+p.th+'&timeSec='+(p.time*60)+'&aggr='+p.aggr).then(function(){potwierdz('Aktywowano: '+p.name);if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Offline',false);});}
-var EMOJI_LIST=['🍅','🥒','🌱','🍉','🫐','🌶️','🥬','🍓','🌽','🥕','🧄','🧅','🍆','🎃','🌻','🌿','🪴','🍇'];
-var edytowanyProfilId=null,wybraneEmoji='🌿';
-function otworzDodawanieProfilu(){edytowanyProfilId=null;document.getElementById('modal-title').innerText='Nowa uprawa';document.getElementById('new-prof-name').value='';document.getElementById('new-prof-th').value=45;document.getElementById('new-prof-th-val').innerText='45%';document.getElementById('new-prof-time').value=3;document.getElementById('new-prof-time-val').innerText='3 min';document.getElementById('btn-delete-prof').style.display='none';var ci=document.getElementById('custom-emoji-input');if(ci)ci.value='';renderujEmojiPicker('🌿');pokazModal('profile-modal');}
-function renderujEmojiPicker(sel){wybraneEmoji=sel;var p=document.getElementById('emoji-picker');p.innerHTML='';EMOJI_LIST.forEach(function(e){var b=document.createElement('button');b.innerText=e;b.style.cssText='font-size:22px;padding:6px;border-radius:10px;border:2px solid '+(e===sel?'var(--accent-green)':'transparent')+';background:var(--nav-bg);cursor:pointer';b.onclick=function(){var ci=document.getElementById('custom-emoji-input');if(ci)ci.value='';renderujEmojiPicker(e);};p.appendChild(b);});}
-function ustawWlasneEmoji(v){v=(v||'').trim();if(!v){return;}wybraneEmoji=v;var p=document.getElementById('emoji-picker');if(p)p.querySelectorAll('button').forEach(function(b){b.style.border='2px solid transparent';});}
-function zamknijModal(){ukryjModal('profile-modal');}
-function zapiszNowyProfil(){var name=document.getElementById('new-prof-name').value.trim();if(!name){potwierdz('Podaj nazwę',false);return;}if(!edytowanyProfilId&&Object.keys(profileData).length>=15){potwierdz('Limit 15 upraw',false);return;}var id=edytowanyProfilId||('custom_'+Date.now());profileData[id]={name:name,icon:wybraneEmoji,th:parseInt(document.getElementById('new-prof-th').value),time:parseFloat(document.getElementById('new-prof-time').value),aggr:1,builtin:0};haptyka(15);ustawStanPrzycisku('btn-save-new-prof',true,'Zapisz');zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();zamknijModal();potwierdz('Zapisano uprawę');}).catch(function(){potwierdz('Zapisano lokalnie',false);}).finally(function(){ustawStanPrzycisku('btn-save-new-prof',false,'Zapisz');});}
-function usunProfil(){if(!edytowanyProfilId)return;if(!confirm('Usunąć tę uprawę?'))return;delete profileData[edytowanyProfilId];haptyka([30,30]);zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();zamknijModal();potwierdz('Usunięto');});}
-function aktualizujEtykieteAgresywnosci(v){var e=["Oszczędny","Zbalansowany","Częsty"];document.getElementById('edit-aggr-val').innerText=e[v];var opisy=["Budzi się rzadko (co 1,5–12 h). Maksymalna oszczędność baterii, mniej częste pomiary.","Budzi się umiarkowanie (co 1–10 h). Rozsądny kompromis dokładności i zużycia energii.","Budzi się często (co 45 min–8 h). Najdokładniejsze pomiary kosztem większego zużycia baterii."];var d=document.getElementById('edit-aggr-desc');if(d)d.innerText=opisy[v];}
-function wczytajProfilDoEdycji(){var id=document.getElementById('edit-profile-select').value;var p=profileData[id];if(!p)return;document.getElementById('edit-th').value=p.th;document.getElementById('edit-th-val').innerText=p.th+'%';document.getElementById('edit-time').value=p.time;document.getElementById('edit-time-val').innerText=p.time+' min';document.getElementById('edit-aggr').value=p.aggr!==undefined?p.aggr:1;aktualizujEtykieteAgresywnosci(document.getElementById('edit-aggr').value);var db=document.getElementById('btn-delete-edit-prof');if(db)db.style.display=(p.builtin?'none':'block');}
-function usunProfilZEdycji(){var id=document.getElementById('edit-profile-select').value;var p=profileData[id];if(!p||p.builtin)return;if(!confirm('Usunąć uprawę „'+p.name+'”? Tej operacji nie można cofnąć.'))return;delete profileData[id];haptyka([30,30]);ustawStanPrzycisku('btn-delete-edit-prof',true,'🗑 Usuń tę uprawę','⏳ Usuwanie...');zapiszProfileNaESP().then(function(){renderujPrzyciskiProfili();odswiezListeEdycji();potwierdz('Usunięto: '+p.name);}).catch(function(){potwierdz('Usunięto lokalnie',false);}).finally(function(){ustawStanPrzycisku('btn-delete-edit-prof',false,'🗑 Usuń tę uprawę');});}
-function zapiszEdytowanyProfil(){if(lockConfig)return;lockConfig=true;haptyka(15);var id=document.getElementById('edit-profile-select').value;profileData[id].th=parseInt(document.getElementById('edit-th').value);profileData[id].time=parseFloat(document.getElementById('edit-time').value);profileData[id].aggr=parseInt(document.getElementById('edit-aggr').value);ustawStanPrzycisku('btn-save-profile',true,"💾 Zapisz zmiany","⏳ Zapis...");zapiszProfileNaESP().then(function(){return espFetch('/save?thPct='+profileData[id].th+'&timeSec='+(profileData[id].time*60)+'&aggr='+profileData[id].aggr);}).then(function(){renderujPrzyciskiProfili();potwierdz('Zapisano: '+profileData[id].name);}).catch(function(){potwierdz('Offline',false);}).finally(function(){lockConfig=false;ustawStanPrzycisku('btn-save-profile',false,"💾 Zapisz zmiany");});}
-// PROGI ALARMÓW
-function zapiszProgiAlarmow(){var b=document.getElementById('al-batt').value,t=document.getElementById('al-temp').value;localStorage.setItem('progiAlarmow',JSON.stringify({batt:b,temp:t}));}
-function wczytajProgiAlarmow(){var c=localStorage.getItem('progiAlarmow');if(c){var p=JSON.parse(c);document.getElementById('al-batt').value=p.batt;document.getElementById('al-batt-val').innerText=p.batt+'%';document.getElementById('al-temp').value=p.temp;document.getElementById('al-temp-val').innerText=p.temp+'°C';}}
-
-// POBIERANIE DANYCH
-var lastFetchMs=0;
-function pobierzDaneZESP32(){if(Date.now()-lastFetchMs<500)return;lastFetchMs=Date.now();espFetch('/data',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){lastDataCache=d;localStorage.setItem('lastESPData',JSON.stringify({data:d,timestamp:Date.now()}));renderujDane(d,Date.now(),IS_DEMO);ustawPolaczenie(true,Date.now(),d.free_heap);}).catch(function(){var c=localStorage.getItem('lastESPData');if(c){var p=JSON.parse(c);renderujDane(p.data,p.timestamp,true);}ustawPolaczenie(false);});}
-
-function ustawPolaczenie(ok,ts,heap){
-  var dot=document.getElementById('conn-dot');
-  if(dot)dot.className='conn-dot'+(ok?'':' off');
-  var cs=document.getElementById('conn-status');if(cs)cs.innerText=ok?'Połączono 🟢':'Brak połączenia 🔴';
-  var cl=document.getElementById('conn-last');if(cl&&ts)cl.innerText='przed chwilą';
-  var ch=document.getElementById('conn-heap');if(ch&&heap)ch.innerText=(heap/1024).toFixed(1)+' KB';
-}
-
-function formatMin(m){if(m===undefined||isNaN(m))return'--:--';return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
-function formatCzas(sec){if(!sec)return'--';var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);if(h>0)return h+'h '+(m>0?m+'min':'');return m+' min';}
-function obliczWilgotnosc(d){if(d.raw_adc===undefined||d.air_val===undefined||d.water_val===undefined){if(d.logs&&d.logs.length)return d.logs[d.logs.length-1].moisture;return null;}var pct=(d.raw_adc-d.air_val)/(d.water_val-d.air_val)*100;return Math.max(0,Math.min(100,Math.round(pct)));}
-
-var ALARM_HERO={2:{icon:'⚠️',txt:'Wystąpił pusty zbiornik',k:'var(--accent-orange)'},6:{icon:'🔥',txt:'Wystąpiła awaria pompy',k:'var(--accent-red)'},8:{icon:'🔋',txt:'Wystąpiła słaba bateria',k:'var(--accent-orange)'}};
-function aktualizujStatusHero(d){
-  var hI=document.getElementById("hero-icon"),hT=document.getElementById("hero-text"),uB=document.getElementById("fault-unlock-btn"),pC=document.getElementById("plants-container"),pT=document.getElementById("plants-title");
-  uB.style.display="none";pC.style.display="flex";pT.style.display="block";hI.classList.remove("pulse-alert");
-  var progi=JSON.parse(localStorage.getItem('progiAlarmow')||'{"batt":20,"temp":35}');
-  var battPct=d.voltage?Math.max(0,Math.min(100,Math.round(((d.voltage-11.5)/2.1)*100))):100;
-  // 1) Stan BIEŻĄCY ma najwyższy priorytet
-  if(d.fault===1){hI.innerText="🔥";hI.classList.add("pulse-alert");hT.innerText="AWARIA POMPY!";hT.style.color="var(--accent-red)";uB.style.display="block";pC.style.display="none";pT.style.display="none";return;}
-  if(d.water==="EMPTY"){hI.innerText="⚠️";hI.classList.add("pulse-alert");hT.innerText="Dolej wody do beczki!";hT.style.color="var(--accent-red)";return;}
-  if(battPct<progi.batt){hI.innerText="🔋";hI.classList.add("pulse-alert");hT.innerText="Niski poziom baterii";hT.style.color="var(--accent-orange)";return;}
-  if(d.temp!==undefined&&d.temp>progi.temp){hI.innerText="🌡️";hI.classList.add("pulse-alert");hT.innerText="Wysoka temperatura";hT.style.color="var(--accent-orange)";return;}
-  // 2) Stan bieżący OK, ale są NIEOBSŁUŻONE zdarzenia z przeszłości
-  if(nieobsluzoneAlarmy&&nieobsluzoneAlarmy.length>0){
-    var najwazniejszy=nieobsluzoneAlarmy.slice().sort(function(a,b){var rank={6:3,2:2,8:1};return (rank[b.type]||0)-(rank[a.type]||0);})[0];
-    var info=ALARM_HERO[najwazniejszy.type]||{icon:'🔔',txt:'Wystąpiło zdarzenie',k:'var(--accent-orange)'};
-    hI.innerText=info.icon;
-    hT.innerText=(nieobsluzoneAlarmy.length>1?'Zdarzenia pod nieobecność ('+nieobsluzoneAlarmy.length+')':info.txt);
-    hT.style.color=info.k;
-    return;
-  }
-  // 3) Wszystko czyste
-  hI.innerText="🌿";hT.innerText="Wszystko w porządku";hT.style.color="var(--accent-green)";
-}
-function renderujDane(d,timestamp,demo){
-  document.getElementById("dash-temp").innerText=(d.temp!==undefined)?d.temp.toFixed(1)+"°":"-";
-  document.getElementById("dash-hum").innerText=(d.air_hum!==undefined)?d.air_hum.toFixed(0)+"%":"-";
-  document.getElementById("dash-pres").innerText=(d.pressure>0)?d.pressure.toFixed(0)+" hPa":"-";
-  document.getElementById("dash-water-temp").innerText=(d.water_temp>0)?d.water_temp.toFixed(1)+"°":"-";
-  document.getElementById("dash-sun").innerText=(d.sun_hours!==undefined)?d.sun_hours+" h":"-";
-  document.getElementById("dash-sunrise").innerText=formatMin(d.sr);
-  document.getElementById("dash-sunset").innerText=formatMin(d.ss);
-
-  if(d.voltage){var bp=Math.max(0,Math.min(100,Math.round(((d.voltage-11.5)/2.1)*100)));document.getElementById("dash-batt").innerText=bp+"%";}
-
-  // WILGOTNOŚĆ GLEBY (pasek)
-  var moist=obliczWilgotnosc(d);
-  if(moist!==null){
-    document.getElementById('moist-pct').innerText=moist+'%';
-    document.getElementById('moist-fill').style.width=moist+'%';
-    var th=d.cfg_th||45;
-    document.getElementById('moist-thresh').style.left=th+'%';
-    document.getElementById('moist-info').innerText='Próg podlewania: '+th+'%';
-    document.getElementById('moist-fill').style.background=moist<th?'linear-gradient(90deg,#ff9f0a,#ff6b22)':'linear-gradient(90deg,#5ac8fa,var(--accent-blue))';
-  }
-
-  // NASTĘPNE SPRAWDZENIE
-  if(d.next_check_sec!==undefined)document.getElementById('next-check').innerText='Następne sprawdzenie za ok. '+formatCzas(d.next_check_sec);
-
-  // WODA
-  if(d.us_dist!==undefined&&d.us_max&&d.us_min){
-    var pct=Math.max(0,Math.min(100,Math.round(100-(((d.us_dist-d.us_min)/(d.us_max-d.us_min))*100))));
-    var liters=(pct/100)*(d.tank_vol||220);
-    document.getElementById("water-height-controller").style.bottom=(-800+(120*(pct/100)))+"px";
-    document.getElementById("dash-water-pct").innerText=pct+"%";
-    document.getElementById("dash-water-liters").innerText=Math.round(liters)+" / "+(d.tank_vol||220)+" L";
-    var days=Math.floor(liters/12);
-    document.getElementById("dash-water-est").innerText=days>14?"Zapas na ponad 2 tyg.":"Wystarczy na ok. "+days+" dni";
-    document.getElementById("dash-water-pct").style.color=pct<=15?"var(--accent-red)":"var(--text-main)";
-    pct<=15?document.getElementById("tank-mask").classList.add("alert"):document.getElementById("tank-mask").classList.remove("alert");
-  }
-
-  // STATUS HERO
-  aktualizujStatusHero(d);
-
-  document.getElementById("last-update-text").innerText=(demo?"Demo":"Połączono");
-
-  // ADAPTACYJNY
-  if(d.adaptive_ready!==undefined){var card=document.getElementById("adaptive-card"),ready=d.adaptive_ready,rate=d.drying_rate||0;if(ready>=1){card.style.display="block";document.getElementById("adaptive-rate").innerText=rate.toFixed(1)+" %/h";document.getElementById("adaptive-bar").style.width=(ready/5*100)+"%";var st;if(ready<2){st="Uczenie się... ("+ready+"/5)";}else{var moist=obliczWilgotnosc(d),prog=d.cfg_th||45;if(moist!==null&&rate>0.05&&moist>prog){var hToThr=(moist-prog)/rate;st=(ready<5?"Aktywne":"✅ Nauczony")+" — pobudka za ~"+(hToThr<1?Math.round(hToThr*60)+" min":hToThr.toFixed(1)+" h");}else{st=(ready<5?"Aktywne ("+ready+"/5)":"✅ W pełni nauczony");}}document.getElementById("adaptive-status").innerText=st;}else card.style.display="none";}
-
-  renderujPrognoze(d);
-  aktualizujLiveKalibracje(d);
-  renderujThunTeaser();
-  wczytajStatystykiWody(d.pump_flow);
-}
-
-// PODLEJ TERAZ
-function podlejTeraz(){
-  var sec=180;
-  var sel=document.querySelector('.profile-btn.selected');
-  if(lastDataCache&&lastDataCache.cfg_time)sec=Math.round(lastDataCache.cfg_time*60);
-  if(!confirm('Podlać teraz przez '+Math.round(sec/60*10)/10+' min?'))return;
-  haptyka([30,30]);var b=document.getElementById('btn-water-now');b.disabled=true;b.innerText='🌊 Podlewanie...';
-  espFetch('/test?sec='+sec).then(function(r){if(!r.ok)throw 0;potwierdz('Podlewanie zakończone');}).catch(function(){potwierdz('Odmowa / brak wody',false);}).finally(function(){b.disabled=false;b.innerText='💧 Podlej teraz';if(!IS_DEMO)pobierzDaneZESP32();});
-}
-
-// PROGNOZA
-var PROGNOZA={1:{icon:'☀️',txt:'Słonecznie',k:'var(--accent-orange)'},2:{icon:'🌤️',txt:'Stabilna pogoda',k:'var(--accent-blue)'},3:{icon:'⛅',txt:'Zmienne warunki',k:'var(--text-sub)'},4:{icon:'🌧️',txt:'Możliwy deszcz',k:'var(--accent-blue)'},5:{icon:'⛈️',txt:'Nadchodzi burza',k:'var(--accent-red)'}};
-function renderujPrognoze(d){var card=document.getElementById('forecast-card');if(!d.forecast||!PROGNOZA[d.forecast]){card.style.display='none';return;}var p=PROGNOZA[d.forecast];card.style.display='block';document.getElementById('forecast-icon').innerText=p.icon;var t=document.getElementById('forecast-text');t.innerText=p.txt;t.style.color=p.k;if(d.press_trend!==undefined){var tr=d.press_trend,s=tr>0.5?'↑':(tr<-0.5?'↓':'→');document.getElementById('forecast-trend').innerText=s+' '+Math.abs(tr).toFixed(1)+' hPa';}document.getElementById('forecast-sub').innerText=(d.forecast>=4&&d.outdoors===1)?'Podlewanie może zostać wstrzymane':'Prognoza z trendu ciśnienia';}
-
-// ALARMY
-var ALARM_NAZWY={2:{txt:'Pusty zbiornik wody',icon:'⚠️'},6:{txt:'Awaria pompy',icon:'🔥'},8:{txt:'Słaba bateria',icon:'🔋'}};
-function wczytajAlarmy(){espFetch('/getAlarms',{cache:'no-store'}).then(function(r){return r.json();}).then(function(al){var np=al.filter(function(a){return a.ack===0;});nieobsluzoneAlarmy=np;var b=document.getElementById('alarm-banner'),l=document.getElementById('alarm-list');if(lastDataCache)aktualizujStatusHero(lastDataCache);if(np.length===0){b.style.display='none';return;}b.style.display='block';l.innerHTML='';np.slice().reverse().forEach(function(a){var info=ALARM_NAZWY[a.type]||{txt:'Zdarzenie',icon:'•'};var k=a.ts>1000000000?new Date(a.ts*1000).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';l.innerHTML+='<div style="font-size:12px;padding:4px 0">'+info.icon+' '+info.txt+' <span style="color:var(--text-sub)">'+k+'</span></div>';});}).catch(function(){});}
-function oznaczAlarmyPrzeczytane(){haptyka(15);nieobsluzoneAlarmy=[];if(lastDataCache)aktualizujStatusHero(lastDataCache);if(IS_DEMO){DEMO_ALARMS.forEach(function(a){a.ack=1;});document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');return;}fetch('/ackAlarms').then(function(){document.getElementById('alarm-banner').style.display='none';potwierdz('Wyczyszczono');});}
-// STATYSTYKI WODY + WYKRESY (z zakresem)
-function filtrujHistorie(hist){if(!hist)return[];var teraz=Math.floor(Date.now()/1000),granica=teraz-zakresDni*86400;var f=hist.filter(function(e){return e.ts>=granica||e.ts<1000000000;});return f.length?f:hist;}
-function wczytajStatystykiWody(pumpFlow){
-  espFetch('/getHistory',{cache:'no-store'}).then(function(r){return r.json();}).then(function(hist){
-    if(!hist||!hist.length)return;
-    var flow=pumpFlow||2.0,perDay={};
-    hist.forEach(function(e){if(!e.p||e.ts<1000000000)return;var k=new Date(e.ts*1000).toISOString().slice(0,10);perDay[k]=(perDay[k]||0)+(e.p/60)*flow;});
-    var dni=Object.keys(perDay).sort(),litry=dni.map(function(k){return perDay[k];});
-    var dzis=new Date().toISOString().slice(0,10);
-    document.getElementById('stat-today').innerText=(perDay[dzis]||0).toFixed(1)+' L';
-    document.getElementById('stat-week').innerText=dni.slice(-7).reduce(function(s,k){return s+perDay[k];},0).toFixed(0)+' L';
-    var avg=litry.length?litry.reduce(function(a,b){return a+b;},0)/litry.length:0;
-    document.getElementById('stat-avg').innerText=avg.toFixed(1)+' L';
-    rysujSlupki('waterChart',litry.slice(-14));
-    var box=document.getElementById('water-anomaly');
-    if(avg>0&&(perDay[dzis]||0)>avg*2.5&&litry.length>3){box.style.display='block';box.style.background='rgba(255,59,48,0.12)';box.style.color='var(--accent-red)';box.innerText='⚠️ Zużycie dziś znacznie wyższe — sprawdź wyciek';}else box.style.display='none';
-    var fhist=filtrujHistorie(hist);
-    var rs=getComputedStyle(document.documentElement);
-    rysujLinie('moistureChart',fhist.map(function(e){return e.m;}),rs.getPropertyValue('--accent-blue').trim()||'#007aff',0,100);
-    rysujLinie('tempChart',fhist.map(function(e){return e.t/10;}),rs.getPropertyValue('--accent-red').trim()||'#ff3b30',0,50);
-  }).catch(function(){});
-}
-function ustawZakres(d){zakresDni=d;['1','7','30'].forEach(function(x){document.getElementById('rng-'+x).classList.remove('active');});document.getElementById('rng-'+d).classList.add('active');haptyka(10);wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);}
-function rysujSlupki(id,dane){var c=document.getElementById(id);if(!c)return;var ctx=c.getContext('2d'),r=c.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,r.width,r.height);if(!dane.length)return;var max=Math.max.apply(null,dane.concat([1])),bw=(r.width-20)/dane.length,col=getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim()||'#007aff';dane.forEach(function(v,i){var h=(v/max)*(r.height-20),x=10+i*bw,y=r.height-10-h;ctx.fillStyle=col;if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x+2,y,Math.max(1,bw-4),h,3);ctx.fill();}else ctx.fillRect(x+2,y,Math.max(1,bw-4),h);});}
-function rysujLinie(id,arr,col,minV,maxV){var c=document.getElementById(id);if(!c)return;var ctx=c.getContext('2d'),r=c.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;ctx.scale(dpr,dpr);var dW=r.width-20,dH=r.height-20;ctx.clearRect(0,0,r.width,r.height);if(!arr.length)return;var sX=dW/Math.max(1,arr.length-1);ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.lineJoin='round';arr.forEach(function(v,i){var b=Math.max(minV,Math.min(v,maxV)),p=(b-minV)/(maxV-minV),x=10+i*sX,y=10+dH-p*dH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();}
-function eksportujCSV(){espFetch('/getHistory').then(function(r){return r.json();}).then(function(hist){if(!hist||!hist.length){potwierdz('Brak danych',false);return;}var csv='data:text/csv;charset=utf-8,Czas,Wilgotnosc_%,Temp_C,Wilg_pow_%,Napiecie_V,Pompa_s\n';hist.forEach(function(e){var d=e.ts>1000000000?new Date(e.ts*1000).toLocaleString('pl-PL'):'-';csv+=d+','+e.m+','+(e.t/10).toFixed(1)+','+e.h+','+(e.v/100).toFixed(2)+','+(e.p||0)+'\n';});var l=document.createElement('a');l.href=encodeURI(csv);l.download='szklarnia_historia.csv';document.body.appendChild(l);l.click();document.body.removeChild(l);potwierdz('Pobrano raport');}); }
-
-// NAWIGACJA
-function zmienZakladke(t){['pulpit','ustawienia'].forEach(function(i){document.getElementById('btn-'+i).classList.remove('active');document.getElementById('tab-'+i).classList.remove('active');});document.getElementById('btn-'+t).classList.add('active');document.getElementById('tab-'+t).classList.add('active');if(t==='ustawienia')setTimeout(function(){wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);},100);}
-function zmienPodzakladke(t){['ogolne','zaawansowane'].forEach(function(i){document.getElementById('btn-sub-'+i).classList.remove('active');document.getElementById('sub-'+i).classList.remove('active');});document.getElementById('btn-sub-'+t).classList.add('active');document.getElementById('sub-'+t).classList.add('active');}
-function zmienMotyw(m){['light','auto','dark'].forEach(function(i){document.getElementById('theme-'+i).classList.remove('active');});document.getElementById('theme-'+m).classList.add('active');if(m==='auto'){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('theme');}else{document.documentElement.setAttribute('data-theme',m);localStorage.setItem('theme',m);}setTimeout(function(){wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);},50);}
-function ustawLokalizacje(o){document.getElementById('loc-in').classList.remove('active');document.getElementById('loc-out').classList.remove('active');document.getElementById(o===1?'loc-out':'loc-in').classList.add('active');espFetch('/location?outdoors='+o);}
-function zresetujLicznikWody(){if(!confirm("Wyzerować licznik?"))return;espFetch('/resetWater').then(function(){potwierdz('Wyzerowano');});}
-function odblokujPompe(){if(!confirm("Odblokować?"))return;espFetch('/resetFault').then(function(){potwierdz('Odblokowano');});}
-function zapiszParametryZbiornika(){espFetch('/tank?vol='+document.getElementById('tank-vol').value+'&flow='+document.getElementById('pump-flow').value).then(function(){potwierdz('Zapisano parametry');});}
-function toggleServiceMode(){isServiceModeActive=!isServiceModeActive;document.getElementById('service-banner').style.display=isServiceModeActive?'block':'none';document.getElementById('btn-service-mode').innerText=isServiceModeActive?'Wyłącz Tryb Serwisowy':'Włącz Tryb Serwisowy';}
-
-// PULL TO REFRESH
-(function(){var startY=0,pulling=false,ptr=document.getElementById('ptr');
-window.addEventListener('touchstart',function(e){if(window.scrollY===0&&document.getElementById('tab-pulpit').classList.contains('active')&&!document.body.classList.contains('modal-open'))startY=e.touches[0].clientY;},{passive:true});
-window.addEventListener('touchmove',function(e){if(startY===0)return;var dy=e.touches[0].clientY-startY;if(dy>0&&dy<120){pulling=true;if(ptr){ptr.style.opacity=Math.min(1,dy/70);ptr.style.transform='translateX(-50%) translateY('+Math.min(dy,70)+'px)';}}},{passive:true});
-window.addEventListener('touchend',function(e){if(pulling){var dy=e.changedTouches[0].clientY-startY;if(dy>60){if(ptr){ptr.querySelector('svg').classList.add('ptr-spin');}pobierzDaneZESP32();setTimeout(function(){if(ptr){ptr.style.opacity=0;ptr.querySelector('svg').classList.remove('ptr-spin');}},800);}else if(ptr)ptr.style.opacity=0;}startY=0;pulling=false;});})();
-
-// BOOT
-(function(){var st=localStorage.getItem('theme');if(st)document.documentElement.setAttribute('data-theme',st);if(IS_DEMO)document.getElementById('demo-pill').style.display='block';wczytajProgiAlarmow();
-document.querySelectorAll('.profile-modal-bg').forEach(function(overlay){overlay.addEventListener('click',function(e){if(e.target===overlay){ukryjModal(overlay.id);}});});
-var ov=document.getElementById('boot-overlay'),s=document.getElementById('boot-status');function hide(){ov.style.opacity=0;setTimeout(function(){ov.style.display='none';},500);}function start(){wczytajProfileZESP();wczytajAlarmy();pobierzDaneZESP32();if(s)s.textContent='Gotowe!';setTimeout(hide,400);}
-if(IS_DEMO){if(s)s.textContent='Tryb demo...';setTimeout(function(){if(s)s.textContent='Ładowanie danych...';},700);setTimeout(start,1400);}
-else{if('serviceWorker'in navigator&&location.protocol!=='file:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}var att=0;(function tryC(){att++;if(att===2&&s)s.textContent='Łączenie...';fetch('/data',{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject();}).then(function(){start();}).catch(function(){if(att<8)setTimeout(tryC,700);else{if(s)s.textContent='Tryb offline';start();}});})();}
-})();
-window.addEventListener('resize',function(){wczytajStatystykiWody(lastDataCache?lastDataCache.pump_flow:2.0);});
-
-// ============ KALIBRACJA I NARZĘDZIA (przywrócone z oryginału) ============
-var liveSoil=0,liveUs=0,liveLight=0,lockCalib=false,lockAction=false;
-var stoperRunning=false,stoperStart=0,stoperInt=null;
-
-// Aktualizacja wartości live w renderujDane - wywoływana z głównego render
-function aktualizujLiveKalibracje(d){
-  liveSoil=d.raw_adc;liveUs=d.us_dist;liveLight=d.raw_light;
-  var s=document.getElementById('live-soil-val');if(s)s.innerText=liveSoil||'---';
-  var u=document.getElementById('live-us-val');if(u)u.innerText=(liveUs!==undefined?liveUs+' cm':'--- cm');
-  var l=document.getElementById('live-light-val');if(l)l.innerText=liveLight||'---';
-  var v=document.getElementById('eng-voltage');if(v&&d.voltage)v.innerText=d.voltage.toFixed(2)+' V';
-  if(d.t_off!==undefined){var t=document.getElementById('calib-tOff');if(t&&document.activeElement!==t)t.value=d.t_off;}
-  // menedżer urządzeń
-  if(d.hw){['us','ds','bme','light','vent'].forEach(function(k){var el=document.getElementById('hw-'+k);if(el)el.checked=d.hw[k]===1;});}
-  aktualizujLiveProcent(d);
-}
-
-function zapiszGlebe(typ){if(lockCalib)return;lockCalib=true;haptyka(15);var bid=(typ==='air')?'btn-soil-dry':'btn-soil-wet';ustawStanPrzycisku(bid,true,(typ==='air')?'SUCHO':'MOKRO');espFetch('/calibrate?'+typ+'='+liveSoil).then(function(){potwierdz('Skalibrowano glebę');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku(bid,false,(typ==='air')?'SUCHO':'MOKRO');});}
-function zapiszWode(typ){if(lockCalib)return;lockCalib=true;haptyka(15);var bid=(typ==='empty')?'btn-water-empty':'btn-water-full';var pk=(typ==='empty')?'usMax':'usMin';ustawStanPrzycisku(bid,true,(typ==='empty')?'PUSTA':'PEŁNA');espFetch('/calibrateExtras?'+pk+'='+liveUs).then(function(){potwierdz('Poziom beczki zapisany');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku(bid,false,(typ==='empty')?'PUSTA':'PEŁNA');});}
-function zapiszSwiatlo(){if(lockCalib)return;lockCalib=true;haptyka(15);ustawStanPrzycisku('btn-calib-light',true,'Ustaw jako SŁOŃCE (100%)');espFetch('/calibrateExtras?lMax='+liveLight).then(function(){potwierdz('Skalibrowano światłomierz');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku('btn-calib-light',false,'Ustaw jako SŁOŃCE (100%)');});}
-function zapiszKorekteTemp(){if(lockCalib)return;lockCalib=true;haptyka(15);var t=document.getElementById('calib-tOff').value;ustawStanPrzycisku('btn-calib-toff',true,'💾 Zapisz korektę','⏳ Zapis...');espFetch('/calibrateExtras?tOff='+t).then(function(){potwierdz('Zapisano przesunięcie');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockCalib=false;ustawStanPrzycisku('btn-calib-toff',false,'💾 Zapisz korektę');});}
-
-function saveHwConfig(){haptyka(15);var q='/hwConfig?us='+(document.getElementById('hw-us').checked?1:0)+'&ds='+(document.getElementById('hw-ds').checked?1:0)+'&bme='+(document.getElementById('hw-bme').checked?1:0)+'&light='+(document.getElementById('hw-light').checked?1:0)+'&vent='+(document.getElementById('hw-vent').checked?1:0);espFetch(q).then(function(){potwierdz('Zapisano sprzęt');if(!IS_DEMO)pobierzDaneZESP32();});}
-
-function toggleStoper(){var b=document.getElementById('btn-stoper'),d=document.getElementById('stopwatch-display'),r=document.getElementById('stoper-result');if(!stoperRunning){stoperStart=Date.now();stoperRunning=true;b.innerText='🛑 Zatrzymaj (mam 1 Litr)';b.style.background='var(--accent-red)';b.style.color='#fff';r.style.display='none';stoperInt=setInterval(function(){d.innerText=((Date.now()-stoperStart)/1000).toFixed(1)+'s';},100);haptyka(15);}else{clearInterval(stoperInt);stoperRunning=false;b.innerText='⏱ Asystent Kalibracji (1 Litr)';b.style.background='var(--accent-blue)';var f=(Date.now()-stoperStart)/1000,lpm=60/f;r.innerText='Wydajność pompy: '+lpm.toFixed(2)+' L/min';r.style.display='block';document.getElementById('pump-flow').value=lpm.toFixed(2);zapiszParametryZbiornika();haptyka([50,100,50]);}}
-
-function uruchomTest(){if(lockAction)return;lockAction=true;haptyka(15);var sec=document.getElementById('testSlider').value;ustawStanPrzycisku('btn-quick-test',true,'🚀 Uruchom Test','🌊 Praca pompy ('+sec+'s)...');espFetch('/test?sec='+sec).then(function(r){if(!r.ok)throw 0;potwierdz('Test pompy zakończony');}).catch(function(){potwierdz('Odmowa przekaźnika',false);}).finally(function(){lockAction=false;ustawStanPrzycisku('btn-quick-test',false,'🚀 Uruchom Test');if(!IS_DEMO)pobierzDaneZESP32();});}
-
-function wypompujWode(){if(lockAction)return;haptyka([50,50,50]);if(!confirm('Wymusić opróżnianie węży?'))return;lockAction=true;ustawStanPrzycisku('btn-wypompuj',true,'❄️ Wypompuj resztki wody z węży','🌊 Pompowanie...');espFetch('/drain').then(function(){potwierdz('Układ opróżniony');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd',false);}).finally(function(){lockAction=false;ustawStanPrzycisku('btn-wypompuj',false,'❄️ Wypompuj resztki wody z węży');});}
-function aktywujHibernacje(){if(lockAction)return;haptyka([100,100,100]);if(!confirm('Uśpić urządzenie na zimę?'))return;lockAction=true;espFetch('/hibernate').then(function(){potwierdz('Urządzenie uśpione');}).finally(function(){lockAction=false;});}
-
-function wgrywajOTA(){var f=document.getElementById('ota-file').files[0];if(!f||!f.name.endsWith('.bin')){potwierdz('Wybierz plik .bin',false);return;}if(IS_DEMO){potwierdz('OTA niedostępne w demo',false);return;}haptyka([20,50,20]);var s=document.getElementById('ota-status'),bar=document.getElementById('ota-progress-bar');s.innerText='Łączenie...';document.getElementById('ota-progress-container').style.display='block';bar.style.width='0%';var fd=new FormData();fd.append('update',f,f.name);var xhr=new XMLHttpRequest();xhr.open('POST','/update',true);xhr.upload.addEventListener('progress',function(e){if(e.lengthComputable){var p=Math.round(e.loaded/e.total*100);bar.style.width=p+'%';s.innerText='Przesyłanie: '+p+'%';}});xhr.onload=function(){if(xhr.status===200){s.innerText='✅ Sukces! Restart...';bar.style.background='var(--accent-green)';haptyka([50,100,50]);}else s.innerText='❌ Błąd';};xhr.send(fd);}
-
-
-// Baza ogrodnicza - klimat Polski (strefa 6, Polska centralna)
-// Miesiące 1-12. Szklarnia zwykle 2-4 tyg wcześniej dla siewu/sadzenia.
-// Kalendarz biodynamiczny Marii Thun 2026 - dane z książki "Dni Siewu" (zdjęcia użytkownika)
-// typ dnia: L=liść, O=owoc, K=korzeń, W=kwiat(Blüte), -=brak/niekorzystny
-// okresy: lista [{od:godzina_od, typ:'L'}] - typ obowiązuje OD tej godziny
-// prognoza: litery B/K/T/V/W (wskaźniki z kolumny Prognoza)
-// sadz: true jeśli dzień objęty zielonym paskiem "czas sadzenia"
-var THUN = {
- "2026-01": {
-  1:{ok:[{od:0,t:'K'}],swieto:"św. Bożej Rodzicielki",prog:"TB",uwaga:"korzeń do 10"},
-  2:{ok:[{od:12,t:'K'},{od:14,t:'W'}],sadz:true,uwaga:"12-13 korzeń, od 14 kwiat; pocz. sadz. 10"},
-  3:{ok:[{od:0,t:'W'}],sadz:true,prog:"KBW"},
-  4:{ok:[{od:0,t:'W'},{od:11,t:'L'}],sadz:true,prog:"KB",uwaga:"kwiat do 10, od 11 liść"},
-  5:{ok:[{od:0,t:'L'},{od:23,t:'O'}],sadz:true,prog:"K",uwaga:"liść do 22, od 23 owoc"},
-  6:{ok:[{od:0,t:'O'}],sadz:true,swieto:"Trzech Króli"},
-  7:{ok:[{od:0,t:'O'},{od:17,t:'O'}],sadz:true,prog:"KT",uwaga:"owoc do 8, owoc od 17"},
-  8:{ok:[{od:0,t:'O'},{od:14,t:'K'}],sadz:true,uwaga:"owoc do 13, od 14 korzeń"},
-  9:{ok:[{od:0,t:'K'}],sadz:true},
-  10:{ok:[{od:0,t:'K'}],sadz:true,prog:"B"},
-  11:{ok:[{od:0,t:'K'}],prog:"K"},
-  12:{ok:[{od:0,t:'K'},{od:8,t:'W'}],uwaga:"korzeń do 7, od 8 kwiat"},
-  13:{ok:[{od:0,t:'W'},{od:20,t:'W'}],prog:"KT",uwaga:"kwiat do 19, od 20 Ag kwiat"},
-  14:{ok:[{od:0,t:'W'},{od:2,t:'L'}],uwaga:"Ag kwiat do 1, od 2 liść"},
-  15:{ok:[{od:0,t:'L'}]},
-  16:{ok:[{od:0,t:'L'},{od:11,t:'O'}],uwaga:"liść do 10, od 11 owoc; koniec czasu sadz. 6"},
-  17:{ok:[{od:0,t:'O'}]},
-  18:{ok:[{od:0,t:'O'},{od:21,t:'K'}],uwaga:"owoc do 20, od 21 korzeń"},
-  19:{ok:[{od:0,t:'K'}]},
-  20:{ok:[{od:0,t:'K'}]},
-  21:{ok:[{od:0,t:'K'},{od:2,t:'W'}],uwaga:"korzeń do 1, od 2 do 20 kwiat"},
-  22:{ok:[{od:5,t:'W'}],uwaga:"od 5 do 23 kwiat"},
-  23:{ok:[{od:0,t:'L'}],uwaga:"liść od 0"},
-  24:{ok:[{od:0,t:'L'}]},
-  25:{ok:[{od:0,t:'L'},{od:19,t:'O'}],uwaga:"liść do 18, od 19 owoc"},
-  26:{ok:[{od:0,t:'O'}]},
-  27:{ok:[{od:0,t:'O'},{od:12,t:'K'}],uwaga:"owoc do 11, od 12 korzeń"},
-  28:{ok:[{od:0,t:'K'}],prog:"W"},
-  29:{ok:[{od:0,t:'K'}],sadz:true,prog:"T",uwaga:"korzeń do 10; pocz. czasu sadz. 19"},
-  30:{ok:[{od:12,t:'W'}],sadz:true,uwaga:"od 12 kwiat"},
-  31:{ok:[{od:0,t:'W'},{od:22,t:'L'}],sadz:true,uwaga:"kwiat do 21, od 22 liść"}
-  },
- "2026-02": {
-  1:{ok:[{od:0,t:'L'}],sadz:true},
-  2:{ok:[{od:0,t:'L'},{od:9,t:'O'}],sadz:true,prog:"W",swieto:"Matki Bożej Gromnicznej",uwaga:"liść do 8, od 9 owoc"},
-  3:{ok:[{od:0,t:'O'}],sadz:true,prog:"TW",uwaga:"owoc do 16"},
-  4:{ok:[{od:1,t:'O'},{od:23,t:'K'}],sadz:true,prog:"TW",uwaga:"od 1 do 22 owoc, od 23 korzeń"},
-  5:{ok:[{od:0,t:'K'}],sadz:true,prog:"TB"},
-  6:{ok:[{od:0,t:'K'}],sadz:true},
-  7:{ok:[{od:0,t:'K'}],sadz:true,prog:"W"},
-  8:{ok:[{od:0,t:'K'},{od:16,t:'W'}],prog:"B",uwaga:"korzeń do 15, od 16 kwiat"},
-  9:{ok:[{od:0,t:'W'}]},
-  10:{ok:[{od:0,t:'W'},{od:4,t:'L'},{od:9,t:'W'},{od:22,t:'L'}],uwaga:"kwiat-3, 4-8 liść, 9-21 Ag kwiat, od 22 liść"},
-  11:{ok:[{od:0,t:'L'}],prog:"W"},
-  12:{ok:[{od:0,t:'L'},{od:19,t:'O'}],prog:"TVW",uwaga:"liść do 18, od 19 owoc; koniec cz.sadz. 13"},
-  13:{ok:[{od:0,t:'O'}],prog:"T",uwaga:"owoc do 19"},
-  14:{ok:[],uwaga:"dzień niekorzystny"},
-  15:{ok:[{od:9,t:'K'}],uwaga:"od 9 korzeń"},
-  16:{ok:[{od:0,t:'K'},{od:22,t:'W'}],prog:"KB",uwaga:"korzeń do 16, od 22 kwiat"},
-  17:{ok:[{od:0,t:'W'},{od:3,t:'K'},{od:10,t:'W'}],uwaga:"kwiat do 2, 3-9 korzeń, od 10 kwiat"},
-  18:{ok:[{od:0,t:'W'},{od:12,t:'W'}],prog:"V",uwaga:"kwiat do 3, kwiat od 12 do 21"},
-  19:{ok:[{od:3,t:'W'},{od:7,t:'L'}],prog:"WV",uwaga:"kwiat od 3 do 6, od 7 liść"},
-  20:{ok:[{od:0,t:'L'}],prog:"W"},
-  21:{ok:[{od:0,t:'L'}],uwaga:"liść do 23"},
-  22:{ok:[{od:0,t:'O'},{od:9,t:'W'}],prog:"KB",uwaga:"owoc od 0 do 8, od 9 do 24 kwiat"},
-  23:{ok:[{od:1,t:'O'},{od:17,t:'K'}],uwaga:"owoc od 1 do 16, od 17 korzeń"},
-  24:{ok:[{od:0,t:'K'}],uwaga:"korzeń do 12"},
-  25:{ok:[{od:14,t:'W'}],prog:"V",uwaga:"od 14 kwiat"},
-  26:{ok:[{od:0,t:'W'}],sadz:true,prog:"V",uwaga:"kwiat; początek czasu sadzenia 2"},
-  27:{ok:[{od:0,t:'W'}],sadz:true,prog:"B"},
-  28:{ok:[{od:0,t:'W'},{od:6,t:'L'}],sadz:true,uwaga:"kwiat do 5, od 6 liść"}
-  },
- "2026-03": {
-  1:{ok:[{od:0,t:'L'},{od:18,t:'O'}],sadz:true,prog:"V",uwaga:"liść do 17, od 18 owoc"},
-  2:{ok:[{od:0,t:'O'}],sadz:true,prog:"W"},
-  3:{ok:[{od:0,t:'O'},{od:10,t:'O'}],sadz:true,uwaga:"owoc do 1, owoc od 10"},
-  4:{ok:[{od:0,t:'O'},{od:9,t:'K'}],sadz:true,prog:"V",uwaga:"owoc do 8, od 9 korzeń"},
-  5:{ok:[{od:0,t:'K'},{od:6,t:'W'},{od:22,t:'K'}],sadz:true,uwaga:"korzeń do 5, 6-21 kwiat, od 22 korzeń"},
-  6:{ok:[{od:0,t:'K'}],sadz:true,prog:"KB"},
-  7:{ok:[{od:0,t:'K'}],sadz:true,uwaga:"korzeń do 24"},
-  8:{ok:[{od:1,t:'W'}],sadz:true,prog:"KB",uwaga:"kwiat od 1, od 19 bardzo korzystny"},
-  9:{ok:[{od:0,t:'W'},{od:13,t:'L'}],sadz:true,uwaga:"kwiat do 12, do 10 b.korz., od 13 liść"},
-  10:{ok:[{od:0,t:'L'},{od:6,t:'W'},{od:19,t:'L'}],sadz:true,prog:"V",uwaga:"liść do 5, 6-18 Ag kwiat, od 19 liść"},
-  11:{ok:[{od:0,t:'L'}],sadz:true,uwaga:"liść; koniec czasu sadzenia 21"},
-  12:{ok:[{od:0,t:'L'},{od:3,t:'O'}],uwaga:"liść do 2, od 3 owoc"},
-  13:{ok:[{od:0,t:'O'}]},
-  14:{ok:[{od:0,t:'O'},{od:14,t:'K'}],prog:"V",uwaga:"owoc do 13, od 14 korzeń"},
-  15:{ok:[{od:0,t:'K'}]},
-  16:{ok:[{od:0,t:'K'},{od:19,t:'W'}],prog:"V",uwaga:"korzeń do 18, od 19 kwiat"},
-  17:{ok:[{od:0,t:'W'},{od:21,t:'W'}],prog:"B",uwaga:"kwiat do 12, kwiat od 21"},
-  18:{ok:[{od:0,t:'W'},{od:15,t:'L'}],prog:"W",uwaga:"kwiat do 14, od 15 liść"},
-  19:{ok:[{od:0,t:'L'}]},
-  20:{ok:[{od:0,t:'L'}],prog:"KV"},
-  21:{ok:[{od:0,t:'L'},{od:8,t:'O'},{od:13,t:'W'}],uwaga:"liść do 7, 8-12 owoc, 13-24 kwiat"},
-  22:{ok:[],sadz:true,prog:"KB",uwaga:"dzień przejściowy"},
-  23:{ok:[{od:2,t:'K'}],sadz:true,uwaga:"od 2 korzeń"},
-  24:{ok:[{od:0,t:'K'}],sadz:true,prog:"B",uwaga:"korzeń do 1"},
-  25:{ok:[{od:15,t:'W'}],sadz:true,uwaga:"od 15 kwiat; pocz. czasu sadz. 7"},
-  26:{ok:[{od:0,t:'W'}],sadz:true,prog:"W"},
-  27:{ok:[{od:0,t:'W'},{od:12,t:'L'}],sadz:true,uwaga:"kwiat do 11, od 12 liść"},
-  28:{ok:[{od:0,t:'L'}],sadz:true,prog:"V",uwaga:"liść do 24"},
-  29:{ok:[{od:1,t:'O'}],sadz:true,uwaga:"owoc od 1 (zmiana czasu na letni)"},
-  30:{ok:[{od:0,t:'O'},{od:17,t:'O'}],uwaga:"owoc do 8, owoc od 17"},
-  31:{ok:[{od:0,t:'O'},{od:18,t:'K'}],uwaga:"owoc do 17, od 18 korzeń"}
-  },
- "2026-04": {
-  1:{ok:[{od:0,t:'K'}],sadz:true},
-  2:{ok:[{od:0,t:'K'}],sadz:true,prog:"K",uwaga:"korzeń do 24"},
-  3:{ok:[],sadz:true,prog:"B",swieto:"Wielki Piątek"},
-  4:{ok:[],sadz:true,prog:"KVB",swieto:"Wielka Sobota"},
-  5:{ok:[{od:0,t:'W'},{od:21,t:'L'}],sadz:true,swieto:"Wielkanoc",uwaga:"kwiat od wsch. słońca do 20, od 21 liść"},
-  6:{ok:[{od:0,t:'L'}],sadz:true,prog:"TW",swieto:"Pon. Wielkanocny"},
-  7:{ok:[{od:0,t:'L'},{od:2,t:'W'},{od:15,t:'L'}],sadz:true,prog:"KV",uwaga:"liść do 1, 2-14 Ag kwiat, od 15 liść"},
-  8:{ok:[{od:0,t:'L'},{od:12,t:'O'}],sadz:true,uwaga:"liść do 11, od 12 owoc; koniec cz.sadz. 6"},
-  9:{ok:[{od:0,t:'O'}],uwaga:"owoc do 23"},
-  10:{ok:[],prog:"W"},
-  11:{ok:[{od:21,t:'K'}],uwaga:"od 21 korzeń"},
-  12:{ok:[{od:0,t:'K'}]},
-  13:{ok:[{od:0,t:'K'},{od:5,t:'W'}],prog:"B",uwaga:"korzeń do 4, od 5 do 21 kwiat"},
-  14:{ok:[{od:6,t:'W'}],prog:"T",uwaga:"od 6 kwiat"},
-  15:{ok:[{od:0,t:'W'},{od:2,t:'L'}],prog:"W",uwaga:"kwiat do 1, od 2 liść"},
-  16:{ok:[{od:0,t:'L'}]},
-  17:{ok:[{od:0,t:'L'},{od:18,t:'O'}],uwaga:"liść do 17, od 18 owoc"},
-  18:{ok:[{od:0,t:'O'}],prog:"W",uwaga:"owoc do 20"},
-  19:{ok:[{od:22,t:'K'}],uwaga:"od 22 korzeń"},
-  20:{ok:[{od:0,t:'K'}]},
-  21:{ok:[{od:0,t:'K'},{od:19,t:'W'}],sadz:true,uwaga:"korzeń do 18, od 19 kwiat; pocz.sadz. 14"},
-  22:{ok:[{od:0,t:'W'}],sadz:true},
-  23:{ok:[{od:0,t:'W'},{od:18,t:'L'}],sadz:true,prog:"B",uwaga:"kwiat do 17, od 18 liść"},
-  24:{ok:[{od:0,t:'L'}],sadz:true},
-  25:{ok:[{od:0,t:'L'},{od:7,t:'O'}],sadz:true,prog:"V",uwaga:"liść do 6, od 7 owoc"},
-  26:{ok:[{od:0,t:'O'},{od:21,t:'O'}],prog:"KVW",uwaga:"owoc do 12, owoc od 21"},
-  27:{ok:[{od:0,t:'O'}],prog:"W",uwaga:"owoc do 23"},
-  28:{ok:[{od:0,t:'K'}],uwaga:"korzeń od 0, 12-22 bardzo korzystny"},
-  29:{ok:[{od:0,t:'K'}],prog:"TB"},
-  30:{ok:[{od:0,t:'K'}],prog:"B"}
-  },
- "2026-05": {
-  1:{ok:[{od:0,t:'K'},{od:16,t:'W'}],prog:"KV",uwaga:"korzeń do 16, od 16 kwiat"},
-  2:{ok:[{od:0,t:'W'}]},
-  3:{ok:[{od:0,t:'W'},{od:4,t:'L'}],uwaga:"kwiat do 3, od 4 liść"},
-  4:{ok:[{od:0,t:'L'},{od:5,t:'L'},{od:19,t:'O'}],prog:"V",uwaga:"Ag kwiat 4-5, 19 liść, od 19 owoc"},
-  5:{ok:[{od:0,t:'O'}],prog:"W"},
-  6:{ok:[{od:0,t:'O'},{od:7,t:'K'}],uwaga:"owoc do 6, od 7 korzeń"},
-  7:{ok:[{od:0,t:'K'}],prog:"K"},
-  8:{ok:[{od:0,t:'K'},{od:6,t:'W'}],prog:"V",uwaga:"korzeń do 5, od 6 kwiat"},
-  9:{ok:[{od:0,t:'W'}],prog:"T",uwaga:"kwiat"},
-  10:{ok:[{od:0,t:'W'},{od:14,t:'L'}],uwaga:"kwiat do 13, od 14 liść"},
-  11:{ok:[{od:0,t:'L'}]},
-  12:{ok:[{od:0,t:'L'},{od:2,t:'O'},{od:11,t:'O'}],prog:"KTB",uwaga:"liść do 2, owoc od 11"},
-  13:{ok:[{od:0,t:'O'}]},
-  14:{ok:[{od:0,t:'O'},{od:4,t:'K'}],uwaga:"owoc do 4, od 4 korzeń"},
-  15:{ok:[{od:0,t:'K'},{od:13,t:'W'}],sadz:true,prog:"V",uwaga:"korzeń do 13, od 14 kwiat"},
-  16:{ok:[{od:0,t:'W'}],sadz:true,prog:"KTB",uwaga:"kwiat"},
-  17:{ok:[{od:0,t:'W'},{od:11,t:'L'}],sadz:true,uwaga:"kwiat do 10, od 11 liść"},
-  18:{ok:[{od:0,t:'L'},{od:4,t:'O'},{od:19,t:'O'}],sadz:true,uwaga:"liść do 3, od 4 owoc; od 19 owoc"},
-  19:{ok:[{od:0,t:'O'},{od:8,t:'K'}],sadz:true,prog:"V",uwaga:"owoc do 8, od 9 korzeń"},
-  20:{ok:[{od:0,t:'K'}],sadz:true,prog:"K"},
-  21:{ok:[{od:0,t:'K'}],sadz:true,prog:"KTB"},
-  22:{ok:[{od:0,t:'K'},{od:14,t:'W'}],sadz:true,prog:"V",uwaga:"korzeń do 13, od 14 kwiat"},
-  23:{ok:[{od:5,t:'W'}],sadz:true,uwaga:"od 5 do 23 kwiat; pocz. cz.sadz. 23"},
-  24:{ok:[{od:0,t:'W'},{od:4,t:'L'}],sadz:true,uwaga:"kwiat do 4, od 4 liść"},
-  25:{ok:[{od:0,t:'L'},{od:8,t:'O'}],sadz:true,prog:"WT",uwaga:"liść do 8, od 8 owoc"},
-  26:{ok:[{od:0,t:'O'}],sadz:true,prog:"KT",uwaga:"owoc"},
-  27:{ok:[{od:0,t:'O'},{od:6,t:'K'}],sadz:true,prog:"VW",uwaga:"owoc do 6, od 6 korzeń"},
-  28:{ok:[{od:0,t:'K'}],sadz:true},
-  29:{ok:[{od:0,t:'K'}],swieto:"Boże Ciało (uwaga: w książce 4 Cz)"},
-  30:{ok:[{od:0,t:'K'},{od:7,t:'W'}],uwaga:"korzeń do 6, od 7 kwiat"},
-  31:{ok:[{od:0,t:'W'}]}
-  },
- "2026-06": {
-  1:{ok:[{od:0,t:'W'},{od:11,t:'L'}],sadz:true,prog:"VT",uwaga:"Ag kwiat do 10, 11-24 liść; koniec czasu sadzenia 18"},
-  2:{ok:[{od:0,t:'O'}],prog:"B"},
-  3:{ok:[{od:0,t:'O'}]},
-  4:{ok:[{od:0,t:'O'},{od:14,t:'K'}],swieto:"Boże Ciało"},
-  5:{ok:[{od:0,t:'K'}],prog:"T"},
-  6:{ok:[{od:0,t:'K'},{od:21,t:'W'}],prog:"K"},
-  7:{ok:[{od:0,t:'W'}],prog:"KTBW"},
-  8:{ok:[{od:0,t:'W'},{od:20,t:'L'}]},
-  9:{ok:[{od:0,t:'L'}]},
-  10:{ok:[{od:0,t:'L'}]},
-  11:{ok:[{od:0,t:'L'},{od:14,t:'O'}],prog:"W"},
-  12:{ok:[{od:0,t:'O'}],prog:"V"},
-  13:{ok:[{od:0,t:'O'},{od:6,t:'K'}],prog:"W"},
-  14:{ok:[{od:0,t:'K'}],sadz:true,prog:"TB",uwaga:"korzeń do 12"},
-  15:{ok:[{od:14,t:'W'}],sadz:true,prog:"K",uwaga:"od 14 kwiat; pocz. czasu sadzenia 9"},
-  16:{ok:[{od:0,t:'W'},{od:23,t:'L'}],sadz:true,prog:"K",uwaga:"kwiat do 22, od 23 liść"},
-  17:{ok:[{od:0,t:'L'},{od:11,t:'L'}],sadz:true,uwaga:"liść do 9, 11-19 liść"},
-  18:{ok:[{od:0,t:'L'},{od:22,t:'O'}],sadz:true,uwaga:"liść od 1 do 21, od 22 owoc"},
-  19:{ok:[{od:0,t:'O'}],sadz:true,uwaga:"owoc do 15"},
-  20:{ok:[{od:0,t:'O'}],sadz:true,prog:"V",uwaga:"owoc od 0 do 2"},
-  21:{ok:[{od:16,t:'K'}],sadz:true,uwaga:"od 16 korzeń"},
-  22:{ok:[{od:0,t:'K'}],sadz:true},
-  23:{ok:[{od:0,t:'K'}],sadz:true},
-  24:{ok:[{od:0,t:'K'}],sadz:true,swieto:"św. Jana",prog:"W"},
-  25:{ok:[{od:0,t:'K'},{od:4,t:'W'},{od:7,t:'L'},{od:18,t:'W'}],sadz:true,prog:"KT",uwaga:"korzeń-3, 4-6 kwiat, 7-17 liść, od 18 kwiat"},
-  26:{ok:[{od:0,t:'W'},{od:17,t:'L'}],sadz:true,prog:"W",uwaga:"kwiat do 16, od 17 liść"},
-  27:{ok:[{od:0,t:'L'}],sadz:true,uwaga:"liść do 23"},
-  28:{ok:[{od:0,t:'W'},{od:13,t:'L'}],sadz:true,uwaga:"Ag kwiat 0-12, od 13 liść; koniec czasu sadzenia 23"},
-  29:{ok:[{od:0,t:'L'},{od:7,t:'O'}],prog:"T",uwaga:"liść do 6, od 7 owoc"},
-  30:{ok:[{od:0,t:'O'}]}
-  },
- "2026-07": {
-  1:{ok:[{od:0,t:'O'},{od:19,t:'K'}],prog:"B",uwaga:"owoc do 18, od 19 korzeń"},
-  2:{ok:[{od:0,t:'K'}]},
-  3:{ok:[{od:0,t:'K'}]},
-  4:{ok:[{od:0,t:'K'},{od:3,t:'W'},{od:14,t:'W'}],uwaga:"korzeń-2, 3-5 kwiat, kwiat od 14"},
-  5:{ok:[{od:0,t:'W'},{od:3,t:'K'},{od:19,t:'W'}],uwaga:"kwiat do 2, 3-18 korzeń, od 19 kwiat"},
-  6:{ok:[{od:0,t:'W'},{od:2,t:'L'}],prog:"W",uwaga:"kwiat do 1, od 2 liść"},
-  7:{ok:[{od:0,t:'L'}]},
-  8:{ok:[{od:0,t:'L'},{od:22,t:'O'}],prog:"T",uwaga:"liść do 21, od 22 owoc"},
-  9:{ok:[{od:0,t:'O'}],prog:"W"},
-  10:{ok:[{od:0,t:'O'},{od:15,t:'K'}],uwaga:"owoc do 14, od 15 korzeń"},
-  11:{ok:[{od:0,t:'K'}],prog:"B"},
-  12:{ok:[{od:0,t:'K'}],sadz:true,prog:"V",uwaga:"korzeń do 21; pocz. czasu sadzenia 18"},
-  13:{ok:[{od:23,t:'W'}],sadz:true,prog:"B",uwaga:"od 23 kwiat"},
-  14:{ok:[{od:0,t:'W'},{od:21,t:'L'}],sadz:true,prog:"W",uwaga:"kwiat do 20, od 21 liść"},
-  15:{ok:[{od:0,t:'L'}],sadz:true,prog:"B"},
-  16:{ok:[{od:0,t:'L'},{od:8,t:'O'}],sadz:true,prog:"W",uwaga:"liść do 7, od 8 do 22 owoc"},
-  17:{ok:[{od:7,t:'O'}],sadz:true,prog:"W",uwaga:"od 7 owoc"},
-  18:{ok:[{od:0,t:'O'},{od:4,t:'K'},{od:11,t:'O'},{od:20,t:'K'}],sadz:true,prog:"W",uwaga:"owoc-3, 4-10 korzeń, 11-19 owoc, od 20 korzeń"},
-  19:{ok:[{od:0,t:'K'}],sadz:true,prog:"V"},
-  20:{ok:[{od:0,t:'K'},{od:4,t:'L'},{od:14,t:'K'}],sadz:true,uwaga:"korzeń do 3, 4-13 liść, od 14 korzeń"},
-  21:{ok:[{od:0,t:'K'}],sadz:true},
-  22:{ok:[{od:0,t:'K'},{od:11,t:'W'}],sadz:true,prog:"KT",uwaga:"korzeń do 10, od 11 kwiat"},
-  23:{ok:[{od:0,t:'W'}],sadz:true,uwaga:"kwiat do 13"},
-  24:{ok:[],sadz:true,uwaga:"dzień przejściowy"},
-  25:{ok:[{od:15,t:'W'},{od:23,t:'L'}],sadz:true,uwaga:"od 15 do 22 Ag kwiat, od 23 liść"},
-  26:{ok:[{od:0,t:'L'},{od:14,t:'O'}],sadz:true,prog:"V",uwaga:"liść do 13, od 14 owoc; koniec czasu sadzenia 5"},
-  27:{ok:[{od:0,t:'O'},{od:4,t:'L'},{od:14,t:'O'}],prog:"V",uwaga:"owoc do 3, od 4 do 13 liść, od 14 owoc"},
-  28:{ok:[{od:0,t:'O'}]},
-  29:{ok:[{od:0,t:'O'},{od:2,t:'K'}],prog:"W",uwaga:"owoc do 1, od 2 korzeń"},
-  30:{ok:[{od:0,t:'K'}],uwaga:"korzeń do 12"},
-  31:{ok:[]}
-  },
- "2026-08": {
-  1:{ok:[{od:10,t:'W'}],prog:"B",uwaga:"od 10 kwiat"},
-  2:{ok:[{od:0,t:'W'},{od:8,t:'L'}],uwaga:"kwiat do 7, od 8 liść"},
-  3:{ok:[{od:0,t:'L'}]},
-  4:{ok:[{od:0,t:'L'}]},
-  5:{ok:[{od:0,t:'L'},{od:5,t:'O'}],uwaga:"liść do 4, od 5 owoc"},
-  6:{ok:[{od:0,t:'O'},{od:22,t:'L'}],prog:"K",uwaga:"owoc do 21, od 22 liść"},
-  7:{ok:[{od:0,t:'L'},{od:9,t:'K'}],uwaga:"liść do 8, od 9 korzeń"},
-  8:{ok:[{od:0,t:'K'}],prog:"V",uwaga:"korzeń do 18"},
-  9:{ok:[],sadz:true,prog:"KB",uwaga:"pocz. czasu sadzenia 3"},
-  10:{ok:[],sadz:true,uwaga:"dzień przejściowy"},
-  11:{ok:[{od:3,t:'W'},{od:7,t:'L'},{od:23,t:'K'}],sadz:true,prog:"T",uwaga:"3-6 kwiat, 7-22 liść, od 23 korzeń"},
-  12:{ok:[{od:0,t:'L'},{od:9,t:'L'},{od:18,t:'O'}],sadz:true,uwaga:"liść i korzeń 0-9, 9-17 liść, od 18 owoc"},
-  13:{ok:[{od:0,t:'O'},{od:16,t:'O'}],sadz:true,uwaga:"owoc do 7, owoc od 16"},
-  14:{ok:[{od:0,t:'O'}],sadz:true,prog:"W"},
-  15:{ok:[{od:0,t:'O'},{od:6,t:'K'}],sadz:true,swieto:"Matki Bożej Zielnej",uwaga:"owoc do 5, od 6 korzeń"},
-  16:{ok:[{od:0,t:'K'}],sadz:true},
-  17:{ok:[{od:0,t:'K'},{od:12,t:'L'},{od:22,t:'K'}],sadz:true,prog:"T",uwaga:"korzeń do 11, 12-21 liść, od 22 korzeń"},
-  18:{ok:[{od:0,t:'K'},{od:19,t:'W'}],sadz:true,prog:"W",uwaga:"korzeń do 18, od 19 kwiat"},
-  19:{ok:[{od:0,t:'W'}],sadz:true,prog:"KB",uwaga:"kwiat"},
-  20:{ok:[{od:0,t:'W'},{od:6,t:'L'}],sadz:true,prog:"T",uwaga:"kwiat do 5, od 6 liść"},
-  21:{ok:[{od:0,t:'L'}],sadz:true,prog:"TW"},
-  22:{ok:[{od:0,t:'L'},{od:2,t:'W'},{od:15,t:'L'},{od:21,t:'O'}],sadz:true,prog:"W",uwaga:"liść-1, 2-14 Ag kwiat, 15-20 liść, od 21 owoc; koniec czasu sadzenia 12"},
-  23:{ok:[{od:0,t:'O'}],prog:"T"},
-  24:{ok:[{od:0,t:'O'}]},
-  25:{ok:[{od:0,t:'O'},{od:9,t:'K'}],prog:"W",uwaga:"owoc do 8, od 9 korzeń"},
-  26:{ok:[{od:0,t:'K'}]},
-  27:{ok:[{od:0,t:'K'},{od:15,t:'W'}],prog:"W",uwaga:"korzeń do 14, od 15 do 16 kwiat"},
-  28:{ok:[{od:1,t:'W'}],prog:"BW",uwaga:"kwiat od 1"},
-  29:{ok:[{od:0,t:'W'},{od:14,t:'L'}],uwaga:"kwiat do 13, od 14 liść"},
-  30:{ok:[{od:0,t:'L'}],prog:"V"},
-  31:{ok:[{od:0,t:'L'},{od:19,t:'L'}],prog:"W",uwaga:"liść, od 19 bardzo korzystny"}
-  },
- "2026-09": {
-  1:{ok:[{od:0,t:'L'},{od:10,t:'O'}],prog:"W",uwaga:"liść-9, do 4 bardzo korzystny, od 10 owoc"},
-  2:{ok:[{od:0,t:'O'}],prog:"V"},
-  3:{ok:[{od:0,t:'O'},{od:4,t:'K'}],uwaga:"owoc do 3, od 4 korzeń"},
-  4:{ok:[{od:0,t:'K'}],prog:"V"},
-  5:{ok:[{od:0,t:'K'},{od:16,t:'W'}],sadz:true,prog:"KW",uwaga:"korzeń-15, od 16 kwiat; pocz. cz.sadz. 9"},
-  6:{ok:[{od:0,t:'W'}],sadz:true,uwaga:"kwiat do 10"},
-  7:{ok:[{od:12,t:'W'},{od:15,t:'L'}],sadz:true,uwaga:"od 12 do 14 kwiat, od 15 liść"},
-  8:{ok:[{od:0,t:'L'},{od:23,t:'L'}],sadz:true,uwaga:"liść do 17, liść od 23"},
-  9:{ok:[{od:0,t:'L'},{od:3,t:'O'}],sadz:true,prog:"B",uwaga:"liść do 2, od 3 do 17 owoc"},
-  10:{ok:[{od:1,t:'O'}],sadz:true,uwaga:"od 1 owoc"},
-  11:{ok:[{od:0,t:'O'},{od:15,t:'K'}],sadz:true,prog:"VTW",uwaga:"owoc do 14, od 15 korzeń"},
-  12:{ok:[{od:0,t:'K'}],sadz:true,prog:"KB",uwaga:"korzeń, od 12 do 21 bardzo korzystny"},
-  13:{ok:[{od:0,t:'K'}],sadz:true,uwaga:"korzeń, od 23 bardzo korzystny"},
-  14:{ok:[{od:0,t:'K'},{od:19,t:'K'}],sadz:true,uwaga:"korzeń-13, do 8 b.korz., korzeń od 19"},
-  15:{ok:[{od:0,t:'K'},{od:4,t:'W'}],sadz:true,prog:"VW",uwaga:"korzeń do 3, od 4 kwiat"},
-  16:{ok:[{od:0,t:'W'}],sadz:true,uwaga:"kwiat do 1"},
-  17:{ok:[{od:15,t:'L'}],sadz:true,uwaga:"od 15 liść"},
-  18:{ok:[{od:0,t:'L'},{od:20,t:'W'}],sadz:true,uwaga:"liść do 19, od 20 Ag kwiat; koniec cz.sadz. 20"},
-  19:{ok:[{od:0,t:'W'},{od:5,t:'O'}],uwaga:"Ag kwiat do 4, od 5 owoc"},
-  20:{ok:[{od:0,t:'O'}],prog:"KB",uwaga:"owoc"},
-  21:{ok:[{od:0,t:'O'},{od:17,t:'K'}],uwaga:"owoc do 16, od 17 korzeń"},
-  22:{ok:[{od:0,t:'K'}],prog:"T"},
-  23:{ok:[{od:0,t:'K'}],prog:"B",uwaga:"korzeń do 23"},
-  24:{ok:[{od:9,t:'W'}],prog:"W",uwaga:"od 9 kwiat"},
-  25:{ok:[{od:0,t:'W'},{od:22,t:'L'}],uwaga:"kwiat do 21, od 22 liść"},
-  26:{ok:[{od:0,t:'L'},{od:2,t:'K'},{od:12,t:'L'}],uwaga:"liść do 1, od 2 do 11 korzeń, od 12 liść"},
-  27:{ok:[{od:0,t:'L'}],prog:"W",uwaga:"liść"},
-  28:{ok:[{od:0,t:'L'},{od:13,t:'K'},{od:23,t:'O'}],uwaga:"liść do 12, 13-22 korzeń, od 23 owoc"},
-  29:{ok:[{od:0,t:'O'}],swieto:"św. Michała",uwaga:"owoc"},
-  30:{ok:[{od:0,t:'O'},{od:9,t:'K'}],prog:"B",uwaga:"owoc do 8, od 9 korzeń"}
-  },
- "2026-10": {
-  1:{ok:[{od:0,t:'K'}],prog:"K",uwaga:"korzeń do 11"},
-  2:{ok:[{od:13,t:'L'}],sadz:true,prog:"VW",uwaga:"od 13 liść; pocz. czasu sadzenia 15"},
-  3:{ok:[{od:0,t:'L'},{od:5,t:'W'}],sadz:true,uwaga:"liść do 4, od 5 kwiat"},
-  4:{ok:[{od:0,t:'W'},{od:21,t:'L'}],sadz:true,uwaga:"kwiat do 20, od 21 liść"},
-  5:{ok:[{od:0,t:'L'},{od:11,t:'L'}],sadz:true,uwaga:"liść do 5, liść od 11"},
-  6:{ok:[{od:0,t:'L'},{od:15,t:'O'}],sadz:true,uwaga:"liść do 9, od 15 do 23 owoc"},
-  7:{ok:[{od:8,t:'O'}],sadz:true,prog:"T",uwaga:"od 8 owoc"},
-  8:{ok:[{od:0,t:'O'},{od:22,t:'K'}],sadz:true,uwaga:"owoc do 22, od 23 korzeń"},
-  9:{ok:[{od:0,t:'K'}],sadz:true},
-  10:{ok:[{od:0,t:'K'}],sadz:true},
-  11:{ok:[{od:0,t:'K'}],sadz:true},
-  12:{ok:[{od:0,t:'K'},{od:12,t:'W'}],sadz:true,uwaga:"korzeń do 11, od 12 kwiat"},
-  13:{ok:[{od:0,t:'W'},{od:23,t:'L'}],sadz:true,prog:"B",uwaga:"kwiat do 22, od 23 liść"},
-  14:{ok:[{od:0,t:'L'}],sadz:true,uwaga:"liść"},
-  15:{ok:[{od:0,t:'L'}],sadz:true,prog:"KW",uwaga:"liść, od 23 bardzo korzystny"},
-  16:{ok:[{od:0,t:'L'},{od:15,t:'O'}],sadz:true,prog:"T",uwaga:"liść-14, do 12 b.korz., od 15 owoc; koniec cz.sadz. 4"},
-  17:{ok:[{od:0,t:'O'}],prog:"K",uwaga:"owoc"},
-  18:{ok:[{od:0,t:'O'}],uwaga:"owoc"},
-  19:{ok:[{od:0,t:'O'},{od:2,t:'K'}],uwaga:"owoc do 1, od 2 korzeń"},
-  20:{ok:[{od:0,t:'K'}],prog:"V"},
-  21:{ok:[{od:0,t:'K'},{od:15,t:'W'}],uwaga:"korzeń do 6, od 15 kwiat"},
-  22:{ok:[{od:0,t:'W'}],prog:"B",uwaga:"kwiat"},
-  23:{ok:[{od:0,t:'W'},{od:7,t:'L'}],uwaga:"kwiat do 6, od 7 liść"},
-  24:{ok:[{od:0,t:'L'}],uwaga:"liść"},
-  25:{ok:[{od:0,t:'L'}],uwaga:"liść do 24 (zmiana czasu na zimowy)"},
-  26:{ok:[{od:1,t:'O'}],prog:"V",uwaga:"owoc od 1"},
-  27:{ok:[{od:0,t:'O'},{od:23,t:'K'}],prog:"KB",uwaga:"owoc do 22, od 23 korzeń"},
-  28:{ok:[{od:0,t:'K'}],prog:"KB",uwaga:"korzeń do 6"},
-  29:{ok:[{od:8,t:'K'}],prog:"KT",uwaga:"od 8 korzeń; pocz. czasu sadz. 20"},
-  30:{ok:[{od:0,t:'K'},{od:3,t:'W'}],sadz:true,prog:"W",uwaga:"korzeń do 2, od 3 kwiat"},
-  31:{ok:[{od:0,t:'W'}],sadz:true,prog:"TW",uwaga:"kwiat"}
-  },
- "2026-11": {
-  1:{ok:[{od:0,t:'W'},{od:2,t:'L'}],sadz:true,swieto:"Wszystkich Świętych",uwaga:"kwiat do 1, od 2 liść"},
-  2:{ok:[{od:0,t:'L'},{od:17,t:'O'}],sadz:true,prog:"W",uwaga:"liść do 11, od 17 do 21 owoc"},
-  3:{ok:[{od:8,t:'O'}],sadz:true,uwaga:"od 8 owoc"},
-  4:{ok:[{od:0,t:'O'}],sadz:true,uwaga:"owoc do 16"},
-  5:{ok:[],sadz:true,uwaga:"dzień przejściowy"},
-  6:{ok:[{od:6,t:'K'}],sadz:true,uwaga:"od 6 korzeń"},
-  7:{ok:[{od:0,t:'K'},{od:15,t:'K'}],sadz:true,prog:"W",uwaga:"korzeń do 9, korzeń od 15"},
-  8:{ok:[{od:0,t:'K'},{od:19,t:'W'}],prog:"KT",uwaga:"korzeń do 18, od 19 kwiat"},
-  9:{ok:[{od:0,t:'W'}],prog:"T",uwaga:"kwiat"},
-  10:{ok:[{od:0,t:'W'},{od:6,t:'L'}],uwaga:"kwiat do 5, od 6 liść"},
-  11:{ok:[{od:0,t:'L'}],prog:"KW",swieto:"Narodowe Święto Niepodległości",uwaga:"liść"},
-  12:{ok:[{od:0,t:'L'},{od:19,t:'O'}],prog:"KV",uwaga:"liść do 18, od 19 owoc; koniec cz.sadz. 10"},
-  13:{ok:[{od:0,t:'O'}],prog:"KV",uwaga:"owoc"},
-  14:{ok:[{od:0,t:'O'}],uwaga:"owoc"},
-  15:{ok:[{od:0,t:'O'},{od:8,t:'K'}],prog:"TW",uwaga:"owoc do 7, od 8 korzeń"},
-  16:{ok:[{od:0,t:'K'}],prog:"T",uwaga:"korzeń"},
-  17:{ok:[{od:0,t:'K'},{od:17,t:'W'}],uwaga:"korzeń do 8, od 17 kwiat"},
-  18:{ok:[{od:0,t:'W'}],prog:"W",uwaga:"kwiat"},
-  19:{ok:[{od:0,t:'W'},{od:16,t:'L'}],prog:"KTW",uwaga:"kwiat do 15, od 16 liść"},
-  20:{ok:[{od:0,t:'L'}],uwaga:"liść do 10"},
-  21:{ok:[],uwaga:"dzień przejściowy"},
-  22:{ok:[{od:12,t:'O'}],prog:"KW",uwaga:"od 12 owoc"},
-  23:{ok:[{od:0,t:'O'},{od:18,t:'L'}],uwaga:"owoc do 18, od 19 liść"},
-  24:{ok:[{od:0,t:'L'},{od:5,t:'K'}],prog:"W",uwaga:"liść do 4, od 5 korzeń"},
-  25:{ok:[{od:0,t:'K'}],uwaga:"korzeń do 9"},
-  26:{ok:[{od:12,t:'W'}],prog:"T",uwaga:"od 12 kwiat; pocz. czasu sadz. 4"},
-  27:{ok:[{od:0,t:'W'}],sadz:true,uwaga:"kwiat"},
-  28:{ok:[{od:0,t:'W'},{od:9,t:'L'}],sadz:true,uwaga:"kwiat do 8, od 9 liść"},
-  29:{ok:[{od:0,t:'L'},{od:10,t:'K'},{od:17,t:'L'},{od:20,t:'O'}],sadz:true,uwaga:"liść-9, 10-16 korzeń, 17-19 liść, 20-24 owoc"},
-  30:{ok:[{od:12,t:'O'}],sadz:true,prog:"KVB",uwaga:"od 12 owoc"}
-  },
- "2026-12": {
-  1:{ok:[{od:0,t:'O'}],sadz:true,prog:"W",uwaga:"owoc"},
-  2:{ok:[{od:0,t:'O'},{od:10,t:'K'}],sadz:true,uwaga:"owoc do 9, od 10 korzeń"},
-  3:{ok:[{od:0,t:'K'}],sadz:true,uwaga:"korzeń"},
-  4:{ok:[{od:0,t:'K'}],sadz:true,prog:"BW",uwaga:"korzeń"},
-  5:{ok:[{od:0,t:'K'}],sadz:true,uwaga:"korzeń do 24"},
-  6:{ok:[{od:1,t:'W'}],sadz:true,uwaga:"kwiat od 1"},
-  7:{ok:[{od:0,t:'W'},{od:6,t:'L'}],sadz:true,uwaga:"kwiat-5, od 6 liść, 12-15 bardzo korzystny"},
-  8:{ok:[{od:0,t:'L'}],sadz:true,uwaga:"liść"},
-  9:{ok:[{od:0,t:'L'}],sadz:true,prog:"VW",uwaga:"liść; koniec czasu sadzenia 16"},
-  10:{ok:[{od:0,t:'L'},{od:2,t:'O'}],prog:"V",uwaga:"liść do 1, od 2 owoc"},
-  11:{ok:[{od:0,t:'O'},{od:9,t:'L'},{od:19,t:'O'}],uwaga:"owoc do 8, od 9 do 18 liść, od 19 owoc"},
-  12:{ok:[{od:0,t:'O'},{od:15,t:'K'}],uwaga:"owoc do 14, od 15 do 23 korzeń"},
-  13:{ok:[],swieto:"im. Otylii",uwaga:"dzień przejściowy"},
-  14:{ok:[{od:18,t:'K'}],prog:"TW",uwaga:"od 18 do 23 korzeń"},
-  15:{ok:[{od:0,t:'W'}],prog:"W",uwaga:"kwiat od 0"},
-  16:{ok:[{od:0,t:'W'}],prog:"K",uwaga:"kwiat do 23"},
-  17:{ok:[{od:0,t:'L'}],uwaga:"liść od 0"},
-  18:{ok:[{od:0,t:'L'}],prog:"V",uwaga:"liść"},
-  19:{ok:[{od:0,t:'L'},{od:21,t:'O'}],prog:"V",uwaga:"liść do 20, od 21 owoc"},
-  20:{ok:[{od:0,t:'O'}],uwaga:"owoc"},
-  21:{ok:[{od:0,t:'O'},{od:14,t:'K'}],prog:"W",uwaga:"owoc do 13, od 14 korzeń"},
-  22:{ok:[{od:0,t:'K'}],uwaga:"korzeń"},
-  23:{ok:[{od:0,t:'K'}],sadz:true,prog:"T",uwaga:"korzeń do 22; pocz. czasu sadz. 15"},
-  24:{ok:[],sadz:true,swieto:"Wigilia",uwaga:"dzień przejściowy"},
-  25:{ok:[{od:0,t:'W'},{od:19,t:'L'}],sadz:true,prog:"T",swieto:"Boże Narodzenie",uwaga:"kwiat od 0 do 18, od 19 liść"},
-  26:{ok:[{od:0,t:'L'}],sadz:true,prog:"T",uwaga:"liść"},
-  27:{ok:[{od:0,t:'L'},{od:13,t:'O'}],sadz:true,uwaga:"liść do 4, od 13 owoc"},
-  28:{ok:[{od:0,t:'O'}],uwaga:"owoc"},
-  29:{ok:[{od:0,t:'O'},{od:17,t:'K'}],prog:"W",uwaga:"owoc do 16, od 17 korzeń"},
-  30:{ok:[{od:0,t:'K'}],prog:"KVBW",uwaga:"korzeń"},
-  31:{ok:[{od:0,t:'K'}],prog:"BW",uwaga:"korzeń do 1, od 2 owoc, 13-16 bardzo korzystny"}
-  }
-};
-var THUN_TYP={
-  L:{nazwa:"Liść",icon:"🥬",zywiol:"Woda",k:"#34a8de",rosliny:"sałata, kapusta, szpinak, rukola, zioła liściowe, pory"},
-  O:{nazwa:"Owoc",icon:"🍅",zywiol:"Ciepło",k:"#ff6b22",rosliny:"pomidor, ogórek, fasola, dynia, cukinia, papryka, zboża"},
-  K:{nazwa:"Korzeń",icon:"🥕",zywiol:"Ziemia",k:"#a06a2c",rosliny:"marchew, burak, ziemniak, cebula, czosnek, rzodkiewka"},
-  W:{nazwa:"Kwiat",icon:"🌸",zywiol:"Światło",k:"#af52de",rosliny:"brokuł, kalafior, kwiaty, zioła kwiatowe"}
-};
-// Ogólne zalecenia miesięczne (uzupełnienie poza miesiącami ze zdjęć; źródło: ogólne reguły Thun)
-var THUN_PROG={W:"skłonność do wichur",B:"skłonność do burz",T:"skłonność do trzęsień ziemi",K:"czas krytyczny w komunikacji",V:"skłonność do aktywności wulkanicznej"};
-var THUN_OGOLNE={
-  1:"Zima — planowanie, zamawianie nasion. Prace w dni korzeniowe.",
-  2:"Pierwsze siewy pod osłonami w dni liściowe i owocowe.",
-  3:"Siew rozsady: pomidory/papryka (owoc), sałata (liść) wg typu dnia.",
-  4:"Sadzenie i siew gruntowy nabiera tempa — kieruj się typem dnia.",
-  5:"Główny sezon sadzenia. Rozsada owocowa w dni owocowe po przymrozkach.",
-  6:"Pełnia prac. Pielęgnacja, podlewanie, zbiór ziół wg typu dnia.",
-  7:"Zbiory i kolejne siewy na jesień. Owoce zbieraj w dni owocowe.",
-  8:"Zbiory pełną parą. Ostatnie siewy warzyw liściowych.",
-  9:"Żniwa i magazynowanie. Sadzenie truskawek, czosnku (korzeń).",
-  10:"Zbiór korzeniowych w dni korzeniowe. Sadzenie drzew.",
-  11:"Porządki, okrywanie. Sadzenie w dni korzeniowe przy spadku.",
-  12:"Odpoczynek. Planowanie kolejnego sezonu."
-};
-
-function thunKlucz(rok,mies){return rok+"-"+String(mies).padStart(2,'0');}
-function thunMaDane(mies,rok){var k=thunKlucz(rok||2026,mies);return THUN[k]&&Object.keys(THUN[k]).length>0;}
-
-// Aktualny typ dnia o danej godzinie
-function thunTypTeraz(dzienObj,godz){
-  if(!dzienObj||!dzienObj.ok||dzienObj.ok.length===0)return null;
-  var akt=null;
-  for(var i=0;i<dzienObj.ok.length;i++){if(dzienObj.ok[i].od<=godz)akt=dzienObj.ok[i].t;}
-  if(akt===null)akt=dzienObj.ok[0].t;
-  return akt;
-}
-// Wszystkie typy w ciągu dnia (do pokazania pełnego rozkładu)
-function thunTypyDnia(dzienObj){
-  if(!dzienObj||!dzienObj.ok)return [];
-  var u=[];dzienObj.ok.forEach(function(o){if(u.indexOf(o.t)<0)u.push(o.t);});return u;
-}
-
-// Teaser na pulpicie
-function renderujThunTeaser(){
-  var card=document.getElementById('kal-teaser');if(!card)return;
-  var teraz=new Date(),mies=teraz.getMonth()+1,dzien=teraz.getDate(),godz=teraz.getHours(),rok=teraz.getFullYear();
-  var k=thunKlucz(rok,mies),dObj=THUN[k]?THUN[k][dzien]:null;
-  var ic=card.querySelector('#kal-teaser-icon'),tx=card.querySelector('#kal-teaser-txt');
-  var chips=document.getElementById('kal-chips');
-  var typ=null;
-  if(dObj&&dObj.ok&&dObj.ok.length>0){
-    typ=thunTypTeraz(dObj,godz);var info=THUN_TYP[typ];
-    if(info){ic.innerText=info.icon;tx.innerHTML='Dziś dzień <b style="color:'+info.k+'">'+info.nazwa.toLowerCase()+'owy</b>';}
-  }else{ic.innerText='🌙';tx.innerHTML=THUN_OGOLNE[mies]||'Kalendarz biodynamiczny Thun';}
-  // KOMPAKTOWE CHIPY - krótkie, wizualne podsumowania
-  if(!chips)return;
-  var lista=[];
-  function chip(emoji,tekst,kolor,tlo){return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;background:'+tlo+';color:'+kolor+'">'+emoji+' '+tekst+'</span>';}
-  // 1. Sugestia podlewania (skrócona do chipa)
-  if(typ&&lastDataCache){
-    var moist=obliczWilgotnosc(lastDataCache),prog=lastDataCache.cfg_th||45;
-    if(moist!==null){
-      var sucha=moist<prog;
-      if((typ==='L'||typ==='O')&&sucha)lista.push(chip('💧','Dobry dzień na podlewanie','var(--accent-green)','rgba(52,199,89,0.12)'));
-      else if((typ==='K'||typ==='W')&&sucha)lista.push(chip('🌱','Gleba sucha — lepszy dzień liściowy','var(--accent-orange)','rgba(255,149,0,0.12)'));
-      else if(!sucha)lista.push(chip('✅','Wilgotność OK','var(--text-sub)','var(--nav-bg)'));
-    }
-  }
-  // 2. Ostrzeżenie pogodowe (skrócone do chipa)
-  if(dObj&&dObj.prog){
-    var zagr=[];
-    if(dObj.prog.indexOf('B')>=0)zagr.push('burze');
-    if(dObj.prog.indexOf('W')>=0)zagr.push('wichury');
-    if(zagr.length>0){
-      var spadek=lastDataCache&&lastDataCache.press_trend!==undefined&&lastDataCache.press_trend<-1;
-      if(spadek)lista.push(chip('⛈️','Ryzyko: '+zagr.join(', '),'var(--accent-red)','rgba(255,59,48,0.12)'));
-      else lista.push(chip('🌬️','Możliwe '+zagr.join(', '),'var(--accent-orange)','rgba(255,149,0,0.12)'));
-    }
-  }
-  if(lista.length>0){chips.innerHTML=lista.join('');chips.style.display='flex';}
-  else chips.style.display='none';
-}
-
-// Pełny ekran
-var thunMies=new Date().getMonth()+1, thunRok=new Date().getFullYear();
-function otworzKalendarz(){thunMies=new Date().getMonth()+1;thunRok=new Date().getFullYear();pokazModal('kal-modal');renderujThunPelny();podlaczSwipeKalendarz();}
-function zamknijKalendarz(){ukryjModal('kal-modal');}
-function thunZmienMiesiac(d){
-  var box=document.getElementById('kal-lista');
-  if(!box){_thunApplyMonth(d);renderujThunPelny();return;}
-  // wysuń obecną treść w bok (w kierunku przeciwnym do nadejścia nowej)
-  box.style.transition='transform .18s ease, opacity .18s ease';
-  box.style.transform='translateX('+(d>0?-30:30)+'px)';
-  box.style.opacity='0';
-  setTimeout(function(){
-    _thunApplyMonth(d);
-    renderujThunPelny();
-    // ustaw poza ekranem po stronie nadejścia, potem wjedź na miejsce
-    box.style.transition='none';
-    box.style.transform='translateX('+(d>0?30:-30)+'px)';
-    box.style.opacity='0';
-    // wymuś reflow by transition zadziałało
-    void box.offsetWidth;
-    box.style.transition='transform .22s ease, opacity .22s ease';
-    box.style.transform='translateX(0)';
-    box.style.opacity='1';
-  },180);
-}
-function _thunApplyMonth(d){thunMies+=d;if(thunMies<1){thunMies=12;thunRok--;}if(thunMies>12){thunMies=1;thunRok++;}}
-var thunSwipeBound=false;
-function podlaczSwipeKalendarz(){
-  if(thunSwipeBound)return;
-  var strefa=document.getElementById('kal-lista-wrap');if(!strefa)return;
-  var box=document.getElementById('kal-lista');
-  var x0=null,y0=null,t0=0,kierunek=0; // 0=nieustalony, 1=poziomy, -1=pionowy
-  function resetBox(){if(box){box.style.transition='transform .2s ease, opacity .2s ease';box.style.transform='translateX(0)';box.style.opacity='1';}}
-  strefa.addEventListener('touchstart',function(e){var t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();kierunek=0;},{passive:true});
-  strefa.addEventListener('touchmove',function(e){
-    if(x0===null||!box)return;
-    var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
-    // ustal kierunek RAZ, gdy ruch przekroczy próg
-    if(kierunek===0&&(Math.abs(dx)>12||Math.abs(dy)>12)){
-      kierunek=(Math.abs(dx)>Math.abs(dy)*1.3)?1:-1;
-    }
-    if(kierunek===1){
-      // poziomy gest - lista podąża za palcem
-      box.style.transition='none';
-      box.style.transform='translateX('+(dx*0.4)+'px)';
-      box.style.opacity=String(Math.max(0.45,1-Math.abs(dx)/400));
-    }
-    // kierunek===-1 (pionowy): nie ruszamy listy w bok, pozwalamy na normalny scroll
-  },{passive:true});
-  strefa.addEventListener('touchend',function(e){
-    if(x0===null)return;
-    var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
-    if(kierunek===1&&Math.abs(dx)>55&&dt<700){
-      if(dx<0){thunZmienMiesiac(1);}else{thunZmienMiesiac(-1);}
-      haptyka(10);
-    }else if(kierunek===1){
-      resetBox(); // poziomy ale za słaby - wróć na miejsce
-    }
-    x0=null;y0=null;kierunek=0;
-  },{passive:true});
-  thunSwipeBound=true;
-}
-
-var MIES_NAZWY=["","Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
-var DNI_TYG=["Nd","Pn","Wt","Śr","Cz","Pt","So"];
-
-function thunOpisOkresy(dObj){
-  // czytelny opis rozkładu godzinowego
-  if(!dObj||!dObj.ok||dObj.ok.length===0)return dObj&&dObj.uwaga?dObj.uwaga:"dzień przejściowy / niekorzystny";
-  return dObj.ok.map(function(o,i){
-    var nast=dObj.ok[i+1];
-    var info=THUN_TYP[o.t];
-    if(o.od===0&&!nast)return info.nazwa;
-    if(o.od===0)return info.nazwa+' do '+nast.od;
-    if(!nast)return info.nazwa+' od '+o.od;
-    return info.nazwa+' '+o.od+'-'+nast.od;
-  }).join(', ');
-}
-
-function renderujThunPelny(){
-  document.getElementById('kal-miesiac-txt').innerText=MIES_NAZWY[thunMies]+' '+thunRok;
-  var box=document.getElementById('kal-lista');box.innerHTML='';
-  var k=thunKlucz(thunRok,thunMies),dane=THUN[k];
-  if(!dane){
-    box.innerHTML='<div style="background:var(--nav-bg);border-radius:14px;padding:16px;font-size:13px;line-height:1.5"><b>🌙 '+MIES_NAZWY[thunMies]+'</b><br><br>'+(THUN_OGOLNE[thunMies]||'')+'<br><br><span style="color:var(--text-sub)">Pełny rozkład dzienny dostępny dla całego roku 2026 (z książki „Dni Siewu"). Dla innych lat pokazujemy zalecenia ogólne.</span></div>';
-    renderThunLegenda(box);return;
-  }
-  var dzisD=new Date(),dzisDzien=(dzisD.getMonth()+1===thunMies&&dzisD.getFullYear()===thunRok)?dzisD.getDate():-1;
-  for(var d=1;d<=31;d++){
-    if(!dane[d])continue;
-    var dObj=dane[d],dow=new Date(thunRok,thunMies-1,d).getDay();
-    var typy=thunTypyDnia(dObj);
-    var dotsHtml=typy.map(function(t){return '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+THUN_TYP[t].k+';margin-left:3px"></span>';}).join('');
-    var ikony=typy.map(function(t){return THUN_TYP[t].icon;}).join('');
-    var jestDzis=(d===dzisDzien);
-    var h='<div style="display:flex;align-items:center;gap:10px;padding:10px 8px;border-bottom:1px solid var(--border-light);'+(jestDzis?'background:var(--profile-sel-bg);border-radius:10px;':'')+'">';
-    h+='<div style="width:34px;text-align:center"><div style="font-size:15px;font-weight:800">'+d+'</div><div style="font-size:9px;color:var(--text-sub)">'+DNI_TYG[dow]+'</div></div>';
-    h+='<div style="flex:1"><div style="font-size:13px;font-weight:600">'+(ikony||'·')+' '+thunOpisOkresy(dObj)+'</div>';
-    if(dObj.uwaga&&dObj.uwaga!==thunOpisOkresy(dObj))h+='<div style="font-size:10px;color:var(--text-sub);margin-top:1px">'+dObj.uwaga+'</div>';
-    if(dObj.swieto)h+='<div style="font-size:10px;color:var(--accent-red);margin-top:1px">'+dObj.swieto+'</div>';
-    if(dObj.prog){var pl=dObj.prog.split('').map(function(c){return THUN_PROG[c]?'<span title="'+THUN_PROG[c]+'" style="font-size:9px;background:var(--nav-bg);border-radius:6px;padding:1px 5px;margin-right:3px;color:var(--text-sub)">'+c+'</span>':'';}).join('');if(pl)h+='<div style="margin-top:3px">'+pl+'</div>';}
-    h+='</div>';
-    if(dObj.sadz)h+='<div title="czas sadzenia" style="width:4px;align-self:stretch;background:#8bc34a;border-radius:2px"></div>';
-    h+='</div>';
-    box.innerHTML+=h;
-  }
-  renderThunLegenda(box);
-}
-function renderThunLegenda(box){
-  var h='<div style="margin-top:14px;padding:12px;background:var(--nav-bg);border-radius:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-sub);margin-bottom:8px">Legenda</div>';
-  for(var t in THUN_TYP){var i=THUN_TYP[t];h+='<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:4px"><span style="width:10px;height:10px;border-radius:50%;background:'+i.k+';display:inline-block"></span><b>'+i.icon+' '+i.nazwa+'</b> <span style="color:var(--text-sub)">('+i.zywiol+') — '+i.rosliny+'</span></div>';}
-  h+='<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:6px"><span style="width:4px;height:14px;background:#8bc34a;display:inline-block;border-radius:2px"></span><span style="color:var(--text-sub)">zielony pasek = korzystny czas sadzenia</span></div>';
-  h+='<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-sub);margin:10px 0 6px">Prognoza (możliwe zakłócenia)</div>';
-  for(var pc in THUN_PROG){h+='<div style="font-size:11px;margin-bottom:3px"><b style="background:var(--nav-bg);border-radius:6px;padding:1px 6px;margin-right:6px">'+pc+'</b><span style="color:var(--text-sub)">'+THUN_PROG[pc]+'</span></div>';}
-  h+='</div>';
-  box.innerHTML+=h;
-}
-
-
-
-// ============ ULEPSZENIA KALIBRACJI + DIAGNOSTYKA ============
-// Live % przy kalibracji gleby + wskaźnik jakości
-function aktualizujLiveProcent(d){
-  var s=document.getElementById('live-soil-val');
-  if(s&&d.raw_adc!==undefined){var pct=obliczWilgotnosc(d);s.innerText=d.raw_adc+(pct!==null?' → '+pct+'%':'');}
-  // jakość kalibracji gleby
-  if(d.air_val!==undefined&&d.water_val!==undefined){
-    var rozp=Math.abs(d.air_val-d.water_val);
-    var q=document.getElementById('calib-quality');
-    if(q){if(rozp<500){q.innerText='⚠️ Mała rozpiętość ('+rozp+') — sprawdź czujnik';q.style.color='var(--accent-orange)';}else{q.innerText='✅ Kalibracja OK (rozpiętość '+rozp+')';q.style.color='var(--accent-green)';}}
-  }
-  // napięcie w karcie kalibracji
-  var vn=document.getElementById('calib-v-now');if(vn&&d.voltage)vn.innerText=d.voltage.toFixed(2)+' V';
-}
-
-function zapiszKalibracjeNapiecia(){
-  var real=parseFloat(document.getElementById('calib-v-real').value);
-  if(!real||real<5||real>20){potwierdz('Wpisz poprawne napięcie',false);return;}
-  haptyka(15);
-  // ESP endpoint /calibrateVoltage?real=13.25 (do dodania po stronie ESP)
-  espFetch('/calibrateVoltage?real='+real).then(function(){potwierdz('Zapisano korekcję napięcia');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd (dodaj endpoint na ESP)',false);});
-}
-
-function resetKalibracji(){
-  if(!confirm('Przywrócić fabryczne wartości kalibracji?'))return;
-  haptyka([50,50,50]);
-  espFetch('/resetCalib').then(function(){potwierdz('Przywrócono fabryczne');if(!IS_DEMO)pobierzDaneZESP32();}).catch(function(){potwierdz('Błąd (dodaj endpoint na ESP)',false);});
-}
-
-function uruchomDiagnostyke(){
-  haptyka(15);
-  var box=document.getElementById('diag-results');box.innerHTML='<div style="text-align:center;color:var(--text-sub);font-size:13px;padding:10px">⏳ Sprawdzanie...</div>';
-  var d=lastDataCache;
-  setTimeout(function(){
-    if(!d){box.innerHTML='<div style="color:var(--accent-red);font-size:13px">Brak danych — odśwież najpierw</div>';return;}
-    var testy=[];
-    if(d.hw){
-      if(d.hw.bme)testy.push(['BME280 (pogoda)',d.temp>-40&&d.temp<80&&d.pressure>800]);
-      if(d.hw.ds)testy.push(['DS18B20 (temp wody)',d.water_temp>0||d.water_temp===0]);
-      if(d.hw.us)testy.push(['JSN-SR04T (ultradźwięki)',d.us_dist>0&&d.us_dist<400]);
-      if(d.hw.light)testy.push(['Fotorezystor',d.raw_light>=0&&d.raw_light<=4095]);
-    }
-    testy.push(['Czujnik wilgotności',d.raw_adc>0&&d.raw_adc<4095]);
-    testy.push(['Pływak zbiornika',d.water==='OK'||d.water==='EMPTY']);
-    testy.push(['Napięcie zasilania',d.voltage>10&&d.voltage<16]);
-    testy.push(['Pamięć ESP',d.free_heap>20000]);
-    var h='';
-    testy.forEach(function(t){h+='<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span>'+t[0]+'</span><b style="color:'+(t[1]?'var(--accent-green)':'var(--accent-red)')+'">'+(t[1]?'✅ OK':'❌ Błąd')+'</b></div>';});
-    var bledy=testy.filter(function(t){return !t[1];}).length;
-    h+='<div style="text-align:center;margin-top:12px;font-weight:700;color:'+(bledy===0?'var(--accent-green)':'var(--accent-orange)')+'">'+(bledy===0?'✅ Wszystko sprawne':'⚠️ Problemów: '+bledy)+'</div>';
-    box.innerHTML=h;haptyka(bledy===0?30:[60,40,60]);
-  },800);
-}
-
-</script>
-<div id="kal-modal" class="profile-modal-bg">
-<div class="section-card" style="width:92%;max-width:400px;margin:0;max-height:88vh;overflow-y:auto;overflow-x:hidden">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><h2 style="margin:0">📅 Kalendarz biodynamiczny</h2><button onclick="zamknijKalendarz()" style="border:none;background:var(--nav-bg);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;color:var(--text-main)">✕</button></div>
-<div style="font-size:11px;color:var(--text-sub);margin-bottom:14px">wg Marii Thun — „Dni Siewu" 2026 · <span style="opacity:.8">przesuń ↔ by zmienić miesiąc</span></div>
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><button onclick="thunZmienMiesiac(-1)" style="border:none;background:var(--nav-bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text-main)">‹</button><div id="kal-miesiac-txt" style="font-size:17px;font-weight:800">—</div><button onclick="thunZmienMiesiac(1)" style="border:none;background:var(--nav-bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--text-main)">›</button></div>
-<div id="kal-lista-wrap" style="overflow:hidden"><div id="kal-lista"></div></div>
-</div>
-</div>
-
-
+    <header class="ios-header">
+        <button id="prev-month" class="ios-button">Poprzedni</button>
+        <h1 id="month-year">Styczeń 2026</h1>
+        <button id="next-month" class="ios-button">Następny</button>
+    </header>
+    
+    <main>
+        <div class="weekdays">
+            <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>So</div><div>Nd</div>
+        </div>
+        <div id="calendar-grid" class="calendar-grid"></div>
+    </main>
+
+    <div id="day-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modal-date"></h2>
+            <div class="modal-body">
+                <p><strong>Znak Zodiaku:</strong> <span id="modal-sign"></span></p>
+                <p><strong>Żywioł:</strong> <span id="modal-element"></span></p>
+                <p><strong>Zalecana praca:</strong> <span id="modal-action"></span></p>
+                <p class="details-text"><span id="modal-details"></span></p>
+            </div>
+            <button id="close-modal" class="ios-button block">Zamknij</button>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           DATA (data.js) - Styczeń 2026 wg pliku PDF
+        ========================================= */
+        const calendarData = {
+            "2026-01-01": { sign: "Byk", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń do 10, czas sadzenia od 10" },
+            "2026-01-02": { sign: "Bliźnięta", element: "Światło", action: "Kwiat", actionType: "kwiat", details: "12-13 korzeń, od 14 kwiat" },
+            "2026-01-03": { sign: "Bliźnięta", element: "Światło", action: "Kwiat", actionType: "kwiat", details: "Kwiat cały dzień" },
+            "2026-01-04": { sign: "Rak", element: "Woda", action: "Liść", actionType: "lisc", details: "Kwiat do 10, od 11 liść" },
+            "2026-01-05": { sign: "Lew", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Liść do 22, od 23 owoc, czas sadzenia" },
+            "2026-01-06": { sign: "Lew", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Owoc cały dzień" },
+            "2026-01-07": { sign: "Lew", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Owoc do 8" },
+            "2026-01-08": { sign: "Panna", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Owoc od 17" },
+            "2026-01-09": { sign: "Panna", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Owoc do 13, od 14 korzeń" },
+            "2026-01-10": { sign: "Panna", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń cały dzień" },
+            "2026-01-11": { sign: "Panna", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń cały dzień" },
+            "2026-01-12": { sign: "Waga", element: "Światło", action: "Kwiat", actionType: "kwiat", details: "Korzeń do 7, od 8 kwiat" },
+            "2026-01-13": { sign: "Skorpion", element: "Woda", action: "Liść", actionType: "lisc", details: "Kwiat do 19, od 20 apogeum kwiat" },
+            "2026-01-14": { sign: "Skorpion", element: "Woda", action: "Liść", actionType: "lisc", details: "Apogeum kwiat do 1, od 2 liść" },
+            "2026-01-15": { sign: "Skorpion", element: "Woda", action: "Liść", actionType: "lisc", details: "Liść cały dzień" },
+            "2026-01-16": { sign: "Skorpion", element: "Woda", action: "Liść", actionType: "lisc", details: "Liść do 10, od 11 owoc. Koniec czasu sadzenia o 6" },
+            "2026-01-17": { sign: "Strzelec", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Owoc cały dzień" },
+            "2026-01-18": { sign: "Strzelec", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Owoc do 20, od 21 korzeń" },
+            "2026-01-19": { sign: "Koziorożec", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń cały dzień" },
+            "2026-01-20": { sign: "Koziorożec", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń cały dzień" },
+            "2026-01-21": { sign: "Wodnik", element: "Światło", action: "Kwiat", actionType: "kwiat", details: "Korzeń do 1, od 2 do 20 kwiat" },
+            "2026-01-22": { sign: "Wodnik", element: "Światło", action: "Kwiat", actionType: "kwiat", details: "Kwiat od 5 do 23" },
+            "2026-01-23": { sign: "Ryby", element: "Woda", action: "Liść", actionType: "lisc", details: "Liść od 0" },
+            "2026-01-24": { sign: "Ryby", element: "Woda", action: "Liść", actionType: "lisc", details: "Liść cały dzień" },
+            "2026-01-25": { sign: "Baran", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Liść do 18, od 19 owoc" },
+            "2026-01-26": { sign: "Baran", element: "Ciepło", action: "Owoc", actionType: "owoc", details: "Owoc cały dzień" },
+            "2026-01-27": { sign: "Byk", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Owoc do 11, od 12 korzeń" },
+            "2026-01-28": { sign: "Byk", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń cały dzień" },
+            "2026-01-29": { sign: "Byk", element: "Ziemia", action: "Korzeń", actionType: "korzen", details: "Korzeń do 10. Początek czasu sadzenia 19" },
+            "2026-01-30": { sign: "Bliźnięta", element: "Światło", action: "Kwiat", actionType: "kwiat", details: "Kwiat od 12" },
+            "2026-01-31": { sign: "Rak", element: "Woda", action: "Liść", actionType: "lisc", details: "Kwiat do 21, od 22 liść" }
+        };
+
+        /* =========================================
+           LOGIC (script.js)
+        ========================================= */
+        let currentDate = new Date(2026, 0, 1);
+
+        function renderCalendar(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            const monthNames = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
+            document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            let startDay = firstDay === 0 ? 6 : firstDay - 1;
+            
+            for (let i = 0; i < startDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'day empty';
+                grid.appendChild(emptyDiv);
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.textContent = day;
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const data = calendarData[dateStr];
+                
+                if (data) {
+                    const dot = document.createElement('div');
+                    dot.className = `dot ${data.actionType}`;
+                    dayDiv.appendChild(dot);
+                    dayDiv.addEventListener('click', () => openModal(dateStr, data));
+                } else {
+                    dayDiv.addEventListener('click', () => openModal(dateStr, { 
+                        sign: '-', element: '-', action: '-', 
+                        details: 'Brak danych w bazie dla tego dnia. Aby uzupełnić dane, dopisz je do obiektu "calendarData" w kodzie strony.' 
+                    }));
+                }
+                
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function openModal(dateStr, data) {
+            document.getElementById('modal-date').textContent = dateStr;
+            document.getElementById('modal-sign').textContent = data.sign;
+            document.getElementById('modal-element').textContent = data.element;
+            document.getElementById('modal-action').textContent = data.action;
+            document.getElementById('modal-details').textContent = data.details;
+            document.getElementById('day-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('day-modal').classList.add('hidden');
+        });
+
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar(currentDate);
+        });
+
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar(currentDate);
+        });
+
+        // Inicjalizacja kalendarza po załadowaniu
+        renderCalendar(currentDate);
+    </script>
 </body>
 </html>
