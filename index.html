@@ -8,10 +8,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Kalendarz">
-    
-    <link rel="apple-touch-icon" href="icon-192.png">
 
     <style>
+        /* Zabezpieczenie przed rozpychaniem elementów */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         :root {
             --bg-color: #f4f4f5;
             --card-bg: #ffffff;
@@ -19,6 +22,12 @@
             --text-secondary: #52525b;
             --accent-blue: #007aff;
             --border-color: #e4e4e7;
+        }
+
+        /* Blokada przewijania na boki */
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         body {
@@ -42,10 +51,11 @@
             top: 0;
             z-index: 10;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            width: 100%;
         }
 
         .ios-header h1 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             margin: 0;
             text-align: center;
@@ -56,82 +66,82 @@
             background: #f4f4f5;
             border: none;
             color: var(--accent-blue);
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-radius: 12px;
             transition: background 0.2s;
         }
 
-        .ios-button:active {
-            background: #e4e4e7;
-        }
-
+        .ios-button:active { background: #e4e4e7; }
+        
         .ios-button.block {
             background: var(--accent-blue);
             color: white;
             width: 100%;
-            padding: 18px;
-            font-size: 20px;
+            padding: 16px;
+            font-size: 18px;
             font-weight: bold;
-            margin-top: 25px;
+            margin-top: 20px;
             border-radius: 16px;
         }
 
-        main {
-            padding: 15px;
+        main { 
+            padding: 10px; 
+            width: 100%;
         }
 
         .legend {
             display: flex;
             justify-content: space-between;
             background: var(--card-bg);
-            padding: 15px 10px;
-            border-radius: 16px;
-            margin-bottom: 20px;
+            padding: 12px 5px;
+            border-radius: 14px;
+            margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            width: 100%;
         }
 
         .legend-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 15px;
+            font-size: 13px; /* Mniejsza czcionka, żeby się zmieściło */
             font-weight: 600;
             color: var(--text-primary);
+            width: 25%;
         }
 
-        .legend-icon {
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
+        .legend-icon { font-size: 24px; margin-bottom: 3px; } /* Mniejsze ikonki */
 
         .weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            font-size: 16px;
+            font-size: 14px; /* Mniejsza czcionka */
             font-weight: bold;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            width: 100%;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 5px; /* Mniejsze przerwy między dniami */
+            width: 100%;
         }
 
         .day {
             background: var(--card-bg);
-            border-radius: 14px;
+            border-radius: 10px;
             aspect-ratio: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 18px; /* Mniejsza liczba dnia */
             font-weight: 700;
             box-shadow: 0 2px 5px rgba(0,0,0,0.08);
             cursor: pointer;
@@ -139,20 +149,12 @@
             border: 2px solid transparent;
         }
 
-        .day:active {
-            transform: scale(0.95);
-            border-color: var(--accent-blue);
-        }
-
-        .day.empty {
-            background: transparent;
-            box-shadow: none;
-            cursor: default;
-        }
-
-        .day-icon {
-            font-size: 26px;
-            margin-top: 2px;
+        .day:active { transform: scale(0.95); border-color: var(--accent-blue); }
+        .day.empty { background: transparent; box-shadow: none; cursor: default; }
+        
+        .day-icon { 
+            font-size: 20px; /* Mniejsza ikonka w kalendarzu */
+            margin-top: 2px; 
         }
 
         .modal {
@@ -167,52 +169,29 @@
             transition: opacity 0.3s;
         }
 
-        .modal.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        .modal.hidden { opacity: 0; pointer-events: none; }
 
         .modal-content {
             background: var(--card-bg);
-            width: 85%;
-            max-width: 400px;
+            width: 90%;
+            max-width: 360px;
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             text-align: center;
         }
 
-        .modal-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
-
-        .modal-content h2 {
-            margin: 0 0 20px 0;
-            font-size: 28px;
-            color: var(--text-primary);
-        }
-
-        .modal-body p {
-            margin: 12px 0;
-            font-size: 20px;
-            line-height: 1.4;
-        }
-
-        .highlight {
-            font-weight: bold;
-            color: var(--accent-blue);
-            font-size: 24px;
-            display: block;
-            margin-top: 5px;
-        }
-
+        .modal-icon { font-size: 50px; margin-bottom: 10px; }
+        .modal-content h2 { margin: 0 0 15px 0; font-size: 24px; color: var(--text-primary); }
+        .modal-body p { margin: 10px 0; font-size: 18px; line-height: 1.4; }
+        .highlight { font-weight: bold; color: var(--accent-blue); font-size: 22px; display: block; margin-top: 5px; }
+        
         .details-text {
-            font-size: 18px !important;
+            font-size: 16px !important;
             color: var(--text-secondary);
-            margin-top: 20px !important;
+            margin-top: 15px !important;
             background: var(--bg-color);
-            padding: 15px;
+            padding: 12px;
             border-radius: 12px;
         }
     </style>
@@ -221,7 +200,7 @@
 
     <header class="ios-header">
         <button id="prev-month" class="ios-button">◀ Wstecz</button>
-        <h1 id="month-year">Styczeń 2026</h1>
+        <h1 id="month-year">Ładowanie...</h1>
         <button id="next-month" class="ios-button">Dalej ▶</button>
     </header>
     
@@ -242,16 +221,25 @@
     <div id="day-modal" class="modal hidden">
         <div class="modal-content">
             <div id="modal-big-icon" class="modal-icon">🥕</div>
-            <h2 id="modal-date">1 Stycznia 2026</h2>
+            <h2 id="modal-date">Data</h2>
             <div class="modal-body">
                 <p>Dzisiaj najlepiej pielęgnować:<br><span id="modal-action" class="highlight">Korzeń</span></p>
                 <p class="details-text" id="modal-details"></p>
             </div>
-            <button id="close-modal" class="ios-button block">Zamknij okienko</button>
+            <button id="close-modal" class="ios-button block">Zamknij</button>
         </div>
     </div>
 
     <script>
+        // Usuwanie starej wersji z pamięci na wypadek resztek cache'u
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+
         const icons = { "ko": "🥕", "kw": "🌻", "li": "🥬", "ow": "🍎" };
 
         const typeMap = {
@@ -261,7 +249,6 @@
             "ow": { action: "Rośliny owocowe", details: "Dobry dzień na pomidory, ogórki, fasolę, dynię oraz drzewa owocowe." }
         };
 
-        // Skompresowana tablica dla 365 dni roku 2026 (Styczeń - Grudzień)
         const yearData = [
             "ko,kw,kw,li,ow,ow,ow,ko,ko,ko,ko,kw,li,li,li,li,ow,ow,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,kw,li", 
             "li,ow,ow,ko,ko,ko,ko,kw,kw,li,li,ow,ow,ow,ko,ko,kw,kw,li,li,li,ow,ko,ko,kw,kw,kw,li", 
@@ -277,14 +264,13 @@
             "ow,ko,ko,ko,kw,kw,li,li,li,ow,ow,ko,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,kw,li,li,ow,ow,ko,ko,ow"
         ];
 
-        let currentDate = new Date(2026, 0, 1); // Startuje od stycznia 2026
+        let currentDate = new Date(); 
 
         function renderCalendar(date) {
             const year = date.getFullYear();
             const month = date.getMonth();
             const monthNames = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
             
-            // Obsługa lat innych niż 2026 (zabezpieczenie przed błędem)
             if(year !== 2026) {
                 document.getElementById('month-year').textContent = `${monthNames[month]} ${year} (Brak danych)`;
                 document.getElementById('calendar-grid').innerHTML = '';
@@ -298,7 +284,7 @@
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
             
-            let startDay = firstDay === 0 ? 6 : firstDay - 1; // Przesunięcie dla poniedziałku jako pierwszego dnia tygodnia
+            let startDay = firstDay === 0 ? 6 : firstDay - 1;
             
             for (let i = 0; i < startDay; i++) {
                 const emptyDiv = document.createElement('div');
@@ -331,11 +317,9 @@
 
         function openModal(day, monthName, year, data, icon) {
             document.getElementById('modal-date').textContent = `${day} ${monthName} ${year}`;
-            
             const iconElement = document.getElementById('modal-big-icon');
             iconElement.textContent = icon;
             iconElement.style.display = 'block';
-
             document.getElementById('modal-action').textContent = data.action;
             document.getElementById('modal-details').textContent = data.details;
             document.getElementById('day-modal').classList.remove('hidden');
