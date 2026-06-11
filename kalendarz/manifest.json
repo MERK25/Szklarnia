@@ -1,0 +1,21 @@
+{
+  "name": "Kalendarz Biodynamiczny 2026",
+  "short_name": "Biodynamika",
+  "description": "Kalendarz biodynamiczny uproszczony",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f4f5",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

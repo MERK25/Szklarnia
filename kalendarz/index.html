@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalendarz Biodynamiczny 2026</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Biodynamika">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+
+    <header class="ios-header">
+        <button id="prev-month" class="ios-button">◀ Wstecz</button>
+        <h1 id="month-year">Styczeń 2026</h1>
+        <button id="next-month" class="ios-button">Dalej ▶</button>
+    </header>
+    
+    <main>
+        <div class="legend">
+            <div class="legend-item"><span class="legend-icon">🥕</span>Korzeń</div>
+            <div class="legend-item"><span class="legend-icon">🌻</span>Kwiat</div>
+            <div class="legend-item"><span class="legend-icon">🥬</span>Liść</div>
+            <div class="legend-item"><span class="legend-icon">🍎</span>Owoc</div>
+        </div>
+
+        <div class="weekdays">
+            <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>So</div><div>Nd</div>
+        </div>
+        <div id="calendar-grid" class="calendar-grid"></div>
+    </main>
+
+    <div id="day-modal" class="modal hidden">
+        <div class="modal-content">
+            <div id="modal-big-icon" class="modal-icon">🥕</div>
+            <h2 id="modal-date"></h2>
+            <div class="modal-body">
+                <p>Dzisiaj najlepiej pielęgnować:<br><span id="modal-action" class="highlight"></span></p>
+                <p class="details-text" id="modal-details"></p>
+            </div>
+            <button id="close-modal" class="ios-button block">Zamknij okienko</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
