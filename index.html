@@ -8,200 +8,99 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Kalendarz">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <style>
-        /* Zabezpieczenie przed rozpychaniem elementów */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
+        *, *::before, *::after { box-sizing: border-box; }
+        
         :root {
             --bg-color: #f4f4f5;
             --card-bg: #ffffff;
             --text-primary: #18181b;
             --text-secondary: #52525b;
             --accent-blue: #007aff;
+            --accent-green: #34c759;
             --border-color: #e4e4e7;
         }
 
-        /* Blokada przewijania na boki */
         html, body {
             max-width: 100vw;
             overflow-x: hidden;
-        }
-
-        body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
+            margin: 0; padding: 0;
             user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
         .ios-header {
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 10px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            width: 100%;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 10px; position: sticky; top: 0; z-index: 10;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); width: 100%;
         }
 
-        .ios-header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            margin: 0;
-            text-align: center;
-            flex-grow: 1;
-        }
-
-        .ios-button {
-            background: #f4f4f5;
-            border: none;
-            color: var(--accent-blue);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 10px 12px;
-            border-radius: 12px;
-            transition: background 0.2s;
-        }
-
+        .ios-header h1 { font-size: 20px; font-weight: 700; margin: 0; text-align: center; flex-grow: 1; }
+        .ios-button { background: #f4f4f5; border: none; color: var(--accent-blue); font-size: 16px; font-weight: 600; cursor: pointer; padding: 10px 12px; border-radius: 12px; }
         .ios-button:active { background: #e4e4e7; }
-        
-        .ios-button.block {
-            background: var(--accent-blue);
-            color: white;
-            width: 100%;
-            padding: 16px;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
-            border-radius: 16px;
-        }
+        .ios-button.block { background: var(--accent-blue); color: white; width: 100%; padding: 16px; font-size: 18px; margin-top: 20px; }
 
-        main { 
-            padding: 10px; 
-            width: 100%;
-        }
+        main { padding: 10px; width: 100%; }
 
         .legend {
-            display: flex;
-            justify-content: space-between;
-            background: var(--card-bg);
-            padding: 12px 5px;
-            border-radius: 14px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            width: 100%;
+            display: flex; justify-content: space-between; background: var(--card-bg);
+            padding: 12px 5px; border-radius: 14px; margin-bottom: 15px; width: 100%;
         }
+        .legend-item { display: flex; flex-direction: column; align-items: center; font-size: 13px; font-weight: 600; width: 25%; }
+        .legend-icon { font-size: 24px; margin-bottom: 3px; }
 
-        .legend-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 13px; /* Mniejsza czcionka, żeby się zmieściło */
-            font-weight: 600;
-            color: var(--text-primary);
-            width: 25%;
-        }
-
-        .legend-icon { font-size: 24px; margin-bottom: 3px; } /* Mniejsze ikonki */
-
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-size: 14px; /* Mniejsza czcionka */
-            font-weight: bold;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            width: 100%;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px; /* Mniejsze przerwy między dniami */
-            width: 100%;
-        }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 14px; font-weight: bold; color: var(--text-secondary); margin-bottom: 8px; width: 100%; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; width: 100%; }
 
         .day {
-            background: var(--card-bg);
-            border-radius: 10px;
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px; /* Mniejsza liczba dnia */
-            font-weight: 700;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            cursor: pointer;
-            position: relative;
+            background: var(--card-bg); border-radius: 10px; aspect-ratio: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.08); cursor: pointer;
             border: 2px solid transparent;
         }
-
         .day:active { transform: scale(0.95); border-color: var(--accent-blue); }
         .day.empty { background: transparent; box-shadow: none; cursor: default; }
-        
-        .day-icon { 
-            font-size: 20px; /* Mniejsza ikonka w kalendarzu */
-            margin-top: 2px; 
-        }
+        .day-icon { font-size: 20px; margin-top: 2px; }
 
         .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 1;
-            transition: opacity 0.3s;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 1; transition: opacity 0.3s;
         }
-
         .modal.hidden { opacity: 0; pointer-events: none; }
-
         .modal-content {
-            background: var(--card-bg);
-            width: 90%;
-            max-width: 360px;
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            text-align: center;
+            background: var(--card-bg); width: 90%; max-width: 360px; border-radius: 24px;
+            padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center;
         }
 
         .modal-icon { font-size: 50px; margin-bottom: 10px; }
-        .modal-content h2 { margin: 0 0 15px 0; font-size: 24px; color: var(--text-primary); }
-        .modal-body p { margin: 10px 0; font-size: 18px; line-height: 1.4; }
+        .modal-content h2 { margin: 0 0 15px 0; font-size: 24px; }
         .highlight { font-weight: bold; color: var(--accent-blue); font-size: 22px; display: block; margin-top: 5px; }
         
-        .details-text {
-            font-size: 16px !important;
-            color: var(--text-secondary);
-            margin-top: 15px !important;
-            background: var(--bg-color);
-            padding: 12px;
-            border-radius: 12px;
+        .exact-book-text {
+            font-size: 19px !important; font-weight: 600; color: #1c1c1e;
+            margin-top: 15px !important; background: #e3f2fd; padding: 15px; border-radius: 12px;
+            border-left: 5px solid var(--accent-blue); text-align: left;
+        }
+        .planting-time {
+            font-size: 15px; font-weight: bold; color: var(--accent-green);
+            background: #e8f5e9; padding: 5px 10px; border-radius: 8px; margin-top: 10px; display: inline-block;
         }
     </style>
 </head>
 <body>
 
     <header class="ios-header">
-        <button id="prev-month" class="ios-button">◀ Wstecz</button>
+        <button id="prev-month" class="ios-button">◀</button>
         <h1 id="month-year">Ładowanie...</h1>
-        <button id="next-month" class="ios-button">Dalej ▶</button>
+        <button id="next-month" class="ios-button">▶</button>
     </header>
     
     <main>
@@ -222,49 +121,65 @@
         <div class="modal-content">
             <div id="modal-big-icon" class="modal-icon">🥕</div>
             <h2 id="modal-date">Data</h2>
-            <div class="modal-body">
-                <p>Dzisiaj najlepiej pielęgnować:<br><span id="modal-action" class="highlight">Korzeń</span></p>
-                <p class="details-text" id="modal-details"></p>
-            </div>
+            <div style="margin-bottom: 10px;">Najlepsze do pracy:<br><span id="modal-action" class="highlight">Korzeń</span></div>
+            <div id="modal-planting" class="planting-time hidden">🌱 Sprzyja sadzeniu i przesadzaniu!</div>
+            <div class="exact-book-text" id="modal-details"></div>
             <button id="close-modal" class="ios-button block">Zamknij</button>
         </div>
     </div>
 
     <script>
-        // Usuwanie starej wersji z pamięci na wypadek resztek cache'u
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                }
+                for(let r of registrations) r.unregister();
             });
         }
 
-        const icons = { "ko": "🥕", "kw": "🌻", "li": "🥬", "ow": "🍎" };
-
-        const typeMap = {
-            "ko": { action: "Rośliny korzeniowe", details: "Dobry dzień na marchew, buraki, rzodkiewkę, seler i cebulę." },
-            "kw": { action: "Rośliny kwiatowe", details: "Dobry dzień na słoneczniki, róże oraz wszelkie kwiaty cięte i ozdobne." },
-            "li": { action: "Rośliny liściowe", details: "Dobry dzień na sałatę, kapustę, szpinak, jarmuż i zioła liściaste." },
-            "ow": { action: "Rośliny owocowe", details: "Dobry dzień na pomidory, ogórki, fasolę, dynię oraz drzewa owocowe." }
-        };
-
+        // BAZA DANYCH 2026 - SZCZEGÓŁOWE ZAPISY Z KSIĄŻKI PDF
         const yearData = [
-            "ko,kw,kw,li,ow,ow,ow,ko,ko,ko,ko,kw,li,li,li,li,ow,ow,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,kw,li", 
-            "li,ow,ow,ko,ko,ko,ko,kw,kw,li,li,ow,ow,ow,ko,ko,kw,kw,li,li,li,ow,ko,ko,kw,kw,kw,li", 
-            "ow,ow,ow,ko,ko,ko,ko,kw,li,li,li,ow,ow,ko,ko,kw,kw,li,li,li,ow,ko,ko,ko,kw,kw,li,li,ow,ow,ko", 
-            "ko,ko,ko,ko,li,li,li,ow,ow,ow,ko,ko,kw,kw,li,li,ow,ow,ko,ko,kw,li,ow,ow,ow,ko,ko,ko,ko,ko", 
-            "kw,li,ow,ow,ko,ko,ko,li,ow,ow,ko,kw,li,li,ow,ko,ko,ko,kw,kw,li,li,ow,ow,ko,ko,kw,kw,li,li,li", 
-            "ow,ow,ow,ko,ko,kw,kw,li,li,li,ow,ow,ko,ko,kw,li,li,ow,ow,ow,ko,ko,ko,ko,kw,li,li,li,ow,ow", 
-            "ko,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,kw,li,li,ow,ow,ko,ko,ko,kw,kw,kw,li,li,ow,ow,ow,ko,ko,kw", 
-            "kw,li,li,li,ow,li,ko,ko,ko,li,ow,ow,ow,ko,ko,ko,kw,kw,li,li,li,ow,ow,ko,ko,kw,kw,li,li,li,li", 
-            "ow,ow,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,kw,li,li,ow,ow,ko,ko", 
-            "ko,li,kw,li,li,ow,ow,ko,ko,ko,kw,li,li,ow,ow,ow,ko,ko,ko,kw,kw,li,li,li,ow,ow,ko,ko,ko,kw,kw", 
-            "li,ow,ow,ow,ko,ko,ko,kw,kw,li,li,ow,ow,ow,ko,ko,kw,kw,li,li,ow,ow,li,ko,ko,kw,kw,li,li,ow", 
-            "ow,ko,ko,ko,kw,kw,li,li,li,ow,ow,ko,ko,ko,kw,kw,li,li,ow,ow,ko,ko,ko,kw,li,li,ow,ow,ko,ko,ow"
+            // Styczeń
+            ["korzeń do 10, czas sadzenia od 10", "12-13 korzeń, od 14 kwiat", "kwiat", "kwiat do 10, od 11 liść", "liść do 22, od 23 owoc", "owoc do 8", "owoc od 17", "owoc do 13, od 14 korzeń", "korzeń", "korzeń", "korzeń", "korzeń do 7, od 8 kwiat", "kwiat do 19, od 20 Ag kwiat", "Ag kwiat do 1, od 2 liść", "liść", "liść do 10, od 11 owoc, koniec czasu sadz. 6", "owoc", "owoc do 20, od 21 korzeń", "korzeń", "korzeń", "korzeń do 1, od 2 do 20 kwiat", "kwiat od 5 do 23", "liść od 0", "liść", "liść do 18, od 19 owoc", "owoc", "owoc do 11, od 12 korzeń", "korzeń", "korzeń do 10, pocz. czasu sadz. 19", "kwiat od 12", "kwiat do 21, od 22 liść"],
+            // Luty
+            ["liść", "liść do 8, od 9 owoc", "owoc do 16", "od 1 do 22 owoc, od 23 korzeń", "korzeń", "korzeń", "korzeń", "korzeń do 15, od 16 kwiat", "kwiat", "kwiat do 3, 4-8 liść, 9-21 Ag kwiat, od 22 liść", "liść", "liść do 18, od 19 owoc, kon. sadz. 13", "owoc do 19", "owoc od 0 do 2", "od 9 korzeń", "korzeń do 16, od 22 kwiat", "kwiat do 2, 3-9 korz., od 10 kwiat", "kwiat do 3, kwiat od 12 do 21", "kwiat od 3 do 6, od 7 liść", "liść", "liść do 23", "owoc od 0 do 8, od 9 do 24 kwiat", "owoc od 1 do 16, od 17 korzeń", "korzeń do 12", "od 14 kwiat", "kwiat, pocz. sadzenia 2", "kwiat", "kwiat do 5, od 6 liść"],
+            // Marzec
+            ["liść do 17, od 18 owoc", "owoc", "owoc do 1", "owoc od 10", "czas sadzenia owoc do 8, od 9 korzeń", "korzeń do 5, 6-21 kwiat, od 22 korzeń", "korzeń", "korzeń do 24", "kwiat od 1, od 19 b. korzystny", "kwiat do 12, do 10 b. korz., od 13 liść", "liść do 5, 6-18 Ag kwiat, od 19 liść", "liść, koniec czasu sadzenia 21", "liść do 2, od 3 owoc", "owoc", "owoc do 13, od 14 korzeń", "korzeń", "korzeń do 18, od 19 kwiat", "kwiat do 12, kwiat od 21", "kwiat do 14, od 15 liść", "liść", "liść", "liść do 7, 8-12 owoc, 13-24 kwiat", "od 2 korzeń", "korzeń do 1", "od 15 kwiat, pocz. sadz. 7", "kwiat", "kwiat do 11, od 12 liść", "liść do 24", "owoc od 1", "owoc do 8", "owoc do 17, od 18 korzeń"],
+            // Kwiecień
+            ["korzeń", "korzeń do 24", "kwiat od wsch. słońca do 20, od 21 liść", "liść", "liść do 1, 2-14 Ag kwiat, od 15 liść", "liść do 11, od 12 owoc, kon. sadzenia 6", "owoc do 23", "od 21 korzeń", "korzeń", "korzeń do 4, od 5 do 21 kwiat", "od 6 kwiat", "kwiat do 1, od 2 liść", "liść", "liść do 17, od 18 owoc", "owoc do 20", "od 22 korzeń", "korzeń", "korzeń do 18, od 19 kwiat, pocz. sadzenia 14", "kwiat", "kwiat do 17, od 18 liść", "liść do 6, od 7 owoc", "owoc do 12", "owoc od 21", "owoc do 23", "korzeń od 0, 12-22 bardzo korzystny", "korzeń", "korzeń", "korzeń", "korzeń", "korzeń"],
+            // Maj
+            ["korzeń do 16, od 17 kwiat", "kwiat", "kwiat do 3, od 4 liść", "liść do 15, od 16 Ag kwiat", "Ag kwiat-4, 5-18 liść, od 19 owoc, k. cz. s. 13", "owoc", "owoc", "owoc do 6, od 7 korzeń", "korzeń", "korzeń do 13, od 14 kwiat", "kwiat do 2, kwiat od 11", "kwiat do 11, od 12 do 19 liść", "od 9 liść", "liść do 4, od 5 owoc", "owoc do 18, od 19 korzeń", "korzeń do 3", "od 5 korzeń", "korzeń do 3, 4-18 kwiat, od 19 korzeń, pocz. sadz. 23", "korzeń do 4, od 5 do 24 kwiat", "liść od 1", "liść do 12, od 13 owoc", "owoc do 13", "owoc od 22", "owoc do 4, od 5 korzeń", "korzeń, od 12 do 21 bardzo korzystny", "korzeń", "korzeń do 22, od 23 kwiat", "kwiat", "kwiat do 10, od 11 liść", "liść do 21, od 22 Ag kwiat", "Ag kwiat, czas sadzenia"],
+            // Czerwiec
+            ["Ag kwiat-10, 11-24 liść, k. cz. sadz. 18", "owoc od 1", "owoc", "owoc do 13, od 14 korzeń", "korzeń", "korzeń do 20, od 21 kwiat", "kwiat do 4, kwiat od 13", "kwiat do 19, od 20 liść", "liść", "liść", "liść do 13, od 14 owoc", "owoc", "owoc do 5, od 6 korzeń", "korzeń do 12", "od 14 kwiat, pocz. czasu sadz. 9", "kwiat do 22, od 23 liść", "liść do 9, liść 11-19", "liść od 1 do 21, od 22 owoc", "owoc do 15", "owoc od 0 do 2", "od 16 korzeń", "korzeń", "korzeń", "korzeń", "korzeń-3, 4-6 kwiat, 7-17 liść, od 18 kwiat", "kwiat do 16, od 17 liść", "liść do 23", "Ag kwiat 0-12, od 13 liść, k. cz. sadz. 23", "liść do 6, od 7 owoc", "owoc"],
+            // Lipiec
+            ["owoc do 18, od 19 korzeń", "korzeń", "korzeń", "korzeń-2, 3-5 kwiat, kwiat od 14", "kwiat do 2, 3-18 korzeń, od 19 kwiat", "kwiat do 1, od 2 liść", "liść do 21, od 22 owoc", "owoc do 14, od 15 korzeń", "korzeń", "korzeń do 21, pocz. czasu sadz. 18", "od 23 kwiat", "kwiat do 20, od 21 liść", "liść", "liść do 7, od 8 do 22 owoc", "od 7 owoc", "owoc-3, 4-10 korz., 11-19 owoc, od 20 korz.", "korzeń", "korzeń do 3, 4-13 liść, od 14 korzeń", "korzeń", "korzeń do 10, od 11 kwiat", "kwiat do 13", "od 15 do 22 Ag kwiat, od 23 liść", "liść do 13, od 14 owoc, k. czasu sadz. 5", "owoc do 3, od 4 do 13 liść, od 14 owoc", "owoc do 1, od 2 korzeń", "korzeń do 12", "korzeń", "korzeń", "korzeń", "kwiat", "kwiat"],
+            // Sierpień
+            ["od 10 kwiat", "kwiat do 7, od 8 liść", "liść", "liść", "liść do 4, od 5 owoc", "owoc do 21, od 22 liść", "liść do 8, od 9 korzeń", "korzeń do 18", "pocz. czasu sadz. 3, korzeń", "3-6 kwiat, 7-22 liść, od 23 korzeń", "liść i korzeń 0-9, 9-17 liść, od 18 owoc", "owoc do 7, owoc od 16", "owoc", "owoc do 5, od 6 korzeń", "korzeń", "korzeń do 11, 12-21 liść, od 22 korzeń", "korzeń do 18, od 19 kwiat", "kwiat", "kwiat do 5, od 6 liść", "liść", "liść-1, 2-14 Ag kwiat, 15-20 liść, od 21 owoc, kon. sadz. 12", "owoc", "owoc", "owoc do 8, od 9 korzeń", "korzeń", "korzeń do 14, od 15 do 16 kwiat", "kwiat od 1", "kwiat do 13, od 14 liść", "liść", "liść, od 19 bardzo korzystny", "liść do 9, od 10 owoc"],
+            // Wrzesień
+            ["liść 9, do 4 bar. korzystny, od 10 owoc", "owoc", "owoc do 3, od 4 korzeń", "korzeń", "korzeń-15, od 16 kwiat, pocz. cz. sadz. 9", "kwiat do 10, od 12 do 14 kwiat, od 15 liść", "liść do 17, liść od 23", "liść do 2, od 3 do 17 owoc", "od 1 owoc", "owoc do 14, od 15 korzeń", "korzeń, od 12 do 21 bardzo korzystny", "korzeń, od 23 bardzo korzystny", "korzeń 13, do 8 b. korz., korzeń od 19", "korzeń do 3, od 4 kwiat", "kwiat do 1", "od 15 liść", "liść do 19, od 20 Ag kwiat, k. cz. sadz. 20", "Ag kwiat do 4, od 5 owoc", "owoc", "owoc do 16, od 17 korzeń", "korzeń", "korzeń do 23", "od 9 kwiat", "kwiat do 21, od 22 liść", "liść do 1, od 2 do 11 korzeń, od 12 liść", "liść", "liść do 12, 13-22 korzeń, od 23 owoc", "owoc", "owoc do 8, od 9 korzeń", "korzeń"],
+            // Październik
+            ["korzeń do 11", "od 13 liść, pocz. czasu sadz. 15", "liść do 4, od 5 kwiat", "kwiat do 20, od 21 liść", "liść do 5, liść od 11", "liść do 9, od 15 do 23 owoc", "od 8 owoc", "owoc do 22, od 23 korzeń", "korzeń", "korzeń do 11, od 12 kwiat", "kwiat do 22, od 23 liść", "liść", "liść, od 23 bardzo korzystny", "liść-14, do 12 b. korz., od 15 owoc, k. cz. sadz. 4", "owoc", "owoc do 1, od 2 korzeń", "korzeń", "korzeń do 6, od 15 kwiat", "kwiat", "kwiat do 6, od 7 liść", "liść", "liść do 24", "owoc od 1", "owoc do 22, od 23 korzeń", "korzeń do 6", "od 8 korzeń, pocz. czasu sadz. 20", "korzeń do 2, od 3 kwiat", "kwiat", "kwiat do 8, od 9 liść", "liść do 17, od 18 owoc", "owoc"],
+            // Listopad
+            ["kwiat do 1, od 2 liść", "liść do 11, od 17 do 21 owoc", "od 8 owoc", "owoc do 16", "od 6 korzeń", "korzeń do 9, korzeń od 15", "korzeń do 18, od 19 kwiat", "kwiat", "kwiat do 5, od 6 liść", "liść", "liść do 18, od 19 owoc, k. czasu sadz. 10", "owoc", "owoc", "owoc do 7, od 8 korzeń", "korzeń", "korzeń do 8, od 17 kwiat", "kwiat", "kwiat do 15, od 16 liść", "liść do 10", "od 12 owoc", "owoc do 18, od 19 liść", "liść do 4, od 5 korzeń", "korzeń do 9", "od 12 kwiat, pocz. czasu sadz. 4", "kwiat", "kwiat do 8, od 9 liść", "liść-9, 10-16 korzeń, 17-19 liść, 20-24 owoc", "od 12 owoc", "owoc do 6, od 7 korzeń", "korzeń"],
+            // Grudzień
+            ["owoc", "owoc do 9, od 10 korzeń", "korzeń", "korzeń do 24", "kwiat od 1", "kwiat-5, od 6 liść, 12-15 bar. korzystny", "liść", "liść, koniec czasu sadzenia 16", "liść do 1, od 2 owoc", "owoc do 8, od 9 do 18 liść, od 19 owoc", "owoc do 14, od 15 do 23 korzeń", "od 18 do 23 korzeń", "kwiat od 0", "kwiat do 23", "liść od 0", "liść", "liść do 20, od 21 owoc", "owoc do 13, od 14 korzeń", "korzeń", "korzeń do 22, pocz. czasu sadz. 15", "kwiat od 0 do 18, od 19 liść", "liść", "liść do 4, od 13 owoc", "owoc do 16, od 17 korzeń", "korzeń", "korzeń do 1, od 2 owoc, 13-16 bar. korz.", "owoc", "owoc do 9, od 10 korzeń", "korzeń", "korzeń do 24", "kwiat"]
         ];
 
         let currentDate = new Date(); 
+
+        function getDayInfo(text) {
+            const t = text.toLowerCase();
+            const types = [
+                { action: "Rośliny korzeniowe", icon: "🥕", idx: t.indexOf("korz") },
+                { action: "Rośliny kwiatowe", icon: "🌻", idx: t.indexOf("kwiat") },
+                { action: "Rośliny liściowe", icon: "🥬", idx: t.indexOf("liś") },
+                { action: "Rośliny owocowe", icon: "🍎", idx: t.indexOf("owoc") }
+            ];
+            
+            // Znajdź główną akcję, która pojawia się jako pierwsza w tekście dnia
+            const valid = types.filter(x => x.idx !== -1).sort((a, b) => a.idx - b.idx);
+            
+            if (valid.length > 0) return valid[0];
+            return { action: "Korzeń", icon: "🥕" }; // Domyślne
+        }
 
         function renderCalendar(date) {
             const year = date.getFullYear();
@@ -292,36 +207,43 @@
                 grid.appendChild(emptyDiv);
             }
             
-            const monthDataStr = yearData[month].split(',');
+            const daysData = yearData[month];
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'day';
                 dayDiv.textContent = day;
                 
-                const dayCode = monthDataStr[day - 1];
-                const dayData = typeMap[dayCode];
+                const exactText = daysData[day - 1] || "Brak danych";
+                const info = getDayInfo(exactText);
                 
-                if (dayData) {
-                    const iconDiv = document.createElement('div');
-                    iconDiv.className = 'day-icon';
-                    iconDiv.textContent = icons[dayCode];
-                    dayDiv.appendChild(iconDiv);
-                    
-                    dayDiv.addEventListener('click', () => openModal(day, monthNames[month], year, dayData, icons[dayCode]));
-                }
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'day-icon';
+                iconDiv.textContent = info.icon;
+                dayDiv.appendChild(iconDiv);
                 
+                dayDiv.addEventListener('click', () => openModal(day, monthNames[month], year, exactText, info));
                 grid.appendChild(dayDiv);
             }
         }
 
-        function openModal(day, monthName, year, data, icon) {
+        function openModal(day, monthName, year, exactText, info) {
             document.getElementById('modal-date').textContent = `${day} ${monthName} ${year}`;
-            const iconElement = document.getElementById('modal-big-icon');
-            iconElement.textContent = icon;
-            iconElement.style.display = 'block';
-            document.getElementById('modal-action').textContent = data.action;
-            document.getElementById('modal-details').textContent = data.details;
+            document.getElementById('modal-big-icon').textContent = info.icon;
+            document.getElementById('modal-action').textContent = info.action;
+            
+            // Formatowanie oryginalnego tekstu z książki - wielka litera
+            const formattedText = exactText.charAt(0).toUpperCase() + exactText.slice(1);
+            document.getElementById('modal-details').textContent = formattedText;
+            
+            // Pokaż/Ukryj znacznik czasu sadzenia
+            const plantingTag = document.getElementById('modal-planting');
+            if(exactText.toLowerCase().includes('sadz')) {
+                plantingTag.classList.remove('hidden');
+            } else {
+                plantingTag.classList.add('hidden');
+            }
+
             document.getElementById('day-modal').classList.remove('hidden');
         }
 
