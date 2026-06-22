@@ -1,267 +1,767 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kalendarz Biodynamiczny</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Kalendarz">
-    <link rel="apple-touch-icon" href="icon-192.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#edefea">
+<meta name="description" content="Wyszukiwarka leków homeopatycznych oparta na Repertorium Kenta — kreator dolegliwości oraz pełne repertorium z wyszukiwarką rubryk i repertoryzacją.">
+<title>Repertorium · leki homeopatyczne</title>
+<style>
+  :root{
+    --bg:#edefea; --canvas:#dfe2da; --card:#ffffff;
+    --label:#1c1c1e; --label2:#6b6b73; --label3:#a3a3ab;
+    --sep:rgba(60,60,67,.10); --sep2:rgba(60,60,67,.18);
+    --accent:#1f8a60; --accent-press:#176f4d; --accent-tint:rgba(31,138,96,.12);
+    --g3:#1f8a60; --g2:#5fae8b; --g1:#a9cdba;
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(20,40,30,.06);
+    --radius:18px; --safe-b:env(safe-area-inset-bottom,0px);
+    --ff:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--ff);background:var(--canvas);color:var(--label);-webkit-font-smoothing:antialiased;line-height:1.42;font-size:17px}
+  #app{max-width:480px;margin:0 auto;min-height:100dvh;min-height:100vh;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.10)}
+  @media (max-width:520px){ #app{box-shadow:none} body{background:var(--bg)} }
 
-    <style>
-        *, *::before, *::after { box-sizing: border-box; }
-        
-        :root {
-            --bg-color: #f4f4f5;
-            --card-bg: #ffffff;
-            --text-primary: #18181b;
-            --text-secondary: #52525b;
-            --accent-blue: #007aff;
-            --accent-green: #34c759;
-            --border-color: #e4e4e7;
-        }
+  .nav{position:sticky;top:0;z-index:30;height:52px;display:flex;align-items:center;padding:0 8px;background:rgba(237,239,234,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--sep)}
+  .nav .title{flex:1;text-align:center;font-size:17px;font-weight:600;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
+  .nav button{border:0;background:none;color:var(--accent);font-family:var(--ff);font-size:17px;padding:8px 10px;min-width:60px;cursor:pointer;display:flex;align-items:center;gap:2px}
+  .nav button:active{opacity:.5}
+  .nav .right{justify-content:flex-end}
+  .nav .icnbtn{min-width:44px;justify-content:center}
+  .chev-l{width:11px;height:18px}
 
-        html, body {
-            max-width: 100vw;
-            overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            margin: 0; padding: 0;
-            user-select: none;
-            -webkit-font-smoothing: antialiased;
-        }
+  .screen{padding:0 16px calc(28px + var(--safe-b));animation:fade .26s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){ .screen{animation:none} *{transition:none!important} }
 
-        .ios-header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 10px; position: sticky; top: 0; z-index: 10;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); width: 100%;
-        }
+  .hero{padding:6px 4px 8px}
+  .hero h1{font-size:34px;line-height:1.1;font-weight:700;letter-spacing:-.5px;margin:8px 0 6px}
+  .hero p{margin:0;color:var(--label2);font-size:15px}
 
-        .ios-header h1 { font-size: 20px; font-weight: 700; margin: 0; text-align: center; flex-grow: 1; }
-        .ios-button { background: #f4f4f5; border: none; color: var(--accent-blue); font-size: 16px; font-weight: 600; cursor: pointer; padding: 10px 12px; border-radius: 12px; }
-        .ios-button:active { background: #e4e4e7; }
-        .ios-button.block { background: var(--accent-blue); color: white; width: 100%; padding: 16px; font-size: 18px; margin-top: 20px; }
+  /* segmented control */
+  .seg{display:flex;background:rgba(118,118,128,.12);border-radius:11px;padding:2px;margin:16px 0 4px}
+  .seg button{flex:1;border:0;background:none;font-family:var(--ff);font-size:14px;font-weight:600;color:var(--label);padding:8px;border-radius:9px;cursor:pointer;transition:.18s}
+  .seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 
-        main { padding: 10px; width: 100%; }
+  .search{position:relative;margin:14px 0 8px}
+  .search input{width:100%;border:0;background:rgba(118,118,128,.12);border-radius:12px;padding:11px 12px 11px 38px;font-size:17px;font-family:var(--ff);color:var(--label)}
+  .search input::placeholder{color:#8a8a90}
+  .search input:focus{outline:2px solid var(--accent-tint)}
+  .search>svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#8a8a90}
 
-        .legend {
-            display: flex; justify-content: space-between; background: var(--card-bg);
-            padding: 12px 5px; border-radius: 14px; margin-bottom: 15px; width: 100%;
-        }
-        .legend-item { display: flex; flex-direction: column; align-items: center; font-size: 13px; font-weight: 600; width: 25%; }
-        .legend-icon { font-size: 24px; margin-bottom: 3px; }
+  .grouphdr{font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:.4px;margin:18px 4px 8px;display:flex;align-items:center;justify-content:space-between}
+  .grouphdr .more{color:var(--accent);text-transform:none;letter-spacing:0;font-weight:500;cursor:pointer}
 
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 14px; font-weight: bold; color: var(--text-secondary); margin-bottom: 8px; width: 100%; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; width: 100%; }
+  .list{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .row{display:flex;align-items:center;gap:13px;padding:12px 14px;cursor:pointer;border-bottom:.5px solid var(--sep);transition:background .15s}
+  .row:last-child{border-bottom:0}
+  .row:active{background:rgba(60,60,67,.07)}
+  .row .ico{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--accent-tint);color:var(--accent)}
+  .row .ico svg{width:20px;height:20px}
+  .row .tx{flex:1;min-width:0}
+  .row .tx b{font-weight:500;font-size:17px;display:block}
+  .row .tx span{font-size:13px;color:var(--label3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .cnt{font-size:13px;color:var(--label3);flex:none}
+  .row .chev{width:8px;height:14px;color:var(--label3);flex:none}
+  .empty{color:var(--label3);text-align:center;padding:34px 10px;font-size:15px}
 
-        .day {
-            background: var(--card-bg); border-radius: 10px; aspect-ratio: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 18px; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.08); cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .day:active { transform: scale(0.95); border-color: var(--accent-blue); }
-        .day.empty { background: transparent; box-shadow: none; cursor: default; }
-        .day-icon { font-size: 20px; margin-top: 2px; }
+  /* rubric rows (full repertory) */
+  .rrow{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;cursor:pointer;border-bottom:.5px solid var(--sep)}
+  .rrow:last-child{border-bottom:0}
+  .rrow:active{background:rgba(60,60,67,.06)}
+  .rrow .add{width:24px;height:24px;border-radius:50%;border:2px solid var(--sep2);flex:none;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:.15s}
+  .rrow .add svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.5);transition:.15s}
+  .rrow.on .add{background:var(--accent);border-color:var(--accent)}
+  .rrow.on .add svg{opacity:1;transform:none}
+  .rrow .rt{flex:1;min-width:0}
+  .rrow .rt b{font-weight:500;font-size:15.5px;line-height:1.3;display:block}
+  .rrow .rt span{font-size:12px;color:var(--label3)}
+  .rrow .rn{font-size:12px;color:var(--label3);flex:none;margin-top:2px}
 
-        .modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 100; opacity: 1; transition: opacity 0.3s;
-        }
-        .modal.hidden { opacity: 0; pointer-events: none; }
-        .modal-content {
-            background: var(--card-bg); width: 90%; max-width: 360px; border-radius: 24px;
-            padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center;
-        }
+  /* questions / wizard */
+  .prog-wrap{padding:14px 2px 4px}
+  .prog{height:5px;border-radius:3px;background:rgba(60,60,67,.12);overflow:hidden}
+  .prog>i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .35s cubic-bezier(.4,0,.2,1)}
+  .prog-lbl{font-size:13px;color:var(--label3);margin:8px 2px 0}
+  .q-eyebrow{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.3px;margin:22px 2px 6px;text-transform:uppercase}
+  .q-title{font-size:26px;font-weight:700;letter-spacing:-.3px;line-height:1.18;margin:0 2px 4px}
+  .q-hint{font-size:14px;color:var(--label2);margin:4px 2px 0}
+  .chips{display:flex;flex-direction:column;gap:10px;margin:20px 0 8px}
+  .chip{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1.5px solid transparent;border-radius:14px;padding:14px 15px;font-size:16px;font-family:var(--ff);color:var(--label);box-shadow:var(--shadow);cursor:pointer;transition:transform .08s,border-color .15s,background .15s}
+  .chip:active{transform:scale(.985)}
+  .chip .tick{width:23px;height:23px;border-radius:50%;border:2px solid var(--sep2);flex:none;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .chip .tick svg{width:13px;height:13px;color:#fff;opacity:0;transform:scale(.5);transition:.15s}
+  .chip.on{border-color:var(--accent);background:var(--accent-tint)}
+  .chip.on .tick{background:var(--accent);border-color:var(--accent)}
+  .chip.on .tick svg{opacity:1;transform:none}
 
-        .modal-icon { font-size: 50px; margin-bottom: 10px; }
-        .modal-content h2 { margin: 0 0 15px 0; font-size: 24px; }
-        .highlight { font-weight: bold; color: var(--accent-blue); font-size: 22px; display: block; margin-top: 5px; }
-        
-        .exact-book-text {
-            font-size: 19px !important; font-weight: 600; color: #1c1c1e;
-            margin-top: 15px !important; background: #e3f2fd; padding: 15px; border-radius: 12px;
-            border-left: 5px solid var(--accent-blue); text-align: left;
-        }
-        .planting-time {
-            font-size: 15px; font-weight: bold; color: var(--accent-green);
-            background: #e8f5e9; padding: 5px 10px; border-radius: 8px; margin-top: 10px; display: inline-block;
-        }
-    </style>
+  .actions{position:sticky;bottom:0;left:0;right:0;margin:8px -16px 0;padding:12px 16px calc(14px + var(--safe-b));background:linear-gradient(to top,var(--bg) 70%,transparent);display:flex;gap:10px}
+  .btn{flex:1;border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:600;font-family:var(--ff);cursor:pointer;transition:transform .08s,opacity .15s}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:active{background:var(--accent-press)}
+  .btn-primary:disabled{opacity:.4}
+  .btn-ghost{background:rgba(118,118,128,.12);color:var(--accent);flex:0 0 auto;padding-left:22px;padding-right:22px}
+
+  /* sticky case button */
+  .casebar{position:sticky;bottom:0;margin:10px -16px 0;padding:10px 16px calc(14px + var(--safe-b));background:linear-gradient(to top,var(--bg) 72%,transparent)}
+  .casebar button{width:100%;border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:600;font-family:var(--ff);background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+  .casebar button:active{background:var(--accent-press)}
+  .casebar .b{background:rgba(255,255,255,.25);border-radius:20px;padding:1px 9px;font-size:14px}
+
+  /* results */
+  .res-head{padding:8px 2px 2px}
+  .res-head h2{font-size:24px;font-weight:700;letter-spacing:-.3px;margin:6px 0 2px}
+  .res-head p{margin:0;color:var(--label2);font-size:14px}
+  .sel-bar{margin:14px 0;background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .sel-bar .toggle{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer;font-size:15px}
+  .sel-bar .toggle b{font-weight:500}
+  .sel-bar .toggle .cnt{margin-left:auto;color:var(--label3);font-size:14px}
+  .sel-bar .body{display:none;padding:0 15px 12px;border-top:.5px solid var(--sep)}
+  .sel-bar.open .body{display:block}
+  .sel-item{font-size:14px;color:var(--label2);padding:8px 0;border-bottom:.5px solid var(--sep);display:flex;gap:8px}
+  .sel-item:last-child{border:0}
+  .sel-item em{color:var(--label3);font-style:normal;margin-left:auto;white-space:nowrap}
+  .rmd{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:13px 14px;margin-bottom:11px;cursor:pointer;transition:transform .08s}
+  .rmd:active{transform:scale(.99)}
+  .rank{font-size:13px;font-weight:700;color:var(--label3);width:18px;text-align:center;flex:none}
+  .ring{width:46px;height:46px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+  .ring::after{content:"";position:absolute;inset:5px;background:var(--card);border-radius:50%}
+  .ring span{position:relative;z-index:1;font-size:13px;font-weight:700;color:var(--accent)}
+  .rmd .info{flex:1;min-width:0}
+  .rmd .info b{font-weight:600;font-size:17px}
+  .rmd .info .lat{font-size:13px;color:var(--label3);font-style:italic}
+  .rmd .info .meta{font-size:13px;color:var(--label2);margin-top:2px}
+  .rmd .chev{width:8px;height:14px;color:var(--label3);flex:none}
+
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.32);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
+  .backdrop.show{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;z-index:50;background:var(--bg);border-radius:22px 22px 0 0;padding:8px 18px calc(24px + var(--safe-b));transform:translateY(101%);transition:transform .34s cubic-bezier(.32,.72,0,1);max-height:88dvh;max-height:88vh;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.18)}
+  .sheet.show{transform:none}
+  .grab{width:38px;height:5px;border-radius:3px;background:var(--sep2);margin:6px auto 10px}
+  .sheet h3{font-size:22px;font-weight:700;margin:6px 0 1px;letter-spacing:-.2px}
+  .sheet .lat{color:var(--label3);font-style:italic;font-size:14px;margin-bottom:14px}
+  .sheet .key{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:14px;font-size:15px;color:var(--label);margin-bottom:16px}
+  .sheet .sub{font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:.4px;margin:0 2px 8px}
+  .cov{background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .cov .ci{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:.5px solid var(--sep);font-size:15px}
+  .cov .ci:last-child{border:0}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .cov .ci .gl{margin-left:auto;font-size:12px;color:var(--label3)}
+  .sheet .close{width:100%;margin-top:18px;background:rgba(118,118,128,.12);color:var(--accent);border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:600;font-family:var(--ff);cursor:pointer}
+  .sheet .danger{color:#c0392b}
+
+  .disc{font-size:14px;color:var(--label2);line-height:1.5}
+  .disc strong{color:var(--label)}
+  .disc .warn{background:#fff5ec;border:1px solid #ffd9b3;color:#8a4b00;border-radius:12px;padding:12px 14px;margin:10px 0;font-size:13.5px}
+
+  .banner{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:11px 13px;font-size:13px;color:var(--label2);margin:6px 0 2px;display:flex;gap:9px;align-items:flex-start}
+  .banner svg{flex:none;width:17px;height:17px;color:var(--accent);margin-top:1px}
+  .banner.demo{background:#fff8ee}
+  .banner.demo svg{color:#c08a2a}
+
+  .foot{margin-top:24px;text-align:center;color:var(--label3);font-size:12px;line-height:1.5}
+  .foot a{color:var(--accent);text-decoration:none}
+</style>
 </head>
 <body>
+<div id="app">
+  <div class="nav" id="nav">
+    <button id="navleft" class="left" style="visibility:hidden" aria-label="Wstecz">
+      <svg class="chev-l" viewBox="0 0 11 18" fill="none"><path d="M9.5 1.5L2 9l7.5 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="navleftlbl">Wstecz</span>
+    </button>
+    <div class="title" id="navtitle">Repertorium</div>
+    <button id="navright" class="right icnbtn" aria-label="Informacje" onclick="openDisclaimer()">
+      <svg viewBox="0 0 22 22" width="22" height="22" fill="none"><circle cx="11" cy="11" r="9.2" stroke="currentColor" stroke-width="1.6"/><circle cx="11" cy="6.6" r="1.15" fill="currentColor"/><path d="M11 9.8v6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div id="view"></div>
+</div>
 
-    <header class="ios-header">
-        <button id="prev-month" class="ios-button">◀</button>
-        <h1 id="month-year">Ładowanie...</h1>
-        <button id="next-month" class="ios-button">▶</button>
-    </header>
-    
-    <main>
-        <div class="legend">
-            <div class="legend-item"><span class="legend-icon">🥕</span>Korzeń</div>
-            <div class="legend-item"><span class="legend-icon">🌻</span>Kwiat</div>
-            <div class="legend-item"><span class="legend-icon">🥬</span>Liść</div>
-            <div class="legend-item"><span class="legend-icon">🍎</span>Owoc</div>
-        </div>
+<div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetbody"></div></div>
 
-        <div class="weekdays">
-            <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>So</div><div>Nd</div>
-        </div>
-        <div id="calendar-grid" class="calendar-grid"></div>
-    </main>
+<script>
+"use strict";
 
-    <div id="day-modal" class="modal hidden">
-        <div class="modal-content">
-            <div id="modal-big-icon" class="modal-icon">🥕</div>
-            <h2 id="modal-date">Data</h2>
-            <div style="margin-bottom: 10px;">Najlepsze do pracy:<br><span id="modal-action" class="highlight">Korzeń</span></div>
-            <div id="modal-planting" class="planting-time hidden">🌱 Sprzyja sadzeniu i przesadzaniu!</div>
-            <div class="exact-book-text" id="modal-details"></div>
-            <button id="close-modal" class="ios-button block">Zamknij</button>
-        </div>
-    </div>
+/* =====================================================================
+   CZĘŚĆ 1 — KURATOROWANA BAZA „KREATORA” (jak poprzednio)
+   ===================================================================== */
+const REM = {
+  Acon:["Aconitum napellus","Tojad mocny","Nagły, gwałtowny początek po zimnym suchym wietrze lub silnym przestrachu. Niepokój, lęk, pragnienie zimnej wody."],
+  Apis:["Apis mellifica","Pszczoła miodna","Różowy, piekąco-kłujący obrzęk; lepiej od zimna, gorzej od ciepła. Zwykle bez pragnienia."],
+  Arn:["Arnica montana","Arnika górska","Skutki urazów i stłuczeń; uczucie „posiniaczenia”. Nie chce być dotykany."],
+  Ars:["Arsenicum album","Biały arszenik","Niepokój, lęk o zdrowie, osłabienie. Pieczenie łagodzone ciepłem; pragnienie częstych małych łyków; gorzej koło północy."],
+  Bell:["Belladonna","Pokrzyk wilcza jagoda","Nagłe stany zapalne: gorąco, czerwień, pulsowanie, rozszerzone źrenice. Gorzej od światła, hałasu, wstrząsu."],
+  Bry:["Bryonia alba","Przestęp biały","Gorzej od najmniejszego ruchu, lepiej w bezruchu i od ucisku. Suchość błon śluzowych, duże pragnienie, drażliwość."],
+  Calc:["Calcarea carbonica","Węglan wapnia","Zmęczenie, poty głowy, wrażliwość na zimno i wilgoć. Powolność, obawy; pragnienie rzeczy niestrawnych."],
+  "Carb-v":["Carbo vegetabilis","Węgiel drzewny","Wzdęcia, odbijanie, potrzeba świeżego powietrza i wachlowania. Osłabienie, ziębnięcie."],
+  Cham:["Chamomilla","Rumianek pospolity","Nieznośna drażliwość z bólu; jeden policzek czerwony. Ząbkowanie; ulga, gdy noszony."],
+  Cocc:["Cocculus indicus","Kulczyba","Nudności podróżne, zawroty od ruchu; wyczerpanie po nieprzespanych nocach."],
+  Coff:["Coffea cruda","Surowa kawa","Bezsenność od natłoku myśli i podniecenia; nadwrażliwość, „wszystko za mocne”."],
+  Coloc:["Colocynthis","Gorzki ogórek","Kolkowy, skurczowy ból brzucha; ulga od zgięcia wpół i mocnego ucisku. Złość z bólem."],
+  Dros:["Drosera rotundifolia","Rosiczka","Napadowy, szczekający kaszel, gorszy w nocy i po położeniu się."],
+  Euphr:["Euphrasia officinalis","Świetlik","Gryzące łzawienie z oczu, łagodny wyciek z nosa (odwrotnie niż Allium cepa)."],
+  "Ferr-p":["Ferrum phosphoricum","Fosforan żelaza","Łagodny początek gorączki bez wyraźnych objawów; skłonność do krwawień, bladość z rumieńcem."],
+  Gels:["Gelsemium sempervirens","Jaśmin karoliński","Osłabienie, ociężałość, drżenie, „grypowe” rozbicie. Brak pragnienia; trema z biegunką."],
+  Hep:["Hepar sulphuris","Wątroba siarki","Skrajna wrażliwość na zimno, dotyk i ból. Skłonność do ropienia; drzazgowaty ból gardła."],
+  Ign:["Ignatia amara","Bób św. Ignacego","Skutki świeżego żalu i przykrości; wzdychanie, zmienność, kula w gardle, objawy paradoksalne."],
+  Ip:["Ipecacuanha","Wymiotnica","Uporczywe, nieustępujące nudności przy zaskakująco czystym języku."],
+  Led:["Ledum palustre","Bagno zwyczajne","Rany kłute i ukłucia; obrzęk lepszy od zimnych okładów."],
+  Lyc:["Lycopodium clavatum","Widłak goździsty","Wzdęcia i pełność, gorzej 16–20, częściej prawa strona. Brak pewności siebie przy zewnętrznej dominacji."],
+  "Mag-phos":["Magnesia phosphorica","Fosforan magnezu","Kurczowe, strzelające bóle; wyraźna ulga od ciepła i ucisku."],
+  Merc:["Mercurius solubilis","Rtęć rozpuszczalna","Ślinotok, poty bez ulgi, obłożony język. Gorzej w nocy i od ciepła łóżka."],
+  "Nat-m":["Natrum muriaticum","Sól kuchenna","Skutki tłumionego żalu, zamknięcie w sobie, gorzej od pocieszania. Pragnienie soli, opryszczka."],
+  "Nux-v":["Nux vomica","Orzech wymiotny","Drażliwość, nadwrażliwość, skutki przejedzenia i używek. Gorzej rano i od zimna; uczucie zalegania."],
+  "Phos-ac":["Phosphoricum acidum","Kwas fosforowy","Apatia i otępienie po wyczerpaniu lub żalu; obojętność, osłabienie."],
+  Phos:["Phosphorus","Fosfor","Pragnienie zimnych napojów, skłonność do krwawień, wrażliwość. Potrzeba towarzystwa; lepiej po krótkim śnie."],
+  Podo:["Podophyllum peltatum","Stopowiec","Obfita, „chlustająca”, poranna biegunka z osłabieniem."],
+  Puls:["Pulsatilla pratensis","Sasanka łąkowa","Zmienne, wędrujące objawy; płaczliwość, potrzeba pocieszania. Brak pragnienia; lepiej na świeżym powietrzu."],
+  "Rhus-t":["Rhus toxicodendron","Sumak jadowity","Sztywność i ból gorsze przy pierwszym ruchu, lepsze od dalszego ruchu i ciepła. Niepokój, wymuszone zmiany pozycji."],
+  Sep:["Sepia officinalis","Mątwa","Wyczerpanie, obojętność wobec bliskich, uczucie opadania narządów; lepiej od energicznego ruchu."],
+  Sil:["Silicea terra","Krzemionka","Skłonność do ropienia i wydalania ciał obcych; wrażliwość na zimno, brak pewności, upór."],
+  Spong:["Spongia tosta","Gąbka prażona","Suchy, szczekający kaszel — „piła w desce”; gorzej przed północą."],
+  Sulph:["Sulphur","Siarka","Pieczenie i świąd gorsze od ciepła i mycia; gorąco stóp. Nawroty, „nieuporządkowany” obraz."],
+  Verat:["Veratrum album","Ciemiernik biały","Biegunka z zimnym potem, bladością i skrajnym osłabieniem; ziębnięcie."],
+  "All-c":["Allium cepa","Cebula","Wodnisty, gryzący wyciek z nosa i łagodne łzawienie; gorzej w ciepłym pokoju, lepiej na powietrzu."]
+};
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let r of registrations) r.unregister();
-            });
-        }
+const RUB = {
+  head_pain:["Głowa — ból, ogólnie","Head, pain",{Bell:3,Bry:3,"Nux-v":3,Puls:3,Sil:2,Sulph:3,Sep:2,Phos:2,"Nat-m":3,Lyc:2,Calc:2,Acon:2,Gels:2,Ign:2}],
+  head_forehead:["Ból w czole / nad oczami","Head, pain, forehead",{Bell:3,Bry:3,"Nux-v":2,Gels:2,Phos:2,Sep:2,Puls:2,Acon:2,"Nat-m":2}],
+  head_temples:["Ból w skroniach","Head, pain, temples",{Bell:2,"Nux-v":2,Lyc:2,Sep:2,Puls:2,"Nat-m":2,Phos:2}],
+  head_occiput:["Ból potylicy (tył głowy)","Head, pain, occiput",{Gels:3,Bry:2,Sep:2,Sil:2,"Nat-m":2}],
+  head_throb:["Ból pulsujący / cała głowa","Head, pain, pulsating",{Bell:3,"Nat-m":2,Puls:2,"Ferr-p":2,Sulph:2,Acon:2}],
+  head_motion:["Głowa — gorzej od ruchu","Head, worse motion",{Bry:3,"Nux-v":2,Sil:2,Sep:2,Gels:2,"Nat-m":2}],
+  head_pressure:["Głowa — lepiej od ucisku","Head, better pressure",{Bry:2,Puls:2,"Mag-phos":2,Sil:2}],
+  fever:["Gorączka","Fever, heat",{Bell:3,Acon:3,Ars:3,Bry:3,Gels:3,"Ferr-p":3,Puls:2,"Nux-v":2,"Rhus-t":2,Sulph:2,Phos:2,Apis:2,Cham:2}],
+  onset_sudden:["Nagły, gwałtowny początek","Onset, sudden, violent",{Acon:3,Bell:3,"Ferr-p":2}],
+  onset_slow:["Powolny, podstępny początek","Onset, slow, insidious",{Gels:3,"Ferr-p":2,Bry:2,Puls:2}],
+  after_cold_wind:["Po zimnym, suchym wietrze","Ailments from cold dry wind",{Acon:3,Hep:2,"Nux-v":2,Bell:2}],
+  after_wet:["Po przemoczeniu / wilgoci","Ailments from getting wet",{"Rhus-t":3,Bry:2,Calc:2}],
+  fever_restless:["Z niepokojem i lękiem","Fever, with anxiety, restlessness",{Acon:3,Ars:3,"Rhus-t":2}],
+  fever_drowsy:["Z sennością, otępieniem","Fever, drowsy, dull",{Gels:3,Bry:2,Puls:2,Apis:2}],
+  cough:["Kaszel","Cough",{Bry:3,Dros:3,Phos:3,Spong:3,Hep:3,Puls:3,"Nux-v":2,"Rhus-t":2,Ip:2,Sulph:2,Acon:2,Bell:2}],
+  cough_dry:["Kaszel suchy","Cough, dry",{Bry:3,Spong:3,Phos:3,Acon:2,Dros:2,Hep:2,"Nux-v":2}],
+  cough_loose:["Kaszel wilgotny, z odkrztuszaniem","Cough, loose",{Puls:3,Phos:2,Sulph:2,Hep:2,Ip:2}],
+  cough_night:["Kaszel — gorzej w nocy","Cough, night",{Dros:3,Hep:3,Puls:2,Phos:2,Ars:2,"Nux-v":2}],
+  cough_cold_air:["Kaszel — gorzej na zimnym powietrzu","Cough, cold air",{Phos:3,Hep:3,Spong:2,Acon:2}],
+  cough_barking:["Kaszel szczekający","Cough, barking",{Spong:3,Dros:3,Hep:2,Acon:2}],
+  throat:["Gardło — ból","Throat, pain",{Bell:3,Merc:3,Hep:3,Lyc:3,Apis:3,Bry:2,"Nux-v":2,"Rhus-t":2,Sulph:2,Puls:2}],
+  throat_right:["Gardło — prawa strona","Throat, right side",{Lyc:3,Bell:2,Apis:2,Merc:2}],
+  throat_swallow:["Gorzej przy przełykaniu","Throat, worse swallowing",{Bell:3,Merc:3,Hep:2,Apis:2,Lyc:2}],
+  throat_splinter:["Uczucie drzazgi / zadry","Throat, splinter sensation",{Hep:3,Sil:2}],
+  throat_warm_dr:["Lepiej od ciepłych napojów","Throat, better warm drinks",{Lyc:2,Ars:2,"Rhus-t":2,Hep:2}],
+  throat_cold_dr:["Lepiej od zimnych napojów","Throat, better cold drinks",{Apis:3,Bell:1}],
+  coryza:["Katar / nieżyt nosa","Coryza",{"All-c":3,Euphr:3,"Nux-v":3,Ars:3,Puls:3,"Nat-m":3,Gels:2,Merc:2,Hep:2,Sulph:2,Phos:2}],
+  coryza_acrid:["Wodnisty, gryzący wyciek z nosa","Coryza, acrid discharge",{"All-c":3,Ars:3,Merc:2}],
+  coryza_bland:["Łagodny katar, gryzące łzawienie","Coryza, bland, acrid lachrymation",{Euphr:3,Puls:2}],
+  coryza_warm_room:["Gorzej w ciepłym pokoju, lepiej na powietrzu","Coryza, worse warm room",{"All-c":3,Puls:3,"Nat-m":2}],
+  coryza_open_air:["Gorzej na świeżym / zimnym powietrzu","Coryza, worse open air",{"Nux-v":3,Hep:3,Ars:2}],
+  coryza_sneeze:["Częste kichanie","Sneezing, frequent",{"All-c":2,"Nux-v":2,Sil:2,"Nat-m":2}],
+  stomach:["Żołądek — niestrawność / nudności","Stomach, indigestion, nausea",{"Nux-v":3,Puls:3,Ip:3,Ars:3,Bry:3,"Carb-v":3,Lyc:3,Cham:2,Sep:2,Sulph:2,Phos:2,Cocc:2}],
+  nausea:["Nudności","Stomach, nausea",{Ip:3,"Nux-v":3,Puls:2,Ars:2,Cocc:2,Sep:2,Verat:2}],
+  nausea_clean:["Nudności uporczywe, język czysty","Nausea, persistent, tongue clean",{Ip:3}],
+  overeat:["Po przejedzeniu / tłustym jedzeniu","Indigestion, after overeating, fat",{Puls:3,"Nux-v":3,"Carb-v":2,Ip:2,Lyc:2}],
+  bloating:["Wzdęcia, odbijanie","Stomach, flatulence, eructation",{"Carb-v":3,Lyc:3,"Nux-v":2}],
+  cramp_bend:["Skurczowy ból, lepiej od zgięcia / ucisku","Stomach, cramp better bending double",{Coloc:3,"Mag-phos":3,"Nux-v":2}],
+  worse_eating:["Gorzej po jedzeniu","Stomach, worse after eating",{"Nux-v":3,Lyc:3,Bry:2,"Carb-v":2,Puls:2}],
+  better_eating:["Lepiej po jedzeniu","Stomach, better after eating",{Phos:2,Sep:2}],
+  diarr:["Biegunka","Diarrhoea, stool",{Ars:3,Verat:3,Podo:3,Sulph:3,Puls:3,Cham:3,"Nux-v":2,Phos:2,Merc:2,Ip:2,Gels:2}],
+  diarr_fright:["Po przestrachu / tremie","Diarrhoea, from fright",{Gels:3,Acon:2}],
+  diarr_morning:["Nad ranem, wcześnie rano","Diarrhoea, morning, early",{Sulph:3,Podo:3}],
+  diarr_painless:["Bezbolesna, wodnista","Diarrhoea, painless, watery",{Phos:3,Podo:2,Verat:2}],
+  diarr_cold_sweat:["Z zimnym potem i osłabieniem","Diarrhoea, with cold sweat, prostration",{Verat:3,Ars:2}],
+  diarr_food:["Po zepsutym jedzeniu / owocach","Diarrhoea, from spoiled food, fruit",{Ars:3,Puls:2,"Carb-v":2}],
+  sleep:["Bezsenność","Sleeplessness",{Coff:3,"Nux-v":3,Ars:3,Puls:2,Sulph:2,Cham:2,Acon:2,Ign:2,Calc:2,Phos:2,Bell:2}],
+  sleep_mind:["Od natłoku myśli, pobudzenia","Sleeplessness, from activity of mind",{Coff:3,"Nux-v":2,Calc:2}],
+  sleep_worry:["Od zmartwień / żalu","Sleeplessness, from worry, grief",{Ign:3,"Nat-m":2}],
+  sleep_wake34:["Budzenie 3–4 nad ranem","Waking, 3–4 a.m.",{"Nux-v":3,Ars:2}],
+  sleep_anx:["Niepokój, lęk w nocy","Sleeplessness, anxiety, restlessness",{Ars:3,Acon:2,"Rhus-t":2}],
+  sleepy_day:["Senność w ciągu dnia","Sleepiness, daytime",{"Nux-v":2,Puls:2,Phos:2,Sulph:2,Gels:2}],
+  anx:["Lęk / niepokój","Mind, anxiety",{Acon:3,Ars:3,Phos:3,Calc:3,Gels:3,Lyc:3,Ign:2,"Nat-m":2,Puls:2,Sep:2,"Nux-v":2}],
+  anx_health:["Lęk o zdrowie","Anxiety, about health",{Ars:3,Calc:2,Phos:2}],
+  anx_antic:["Trema, lęk antycypacyjny","Anxiety, anticipation",{Gels:3,Lyc:3,Sil:2,Ars:2}],
+  anx_panic:["Nagła panika, lęk przed śmiercią","Fear, death, sudden",{Acon:3,Ars:2}],
+  anx_restless:["Niepokój ruchowy, nie może usiedzieć","Restlessness, anxious",{Ars:3,"Rhus-t":2,Acon:2}],
+  anx_alone:["Gorzej w samotności","Anxiety, alone, worse",{Phos:3,Ars:3,Lyc:2}],
+  grief:["Smutek / żal","Mind, grief, sadness",{Ign:3,"Nat-m":3,"Phos-ac":3,Puls:3,Sep:2}],
+  grief_recent:["Świeży żal, szok po stracie","Ailments from grief, recent",{Ign:3,Acon:2,"Nat-m":2}],
+  grief_silent:["Tłumiony, zamknięty w sobie","Grief, silent, suppressed",{"Nat-m":3,Ign:2,Sep:2}],
+  grief_apathy:["Apatia, otępienie po żalu","Indifference, apathy after grief",{"Phos-ac":3,Sep:2,"Nat-m":2}],
+  grief_sigh:["Wzdychanie, kula w gardle","Sighing; lump in throat",{Ign:3}],
+  pain_jm:["Bóle stawów / mięśni","Extremities, pain",{"Rhus-t":3,Bry:3,Arn:3,Led:3,Calc:2,"Nux-v":2,Puls:2,Sulph:2,Sep:2}],
+  pain_first_motion:["Gorzej przy 1. ruchu, lepiej od dalszego","Worse first motion, better continued",{"Rhus-t":3}],
+  pain_any_motion:["Gorzej od każdego ruchu, lepiej w bezruchu","Worse any motion, better rest",{Bry:3,"Nux-v":2}],
+  pain_cold_damp:["Gorzej w zimnie i wilgoci","Worse cold, damp weather",{"Rhus-t":3,Calc:2,"Nux-v":2}],
+  pain_warm:["Lepiej od ciepła","Better warmth",{"Rhus-t":2,Ars:2,"Mag-phos":2,"Nux-v":2}],
+  pain_cold:["Lepiej od zimna / zimnych okładów","Better cold applications",{Led:3,Puls:2,Apis:2}],
+  pain_bruised:["Po urazie, uczucie „posiniaczenia”","After injury, bruised sensation",{Arn:3,"Rhus-t":2}],
+  pain_stiff_am:["Sztywność poranna","Stiffness, morning",{"Rhus-t":3,Calc:2,"Nux-v":2}],
+  skin:["Skóra — świąd / wysypka","Skin, eruptions, itching",{Sulph:3,"Rhus-t":3,Apis:3,Ars:3,Merc:2,Puls:2,Hep:2,Sil:2,Bell:2}],
+  skin_itch_warm:["Świąd gorszy od ciepła / łóżka","Itching, worse warmth of bed",{Sulph:3,Merc:2,Puls:2}],
+  skin_burn_warm:["Pieczenie lepsze od ciepła","Burning, better warmth",{Ars:3,"Rhus-t":2}],
+  skin_sting_cold:["Piekąco-kłujący obrzęk, lepiej od zimna","Stinging swelling, better cold",{Apis:3,Led:2}],
+  skin_moist:["Sączące, pęcherzykowe zmiany","Eruptions, moist, vesicular",{"Rhus-t":3,Merc:2,Sulph:2}],
+  skin_dry:["Sucha, szorstka skóra","Skin, dry, rough",{Sulph:3,Ars:2}],
+  skin_supp:["Ropiejące, skłonność do ropni","Suppuration, abscess tendency",{Hep:3,Sil:3,Merc:2}],
+  menses:["Dolegliwości menstruacyjne","Female, menses, complaints",{Puls:3,Sep:3,Cham:3,Bell:3,"Mag-phos":3,"Nux-v":2,Calc:2,Sulph:2}],
+  menses_cramp:["Bolesne skurcze, lepiej od ciepła / ucisku","Dysmenorrhoea, better warmth, pressure",{"Mag-phos":3,Coloc:2,Cham:2,"Nux-v":2}],
+  menses_late:["Opóźnione, skąpe","Menses, late, scanty",{Puls:3,Sep:2,"Nat-m":2}],
+  menses_early:["Wczesne, obfite","Menses, early, profuse",{Calc:3,Bell:2,Cham:2}],
+  menses_irrit:["Drażliwość, nieznośność z bólu","Irritability before/with menses",{Cham:3,"Nux-v":2,Sep:2}],
+  menses_weepy:["Płaczliwość, zmienność nastroju","Weeping, changeable mood",{Puls:3}],
+  worse_morning:["Gorzej rano","Aggravation, morning",{"Nux-v":3,Bry:2,"Nat-m":2,Sulph:2,Calc:2}],
+  worse_afternoon:["Gorzej po południu","Aggravation, afternoon",{Lyc:3,Bell:2,Apis:2,Puls:2}],
+  worse_evening:["Gorzej wieczorem","Aggravation, evening",{Puls:3,Sulph:2,Bell:2,Merc:2}],
+  worse_night:["Gorzej w nocy","Aggravation, night",{Ars:3,Merc:3,Dros:2,Hep:2,"Rhus-t":2,Calc:2,Puls:2}],
+  chilly_cold:["Marznę — gorzej w zimnie","Worse cold, chilly patient",{"Nux-v":3,Ars:3,Hep:3,Sil:3,Calc:2,Sep:2,"Rhus-t":2,Phos:2}],
+  hot_warm:["Gorąco mi — gorzej w cieple","Worse heat, warm patient",{Puls:3,Sulph:3,Apis:3,Lyc:2,Bry:2,Merc:2}],
+  better_air:["Lepiej na świeżym powietrzu","Better open air",{Puls:3,"All-c":2,Sulph:2,Apis:2,Lyc:2}],
+  better_warmth:["Lepiej od ciepła / okrycia","Better warmth, wrapping",{"Nux-v":3,Hep:3,Ars:3,Sil:2,"Rhus-t":2,"Mag-phos":2}],
+  better_motion:["Lepiej od ruchu","Better motion",{"Rhus-t":3,Puls:2,Sep:2}],
+  better_rest:["Lepiej w spoczynku","Better rest, lying still",{Bry:3,"Nux-v":2,Gels:2}],
+  thirst_cold:["Pragnienie zimnej wody","Thirst, for cold water",{Phos:3,Bry:3,Acon:2,Sulph:2,"Nat-m":2}],
+  thirst_sips:["Pragnienie częstych małych łyków","Thirst, small quantities often",{Ars:3,Lyc:2}],
+  thirstless:["Brak pragnienia","Thirstless",{Puls:3,Apis:2,Gels:2}],
+  mood_irrit:["Drażliwość, złość","Mind, irritability",{"Nux-v":3,Cham:3,Bry:2,Sep:2,Lyc:2,"Nat-m":2}],
+  mood_weepy:["Płaczliwość, potrzeba pocieszania","Weeping, desires consolation",{Puls:3,Ign:2}],
+  mood_anx:["Lęk, niepokój","Mind, anxious",{Ars:3,Acon:3,Phos:2,Calc:2,Gels:2}],
+  mood_indiff:["Apatia, obojętność","Indifference",{Sep:3,"Phos-ac":3,"Nat-m":2,Puls:2}],
+  worse_consol:["Gorzej, gdy ktoś pociesza","Worse from consolation",{"Nat-m":3,Ign:2,Sil:2,Sep:2}],
+  better_consol:["Lepiej od pocieszania","Better from consolation",{Puls:3,Phos:2}]
+};
 
-        // BAZA DANYCH 2026 - SZCZEGÓŁOWE ZAPISY Z KSIĄŻKI PDF
-        const yearData = [
-            // Styczeń
-            ["korzeń do 10, czas sadzenia od 10", "12-13 korzeń, od 14 kwiat", "kwiat", "kwiat do 10, od 11 liść", "liść do 22, od 23 owoc", "owoc do 8", "owoc od 17", "owoc do 13, od 14 korzeń", "korzeń", "korzeń", "korzeń", "korzeń do 7, od 8 kwiat", "kwiat do 19, od 20 Ag kwiat", "Ag kwiat do 1, od 2 liść", "liść", "liść do 10, od 11 owoc, koniec czasu sadz. 6", "owoc", "owoc do 20, od 21 korzeń", "korzeń", "korzeń", "korzeń do 1, od 2 do 20 kwiat", "kwiat od 5 do 23", "liść od 0", "liść", "liść do 18, od 19 owoc", "owoc", "owoc do 11, od 12 korzeń", "korzeń", "korzeń do 10, pocz. czasu sadz. 19", "kwiat od 12", "kwiat do 21, od 22 liść"],
-            // Luty
-            ["liść", "liść do 8, od 9 owoc", "owoc do 16", "od 1 do 22 owoc, od 23 korzeń", "korzeń", "korzeń", "korzeń", "korzeń do 15, od 16 kwiat", "kwiat", "kwiat do 3, 4-8 liść, 9-21 Ag kwiat, od 22 liść", "liść", "liść do 18, od 19 owoc, kon. sadz. 13", "owoc do 19", "owoc od 0 do 2", "od 9 korzeń", "korzeń do 16, od 22 kwiat", "kwiat do 2, 3-9 korz., od 10 kwiat", "kwiat do 3, kwiat od 12 do 21", "kwiat od 3 do 6, od 7 liść", "liść", "liść do 23", "owoc od 0 do 8, od 9 do 24 kwiat", "owoc od 1 do 16, od 17 korzeń", "korzeń do 12", "od 14 kwiat", "kwiat, pocz. sadzenia 2", "kwiat", "kwiat do 5, od 6 liść"],
-            // Marzec
-            ["liść do 17, od 18 owoc", "owoc", "owoc do 1", "owoc od 10", "czas sadzenia owoc do 8, od 9 korzeń", "korzeń do 5, 6-21 kwiat, od 22 korzeń", "korzeń", "korzeń do 24", "kwiat od 1, od 19 b. korzystny", "kwiat do 12, do 10 b. korz., od 13 liść", "liść do 5, 6-18 Ag kwiat, od 19 liść", "liść, koniec czasu sadzenia 21", "liść do 2, od 3 owoc", "owoc", "owoc do 13, od 14 korzeń", "korzeń", "korzeń do 18, od 19 kwiat", "kwiat do 12, kwiat od 21", "kwiat do 14, od 15 liść", "liść", "liść", "liść do 7, 8-12 owoc, 13-24 kwiat", "od 2 korzeń", "korzeń do 1", "od 15 kwiat, pocz. sadz. 7", "kwiat", "kwiat do 11, od 12 liść", "liść do 24", "owoc od 1", "owoc do 8", "owoc do 17, od 18 korzeń"],
-            // Kwiecień
-            ["korzeń", "korzeń do 24", "kwiat od wsch. słońca do 20, od 21 liść", "liść", "liść do 1, 2-14 Ag kwiat, od 15 liść", "liść do 11, od 12 owoc, kon. sadzenia 6", "owoc do 23", "od 21 korzeń", "korzeń", "korzeń do 4, od 5 do 21 kwiat", "od 6 kwiat", "kwiat do 1, od 2 liść", "liść", "liść do 17, od 18 owoc", "owoc do 20", "od 22 korzeń", "korzeń", "korzeń do 18, od 19 kwiat, pocz. sadzenia 14", "kwiat", "kwiat do 17, od 18 liść", "liść do 6, od 7 owoc", "owoc do 12", "owoc od 21", "owoc do 23", "korzeń od 0, 12-22 bardzo korzystny", "korzeń", "korzeń", "korzeń", "korzeń", "korzeń"],
-            // Maj
-            ["korzeń do 16, od 17 kwiat", "kwiat", "kwiat do 3, od 4 liść", "liść do 15, od 16 Ag kwiat", "Ag kwiat-4, 5-18 liść, od 19 owoc, k. cz. s. 13", "owoc", "owoc", "owoc do 6, od 7 korzeń", "korzeń", "korzeń do 13, od 14 kwiat", "kwiat do 2, kwiat od 11", "kwiat do 11, od 12 do 19 liść", "od 9 liść", "liść do 4, od 5 owoc", "owoc do 18, od 19 korzeń", "korzeń do 3", "od 5 korzeń", "korzeń do 3, 4-18 kwiat, od 19 korzeń, pocz. sadz. 23", "korzeń do 4, od 5 do 24 kwiat", "liść od 1", "liść do 12, od 13 owoc", "owoc do 13", "owoc od 22", "owoc do 4, od 5 korzeń", "korzeń, od 12 do 21 bardzo korzystny", "korzeń", "korzeń do 22, od 23 kwiat", "kwiat", "kwiat do 10, od 11 liść", "liść do 21, od 22 Ag kwiat", "Ag kwiat, czas sadzenia"],
-            // Czerwiec
-            ["Ag kwiat-10, 11-24 liść, k. cz. sadz. 18", "owoc od 1", "owoc", "owoc do 13, od 14 korzeń", "korzeń", "korzeń do 20, od 21 kwiat", "kwiat do 4, kwiat od 13", "kwiat do 19, od 20 liść", "liść", "liść", "liść do 13, od 14 owoc", "owoc", "owoc do 5, od 6 korzeń", "korzeń do 12", "od 14 kwiat, pocz. czasu sadz. 9", "kwiat do 22, od 23 liść", "liść do 9, liść 11-19", "liść od 1 do 21, od 22 owoc", "owoc do 15", "owoc od 0 do 2", "od 16 korzeń", "korzeń", "korzeń", "korzeń", "korzeń-3, 4-6 kwiat, 7-17 liść, od 18 kwiat", "kwiat do 16, od 17 liść", "liść do 23", "Ag kwiat 0-12, od 13 liść, k. cz. sadz. 23", "liść do 6, od 7 owoc", "owoc"],
-            // Lipiec
-            ["owoc do 18, od 19 korzeń", "korzeń", "korzeń", "korzeń-2, 3-5 kwiat, kwiat od 14", "kwiat do 2, 3-18 korzeń, od 19 kwiat", "kwiat do 1, od 2 liść", "liść do 21, od 22 owoc", "owoc do 14, od 15 korzeń", "korzeń", "korzeń do 21, pocz. czasu sadz. 18", "od 23 kwiat", "kwiat do 20, od 21 liść", "liść", "liść do 7, od 8 do 22 owoc", "od 7 owoc", "owoc-3, 4-10 korz., 11-19 owoc, od 20 korz.", "korzeń", "korzeń do 3, 4-13 liść, od 14 korzeń", "korzeń", "korzeń do 10, od 11 kwiat", "kwiat do 13", "od 15 do 22 Ag kwiat, od 23 liść", "liść do 13, od 14 owoc, k. czasu sadz. 5", "owoc do 3, od 4 do 13 liść, od 14 owoc", "owoc do 1, od 2 korzeń", "korzeń do 12", "korzeń", "korzeń", "korzeń", "kwiat", "kwiat"],
-            // Sierpień
-            ["od 10 kwiat", "kwiat do 7, od 8 liść", "liść", "liść", "liść do 4, od 5 owoc", "owoc do 21, od 22 liść", "liść do 8, od 9 korzeń", "korzeń do 18", "pocz. czasu sadz. 3, korzeń", "3-6 kwiat, 7-22 liść, od 23 korzeń", "liść i korzeń 0-9, 9-17 liść, od 18 owoc", "owoc do 7, owoc od 16", "owoc", "owoc do 5, od 6 korzeń", "korzeń", "korzeń do 11, 12-21 liść, od 22 korzeń", "korzeń do 18, od 19 kwiat", "kwiat", "kwiat do 5, od 6 liść", "liść", "liść-1, 2-14 Ag kwiat, 15-20 liść, od 21 owoc, kon. sadz. 12", "owoc", "owoc", "owoc do 8, od 9 korzeń", "korzeń", "korzeń do 14, od 15 do 16 kwiat", "kwiat od 1", "kwiat do 13, od 14 liść", "liść", "liść, od 19 bardzo korzystny", "liść do 9, od 10 owoc"],
-            // Wrzesień
-            ["liść 9, do 4 bar. korzystny, od 10 owoc", "owoc", "owoc do 3, od 4 korzeń", "korzeń", "korzeń-15, od 16 kwiat, pocz. cz. sadz. 9", "kwiat do 10, od 12 do 14 kwiat, od 15 liść", "liść do 17, liść od 23", "liść do 2, od 3 do 17 owoc", "od 1 owoc", "owoc do 14, od 15 korzeń", "korzeń, od 12 do 21 bardzo korzystny", "korzeń, od 23 bardzo korzystny", "korzeń 13, do 8 b. korz., korzeń od 19", "korzeń do 3, od 4 kwiat", "kwiat do 1", "od 15 liść", "liść do 19, od 20 Ag kwiat, k. cz. sadz. 20", "Ag kwiat do 4, od 5 owoc", "owoc", "owoc do 16, od 17 korzeń", "korzeń", "korzeń do 23", "od 9 kwiat", "kwiat do 21, od 22 liść", "liść do 1, od 2 do 11 korzeń, od 12 liść", "liść", "liść do 12, 13-22 korzeń, od 23 owoc", "owoc", "owoc do 8, od 9 korzeń", "korzeń"],
-            // Październik
-            ["korzeń do 11", "od 13 liść, pocz. czasu sadz. 15", "liść do 4, od 5 kwiat", "kwiat do 20, od 21 liść", "liść do 5, liść od 11", "liść do 9, od 15 do 23 owoc", "od 8 owoc", "owoc do 22, od 23 korzeń", "korzeń", "korzeń do 11, od 12 kwiat", "kwiat do 22, od 23 liść", "liść", "liść, od 23 bardzo korzystny", "liść-14, do 12 b. korz., od 15 owoc, k. cz. sadz. 4", "owoc", "owoc do 1, od 2 korzeń", "korzeń", "korzeń do 6, od 15 kwiat", "kwiat", "kwiat do 6, od 7 liść", "liść", "liść do 24", "owoc od 1", "owoc do 22, od 23 korzeń", "korzeń do 6", "od 8 korzeń, pocz. czasu sadz. 20", "korzeń do 2, od 3 kwiat", "kwiat", "kwiat do 8, od 9 liść", "liść do 17, od 18 owoc", "owoc"],
-            // Listopad
-            ["kwiat do 1, od 2 liść", "liść do 11, od 17 do 21 owoc", "od 8 owoc", "owoc do 16", "od 6 korzeń", "korzeń do 9, korzeń od 15", "korzeń do 18, od 19 kwiat", "kwiat", "kwiat do 5, od 6 liść", "liść", "liść do 18, od 19 owoc, k. czasu sadz. 10", "owoc", "owoc", "owoc do 7, od 8 korzeń", "korzeń", "korzeń do 8, od 17 kwiat", "kwiat", "kwiat do 15, od 16 liść", "liść do 10", "od 12 owoc", "owoc do 18, od 19 liść", "liść do 4, od 5 korzeń", "korzeń do 9", "od 12 kwiat, pocz. czasu sadz. 4", "kwiat", "kwiat do 8, od 9 liść", "liść-9, 10-16 korzeń, 17-19 liść, 20-24 owoc", "od 12 owoc", "owoc do 6, od 7 korzeń", "korzeń"],
-            // Grudzień
-            ["owoc", "owoc do 9, od 10 korzeń", "korzeń", "korzeń do 24", "kwiat od 1", "kwiat-5, od 6 liść, 12-15 bar. korzystny", "liść", "liść, koniec czasu sadzenia 16", "liść do 1, od 2 owoc", "owoc do 8, od 9 do 18 liść, od 19 owoc", "owoc do 14, od 15 do 23 korzeń", "od 18 do 23 korzeń", "kwiat od 0", "kwiat do 23", "liść od 0", "liść", "liść do 20, od 21 owoc", "owoc do 13, od 14 korzeń", "korzeń", "korzeń do 22, pocz. czasu sadz. 15", "kwiat od 0 do 18, od 19 liść", "liść", "liść do 4, od 13 owoc", "owoc do 16, od 17 korzeń", "korzeń", "korzeń do 1, od 2 owoc, 13-16 bar. korz.", "owoc", "owoc do 9, od 10 korzeń", "korzeń", "korzeń do 24", "kwiat"]
-        ];
+const Q = {
+  worse_time:["Kiedy dolegliwość się nasila?","Możesz wybrać kilka pór.",[["Rano","worse_morning"],["Po południu","worse_afternoon"],["Wieczorem","worse_evening"],["W nocy","worse_night"]]],
+  temp:["Jak reagujesz na temperaturę?","Ogólna skłonność ciała.",[["Marznę, gorzej w zimnie","chilly_cold"],["Jest mi gorąco, gorzej w cieple","hot_warm"]]],
+  better:["Co przynosi ulgę?","Wybierz to, co pasuje.",[["Świeże powietrze","better_air"],["Ciepło / okrycie","better_warmth"],["Ruch","better_motion"],["Spoczynek, bezruch","better_rest"]]],
+  thirst:["Jak z pragnieniem?","",[["Pragnienie zimnej wody","thirst_cold"],["Częste małe łyki","thirst_sips"],["Brak pragnienia","thirstless"]]],
+  mood:["Nastrój, który dominuje?","",[["Drażliwość, złość","mood_irrit"],["Płaczliwość, potrzeba pocieszania","mood_weepy"],["Lęk, niepokój","mood_anx"],["Apatia, obojętność","mood_indiff"]]],
+  consol:["A gdy ktoś próbuje pocieszać?","",[["Robi mi się lżej","better_consol"],["Robi mi się gorzej","worse_consol"]]],
+  head_loc:["Gdzie umiejscowiony jest ból głowy?","",[["Czoło / nad oczami","head_forehead"],["Skronie","head_temples"],["Potylica (tył głowy)","head_occiput"],["Pulsujący / cała głowa","head_throb"]]],
+  head_mod:["Co dzieje się z bólem głowy?","",[["Gorzej od ruchu","head_motion"],["Lepiej od ucisku","head_pressure"]]],
+  fever_onset:["Jak zaczęła się dolegliwość?","",[["Nagle i gwałtownie","onset_sudden"],["Powoli, podstępnie","onset_slow"],["Po zimnym, suchym wietrze","after_cold_wind"],["Po przemoczeniu / wilgoci","after_wet"]]],
+  fever_state:["Co towarzyszy gorączce?","",[["Niepokój i lęk","fever_restless"],["Senność, otępienie","fever_drowsy"]]],
+  cough_kind:["Jaki to kaszel?","",[["Suchy","cough_dry"],["Wilgotny, z odkrztuszaniem","cough_loose"],["Szczekający","cough_barking"]]],
+  cough_when:["Co go nasila?","",[["Noc","cough_night"],["Zimne powietrze","cough_cold_air"]]],
+  throat_side:["Jak wygląda ból gardła?","",[["Bardziej prawa strona","throat_right"],["Gorzej przy przełykaniu","throat_swallow"],["Uczucie drzazgi / zadry","throat_splinter"]]],
+  throat_relief:["Co łagodzi gardło?","",[["Ciepłe napoje","throat_warm_dr"],["Zimne napoje","throat_cold_dr"]]],
+  cor_kind:["Jaki jest wyciek z nosa?","",[["Wodnisty, gryzący","coryza_acrid"],["Łagodny, z gryzącym łzawieniem","coryza_bland"],["Częste kichanie","coryza_sneeze"]]],
+  cor_mod:["Gdzie czujesz się gorzej?","",[["W ciepłym pokoju","coryza_warm_room"],["Na świeżym / zimnym powietrzu","coryza_open_air"]]],
+  stom_kind:["Co najbardziej dokucza w brzuchu?","",[["Nudności","nausea"],["Nudności uporczywe, język czysty","nausea_clean"],["Po przejedzeniu / tłustym","overeat"],["Wzdęcia, odbijanie","bloating"],["Skurcz lepszy od zgięcia","cramp_bend"]]],
+  stom_eat:["A jedzenie?","",[["Gorzej po jedzeniu","worse_eating"],["Lepiej po jedzeniu","better_eating"]]],
+  diarr_kind:["Co charakteryzuje biegunkę?","",[["Po przestrachu / tremie","diarr_fright"],["Nad ranem, wcześnie rano","diarr_morning"],["Bezbolesna, wodnista","diarr_painless"],["Z zimnym potem i osłabieniem","diarr_cold_sweat"],["Po zepsutym jedzeniu","diarr_food"]]],
+  sleep_kind:["Co przeszkadza w spaniu?","",[["Natłok myśli, pobudzenie","sleep_mind"],["Zmartwienia / żal","sleep_worry"],["Budzenie 3–4 nad ranem","sleep_wake34"],["Niepokój, lęk w nocy","sleep_anx"],["Senność w dzień","sleepy_day"]]],
+  anx_kind:["Jak objawia się lęk?","",[["Lęk o zdrowie","anx_health"],["Trema, lęk antycypacyjny","anx_antic"],["Nagła panika, lęk przed śmiercią","anx_panic"],["Niepokój ruchowy","anx_restless"],["Gorzej w samotności","anx_alone"]]],
+  grief_kind:["Jaki jest ten żal?","",[["Świeży, szok po stracie","grief_recent"],["Tłumiony, zamknięty w sobie","grief_silent"],["Apatia, otępienie","grief_apathy"],["Wzdychanie, kula w gardle","grief_sigh"]]],
+  pain_mod:["Co dzieje się z bólem stawów / mięśni?","",[["Gorzej przy 1. ruchu, lepiej od dalszego","pain_first_motion"],["Gorzej od każdego ruchu","pain_any_motion"],["Gorzej w zimnie i wilgoci","pain_cold_damp"],["Po urazie, „posiniaczenie”","pain_bruised"],["Sztywność poranna","pain_stiff_am"]]],
+  pain_relief:["Co łagodzi ból?","",[["Ciepło","pain_warm"],["Zimne okłady","pain_cold"]]],
+  skin_kind:["Jak wygląda zmiana skórna?","",[["Świąd gorszy od ciepła","skin_itch_warm"],["Pieczenie lepsze od ciepła","skin_burn_warm"],["Piekąco-kłujący obrzęk","skin_sting_cold"],["Sączące, pęcherzykowe","skin_moist"],["Sucha, szorstka","skin_dry"],["Ropiejące","skin_supp"]]],
+  men_kind:["Co dokucza przy miesiączce?","",[["Bolesne skurcze","menses_cramp"],["Opóźnione, skąpe","menses_late"],["Wczesne, obfite","menses_early"],["Drażliwość","menses_irrit"],["Płaczliwość, zmienność","menses_weepy"]]]
+};
 
-        let currentDate = new Date(); 
+const ICON = {
+  head:'<path d="M15.5 4C9.7 4 5 8.2 5 14c0 2.5 1.4 4 1.4 6H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.4 20v-2.3M13 20v-3.4c0-1 .7-1.4 1.6-1.6 1.7-.4 2.1-1.4 2-2.5M11 8.5c1.4 0 2 1 2 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+  fever:'<path d="M11 4.5a2 2 0 1 1 2 0v8.2a3.6 3.6 0 1 1-2 0V4.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/>',
+  lungs:'<path d="M12 3v8M9 8c0 4-1 5-3.5 6.5C4 15.5 4 18 5.5 19s2.7.2 3.2-1.2C9.3 16 9 11 9 8ZM15 8c0 4 1 5 3.5 6.5C20 15.5 20 18 18.5 19s-2.7.2-3.2-1.2C14.7 16 15 11 15 8Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  throat:'<path d="M12 4c-3 0-4 2-4 4s1 3 1 5-2 2-2 4 2 3 5 3 5-1.5 5-4-1.5-2.5-2-5 1-3 1-4-1-3-4-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+  nose:'<path d="M12 4v6c0 1.5-1.2 2-1.2 4 0 1.6 1.2 2.6 2.8 2.6M9 16.5c-1.4 0-2-1-2-2M15 16.5c1.4 0 2-1 2-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  stomach:'<path d="M9 4v4c0 2 1.5 2.5 1.5 4.5 0 3 1.5 5 4 5 2 0 3-1.6 3-3.5 0-4-3-4.5-3-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  drop:'<path d="M12 4s5 5.5 5 9.2A5 5 0 0 1 7 13.2C7 9.5 12 4 12 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+  moon:'<path d="M18 14.5A7 7 0 1 1 9.5 6 5.5 5.5 0 0 0 18 14.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+  heart:'<path d="M12 19s-6-3.7-6-8.2A3.4 3.4 0 0 1 12 8a3.4 3.4 0 0 1 6 2.8C18 15.3 12 19 12 19Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+  cloud:'<path d="M8 17h8a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.7-1A3.2 3.2 0 0 0 8 17Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 20l-1 1M12 20l-1 1M15 20l-1 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  bone:'<path d="M8 8a2 2 0 1 0-1.7-3A2 2 0 1 0 5 8l5.5 5.5M16 16a2 2 0 1 0 1.7 3A2 2 0 1 0 19 16l-5.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  hand:'<path d="M9 12V6.5a1.3 1.3 0 0 1 2.6 0V11m0-.5V5.3a1.3 1.3 0 0 1 2.6 0V11m0-.3V6.4a1.3 1.3 0 0 1 2.6 0V13c0 3.5-2 6-5 6-2.2 0-3.4-1-4.5-2.7L5 13.4a1.3 1.3 0 0 1 2-1.6L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  flower:'<circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M12 10V6m0 12v-4m2-2h4M6 12h4m1.3-1.3L8.5 8m7 7-2.8-2.8m0-1.4L15.5 8m-7 7 2.8-2.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+  book:'<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H18v15H6.5A1.5 1.5 0 0 0 5 20.5V5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 17.5A1.5 1.5 0 0 1 6.5 16H18" stroke="currentColor" stroke-width="1.6"/>'
+};
 
-        function getDayInfo(text) {
-            const t = text.toLowerCase();
-            const types = [
-                { action: "Rośliny korzeniowe", icon: "🥕", idx: t.indexOf("korz") },
-                { action: "Rośliny kwiatowe", icon: "🌻", idx: t.indexOf("kwiat") },
-                { action: "Rośliny liściowe", icon: "🥬", idx: t.indexOf("liś") },
-                { action: "Rośliny owocowe", icon: "🍎", idx: t.indexOf("owoc") }
-            ];
-            
-            // Znajdź główną akcję, która pojawia się jako pierwsza w tekście dnia
-            const valid = types.filter(x => x.idx !== -1).sort((a, b) => a.idx - b.idx);
-            
-            if (valid.length > 0) return valid[0];
-            return { action: "Korzeń", icon: "🥕" }; // Domyślne
-        }
+const TOPICS = [
+  {id:"head", pl:"Ból głowy", icon:"head", kw:["glowa","głowa","ból głowy","migrena","head"], base:"head_pain", qs:["head_loc","head_mod","worse_time","temp","thirst","mood"]},
+  {id:"fever", pl:"Gorączka / przeziębienie", icon:"fever", kw:["goraczka","gorączka","przeziebienie","przeziębienie","grypa","fever"], base:"fever", qs:["fever_onset","fever_state","temp","thirst","worse_time"]},
+  {id:"cough", pl:"Kaszel", icon:"lungs", kw:["kaszel","cough"], base:"cough", qs:["cough_kind","cough_when","temp","worse_time"]},
+  {id:"throat", pl:"Ból gardła", icon:"throat", kw:["gardlo","gardło","throat","angina"], base:"throat", qs:["throat_side","throat_relief","temp","thirst"]},
+  {id:"coryza", pl:"Katar / nieżyt nosa", icon:"nose", kw:["katar","nos","coryza","nieżyt"], base:"coryza", qs:["cor_kind","cor_mod","temp","better"]},
+  {id:"stomach", pl:"Żołądek / niestrawność", icon:"stomach", kw:["zoladek","żołądek","nudnosci","nudności","niestrawnosc","mdlosci","stomach"], base:"stomach", qs:["stom_kind","stom_eat","worse_time","mood"]},
+  {id:"diarr", pl:"Biegunka", icon:"drop", kw:["biegunka","rozwolnienie","diarrhoea","stolec"], base:"diarr", qs:["diarr_kind","temp","thirst","worse_time"]},
+  {id:"sleep", pl:"Bezsenność", icon:"moon", kw:["sen","bezsennosc","bezsenność","spanie","sleep"], base:"sleep", qs:["sleep_kind","mood","worse_time"]},
+  {id:"anx", pl:"Lęk / niepokój", icon:"cloud", kw:["lek","lęk","niepokoj","niepokój","stres","panika","anxiety"], base:"anx", qs:["anx_kind","temp","thirst","consol"]},
+  {id:"grief", pl:"Smutek / żal", icon:"heart", kw:["smutek","zal","żal","strata","grief","depresja"], base:"grief", qs:["grief_kind","consol","mood","worse_time"]},
+  {id:"pain", pl:"Bóle stawów / mięśni", icon:"bone", kw:["stawy","miesnie","mięśnie","ból stawów","reumatyzm","kregoslup","kręgosłup"], base:"pain_jm", qs:["pain_mod","pain_relief","temp","worse_time"]},
+  {id:"skin", pl:"Dolegliwości skórne", icon:"hand", kw:["skora","skóra","swiad","świąd","wysypka","skin","alergia"], base:"skin", qs:["skin_kind","temp","worse_time"]},
+  {id:"menses", pl:"Dolegliwości menstruacyjne", icon:"flower", kw:["miesiaczka","miesiączka","menstruacja","pms","okres","menses"], base:"menses", qs:["men_kind","temp","mood","consol"]}
+];
 
-        function renderCalendar(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const monthNames = ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'];
-            
-            if(year !== 2026) {
-                document.getElementById('month-year').textContent = `${monthNames[month]} ${year} (Brak danych)`;
-                document.getElementById('calendar-grid').innerHTML = '';
-                return;
-            }
+/* unified remedy meta keyed by lowercase abbreviation */
+const REM_LOWER = {};
+for (const k in REM) REM_LOWER[k.toLowerCase()] = {name:REM[k][0], key:REM[k][2]};
 
-            document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
-            
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
-            
-            let startDay = firstDay === 0 ? 6 : firstDay - 1;
-            
-            for (let i = 0; i < startDay; i++) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.className = 'day empty';
-                grid.appendChild(emptyDiv);
-            }
-            
-            const daysData = yearData[month];
+/* =====================================================================
+   CZĘŚĆ 2 — PEŁNE REPERTORIUM KENTA (ładowane z kent-repertory.json)
+   Bez pliku działa wbudowana baza demonstracyjna zbudowana z RUB.
+   ===================================================================== */
+const CH_PL = {
+  "Mind":"Umysł","Vertigo":"Zawroty głowy","Head":"Głowa","Eye":"Oko","Vision":"Wzrok",
+  "Ear":"Ucho","Hearing":"Słuch","Nose":"Nos","Face":"Twarz","Mouth":"Usta","Teeth":"Zęby",
+  "Throat":"Gardło","External throat":"Gardło zewnętrzne","Stomach":"Żołądek","Abdomen":"Brzuch",
+  "Rectum":"Odbytnica","Stool":"Stolec","Urinary organs":"Narządy moczowe","Bladder":"Pęcherz",
+  "Kidneys":"Nerki","Prostate gland":"Gruczoł krokowy","Urethra":"Cewka moczowa","Urine":"Mocz",
+  "Genitalia male":"Narządy płciowe — męskie","Genitalia female":"Narządy płciowe — żeńskie",
+  "Larynx and trachea":"Krtań i tchawica","Respiration":"Oddychanie","Cough":"Kaszel",
+  "Expectoration":"Odkrztuszanie","Chest":"Klatka piersiowa","Back":"Plecy","Extremities":"Kończyny",
+  "Sleep":"Sen","Chill":"Dreszcze","Fever":"Gorączka","Perspiration":"Pocenie","Skin":"Skóra",
+  "Generalities":"Objawy ogólne"
+};
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'day';
-                dayDiv.textContent = day;
-                
-                const exactText = daysData[day - 1] || "Brak danych";
-                const info = getDayInfo(exactText);
-                
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'day-icon';
-                iconDiv.textContent = info.icon;
-                dayDiv.appendChild(iconDiv);
-                
-                dayDiv.addEventListener('click', () => openModal(day, monthNames[month], year, exactText, info));
-                grid.appendChild(dayDiv);
-            }
-        }
+let KENT = null;     // {chapters:[..], remedies:{key:name}, rubrics:[{id,ch,pl,path,en,rem}], demo:bool}
+let KENT_INDEX = []; // do wyszukiwania: {id, hay, ref}
 
-        function openModal(day, monthName, year, exactText, info) {
-            document.getElementById('modal-date').textContent = `${day} ${monthName} ${year}`;
-            document.getElementById('modal-big-icon').textContent = info.icon;
-            document.getElementById('modal-action').textContent = info.action;
-            
-            // Formatowanie oryginalnego tekstu z książki - wielka litera
-            const formattedText = exactText.charAt(0).toUpperCase() + exactText.slice(1);
-            document.getElementById('modal-details').textContent = formattedText;
-            
-            // Pokaż/Ukryj znacznik czasu sadzenia
-            const plantingTag = document.getElementById('modal-planting');
-            if(exactText.toLowerCase().includes('sadz')) {
-                plantingTag.classList.remove('hidden');
-            } else {
-                plantingTag.classList.add('hidden');
-            }
+function buildDemoKent(){
+  const remedies = {};
+  for (const k in REM) remedies[k.toLowerCase()] = REM[k][0];
+  const chOf = id =>
+    /^head/.test(id) ? "Head" :
+    /^(fever|onset|after)/.test(id) ? "Fever" :
+    /^cough/.test(id) ? "Cough" :
+    /^throat/.test(id) ? "Throat" :
+    /^(coryza|sneez)/.test(id) ? "Nose" :
+    /^(stomach|nausea|overeat|bloating|cramp|worse_eating|better_eating)/.test(id) ? "Stomach" :
+    /^diarr/.test(id) ? "Stool" :
+    /^(sleep|sleepy)/.test(id) ? "Sleep" :
+    /^(anx|mood|grief|worse_consol|better_consol)/.test(id) ? "Mind" :
+    /^pain/.test(id) ? "Extremities" :
+    /^skin/.test(id) ? "Skin" :
+    /^menses/.test(id) ? "Genitalia female" :
+    "Generalities";
+  const rubrics = Object.entries(RUB).map(([id,r])=>{
+    const rem = {}; for (const k in r[2]) rem[k.toLowerCase()] = r[2][k];
+    return {ch:chOf(id), p:r[0], en:r[1], r:rem};
+  });
+  const order = [];
+  rubrics.forEach(x=>{ if(!order.includes(x.ch)) order.push(x.ch); });
+  return {chapters:order, remedies, rubrics, demo:true};
+}
 
-            document.getElementById('day-modal').classList.remove('hidden');
-        }
+function normalizeKent(raw){
+  // raw.rubrics items use short keys c/p/r (z buildera) lub ch/p/en/r (demo)
+  const rubrics = raw.rubrics.map((x,i)=>({
+    id:"k"+i,
+    ch:x.c || x.ch,
+    pl:CH_PL[x.c || x.ch] || (x.c || x.ch),
+    path:x.p,
+    en:x.en || "",
+    rem:x.r
+  }));
+  KENT = {chapters:raw.chapters, remedies:raw.remedies, rubrics, demo:!!raw.demo, meta:raw.meta};
+  KENT_INDEX = rubrics.map(r=>({id:r.id, hay:(r.path+" "+(r.en||"")).toLowerCase(), ref:r}));
+}
 
-        document.getElementById('close-modal').addEventListener('click', () => {
-            document.getElementById('day-modal').classList.add('hidden');
-        });
+async function loadKent(){
+  try{
+    const res = await fetch("kent-repertory.json", {cache:"no-store"});
+    if(res.ok){
+      const data = await res.json();
+      if(data && data.rubrics && data.rubrics.length){ normalizeKent(data); return; }
+    }
+  }catch(e){/* brak pliku — użyj demo */}
+  normalizeKent(buildDemoKent());
+}
 
-        document.getElementById('prev-month').addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar(currentDate);
-        });
+function rubricsByChapter(ch){ return KENT.rubrics.filter(r=>r.ch===ch); }
+function chapterCounts(){
+  const m = {}; KENT.rubrics.forEach(r=>{ m[r.ch]=(m[r.ch]||0)+1; });
+  return KENT.chapters.filter(c=>m[c]).map(c=>({ch:c, pl:CH_PL[c]||c, n:m[c]}));
+}
 
-        document.getElementById('next-month').addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar(currentDate);
-        });
+/* unified remedy helpers (lowercase keys) */
+function remName(k){ return (KENT && KENT.remedies[k]) || (REM_LOWER[k] && REM_LOWER[k].name) || (k.charAt(0).toUpperCase()+k.slice(1)); }
+function remKeynote(k){ return REM_LOWER[k] ? REM_LOWER[k].key : ""; }
 
-        renderCalendar(currentDate);
-    </script>
+/* =====================================================================
+   ENGINE: repertoryzacja na liście rubryk {label,en,rem:{key:grade}}
+   ===================================================================== */
+function repertorize(rubrics){
+  const sc = {};
+  rubrics.forEach(r=>{
+    for(const rem in r.rem){
+      if(!sc[rem]) sc[rem]={score:0,count:0};
+      sc[rem].score += r.rem[rem]; sc[rem].count++;
+    }
+  });
+  return Object.entries(sc).map(([rem,v])=>({rem,...v}))
+    .sort((a,b)=> b.count-a.count || b.score-a.score || a.rem.localeCompare(b.rem));
+}
+function rgColor(g){ return g===3?'var(--g3)':g===2?'var(--g2)':'var(--g1)'; }
+
+/* =====================================================================
+   STAN + persistencja koszyka
+   ===================================================================== */
+let state = {tab:'wizard', screen:'home', topic:null, idx:0, picks:{}, wquery:"", rquery:"", chapter:null, browseLimit:300};
+let caseSet = new Set();   // id rubryk Kenta w koszyku
+let selOpen = false;
+
+try{ const s=localStorage.getItem('kent_case'); if(s) caseSet=new Set(JSON.parse(s)); }catch(e){}
+function persistCase(){ try{ localStorage.setItem('kent_case', JSON.stringify([...caseSet])); }catch(e){} }
+
+/* =====================================================================
+   ELEMENTY UI / NAWIGACJA
+   ===================================================================== */
+const view=document.getElementById('view');
+const navleft=document.getElementById('navleft'), navleftlbl=document.getElementById('navleftlbl');
+const navtitle=document.getElementById('navtitle'), navright=document.getElementById('navright');
+
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function svg(name){return `<svg viewBox="0 0 24 24" fill="none">${ICON[name]}</svg>`;}
+const chevR='<svg class="chev" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const tickSvg='<svg viewBox="0 0 14 14" fill="none"><path d="M2 7.5l3.2 3.2L12 3.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function setNav(){
+  const s=state.screen;
+  if(s==='home'){ navleft.style.visibility='hidden'; navtitle.textContent='Repertorium'; }
+  else if(s==='wflow'){ navleft.style.visibility='visible'; navleftlbl.textContent='Wstecz'; navtitle.textContent=state.topic?state.topic.pl:''; }
+  else if(s==='wresult'){ navleft.style.visibility='visible'; navleftlbl.textContent='Start'; navtitle.textContent='Dopasowanie'; }
+  else if(s==='chapter'){ navleft.style.visibility='visible'; navleftlbl.textContent='Rozdziały'; navtitle.textContent=state.chapter?(CH_PL[state.chapter]||state.chapter):''; }
+  else if(s==='rresult'){ navleft.style.visibility='visible'; navleftlbl.textContent='Repertorium'; navtitle.textContent='Analiza'; }
+}
+navleft.onclick=()=>{
+  const s=state.screen;
+  if(s==='wflow'){ if(state.idx>0){state.idx--;render();} else goHome('wizard'); }
+  else if(s==='wresult') goHome('wizard');
+  else if(s==='chapter'){ state.screen='home'; state.chapter=null; render(); }
+  else if(s==='rresult'){ state.screen='home'; render(); }
+};
+function goHome(tab){ state.screen='home'; if(tab)state.tab=tab; state.topic=null; state.idx=0; selOpen=false; render(); window.scrollTo(0,0); }
+
+function render(){
+  setNav();
+  const s=state.screen;
+  if(s==='home') renderHome();
+  else if(s==='wflow') renderFlow();
+  else if(s==='wresult') renderWizardResult();
+  else if(s==='chapter') renderChapter();
+  else if(s==='rresult') renderRepResult();
+}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const seg=`<div class="seg">
+    <button class="${state.tab==='wizard'?'on':''}" id="segW">Kreator</button>
+    <button class="${state.tab==='rep'?'on':''}" id="segR">Repertorium</button></div>`;
+  if(state.tab==='wizard') renderHomeWizard(seg);
+  else renderHomeRep(seg);
+  const segW=document.getElementById('segW'), segR=document.getElementById('segR');
+  if(segW) segW.onclick=()=>{state.tab='wizard';render();window.scrollTo(0,0);};
+  if(segR) segR.onclick=()=>{state.tab='rep';render();window.scrollTo(0,0);};
+}
+
+function renderHomeWizard(seg){
+  const q=state.wquery.trim().toLowerCase();
+  const list=q?TOPICS.filter(t=>t.pl.toLowerCase().includes(q)||t.kw.some(k=>k.includes(q))):TOPICS;
+  const rows=list.map(t=>`<div class="row" role="button" tabindex="0" data-topic="${t.id}">
+      <div class="ico">${svg(t.icon)}</div>
+      <div class="tx"><b>${esc(t.pl)}</b><span>${esc(RUB[t.base][1])}</span></div>${chevR}</div>`).join('');
+  view.innerHTML=`<div class="screen">
+    <div class="hero"><h1>Repertorium</h1><p>Wpisz dolegliwość i odpowiedz na pytania — kreator dobierze rubryki i wskaże leki.</p></div>
+    ${seg}
+    <div class="search"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="q" type="search" enterkeyhint="search" placeholder="Wpisz dolegliwość…" value="${esc(state.wquery)}" autocomplete="off" autocapitalize="off"></div>
+    <div class="grouphdr">${q?'Wyniki':'Wybierz dolegliwość'}</div>
+    ${rows?`<div class="list">${rows}</div>`:`<div class="empty">Brak dopasowań dla „${esc(state.wquery)}”.</div>`}
+    <div class="foot">Źródło: <a href="http://www.homeoint.org/books/kentrep/" target="_blank" rel="noopener">Repertorium Kenta</a> (1897, domena publiczna). <a href="#" onclick="openDisclaimer();return false">Zastrzeżenie</a>.</div>
+  </div>`;
+  const input=document.getElementById('q');
+  input.addEventListener('input',e=>{state.wquery=e.target.value;renderHomeWizard(seg);bindSeg();caretEnd(document.getElementById('q'));});
+  bindTopics();
+}
+function bindTopics(){ view.querySelectorAll('[data-topic]').forEach(el=>{ el.onclick=()=>startTopic(el.dataset.topic); el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startTopic(el.dataset.topic);}}; }); }
+function bindSeg(){ const w=document.getElementById('segW'),r=document.getElementById('segR'); if(w)w.onclick=()=>{state.tab='wizard';render();window.scrollTo(0,0);}; if(r)r.onclick=()=>{state.tab='rep';render();window.scrollTo(0,0);}; }
+function caretEnd(el){ if(!el)return; el.focus(); const v=el.value; el.value=''; el.value=v; }
+
+function renderHomeRep(seg){
+  const q=state.rquery.trim().toLowerCase();
+  let body='';
+  if(q.length>=2){
+    const out=[]; for(let i=0;i<KENT_INDEX.length && out.length<200;i++){ if(KENT_INDEX[i].hay.includes(q)) out.push(KENT_INDEX[i].ref); }
+    body = out.length
+      ? `<div class="grouphdr">Znalezione rubryki<span class="more">${out.length}${out.length===200?'+':''}</span></div><div class="list">${out.map(rubricRow).join('')}</div>`
+      : `<div class="empty">Brak rubryk dla „${esc(state.rquery)}”.</div>`;
+  } else {
+    const chs=chapterCounts();
+    body=`<div class="grouphdr">Rozdziały repertorium<span class="more">${KENT.rubrics.length} rubryk</span></div>
+      <div class="list">${chs.map(c=>`<div class="row" role="button" tabindex="0" data-ch="${esc(c.ch)}">
+        <div class="ico">${svg('book')}</div><div class="tx"><b>${esc(c.pl)}</b><span>${esc(c.ch)}</span></div>
+        <span class="cnt">${c.n}</span>${chevR}</div>`).join('')}</div>`;
+  }
+  const banner = KENT.demo
+    ? `<div class="banner demo"><svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9.2" stroke="currentColor" stroke-width="1.6"/><circle cx="11" cy="6.6" r="1.15" fill="currentColor"/><path d="M11 9.8v6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><div>Wersja demonstracyjna (${KENT.rubrics.length} rubryk). Uruchom <b>build_kent.py</b> i wgraj <b>kent-repertory.json</b>, aby załadować pełne repertorium.</div></div>`
+    : `<div class="banner"><svg viewBox="0 0 22 22" fill="none"><path d="M5 11.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div>Pełne repertorium załadowane — ${KENT.rubrics.length.toLocaleString('pl')} rubryk, ${Object.keys(KENT.remedies).length} leków.</div></div>`;
+
+  view.innerHTML=`<div class="screen">
+    <div class="hero"><h1>Repertorium</h1><p>Przeszukaj rubryki lub wejdź w rozdział. Dodaj objawy do koszyka, a następnie przeprowadź analizę.</p></div>
+    ${seg}
+    <div class="search"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="rq" type="search" enterkeyhint="search" placeholder="Szukaj rubryki (np. headache, anger, cough)…" value="${esc(state.rquery)}" autocomplete="off" autocapitalize="off"></div>
+    ${banner}
+    ${body}
+    ${caseBar()}
+    <div class="foot">Źródło: <a href="http://www.homeoint.org/books/kentrep/" target="_blank" rel="noopener">Repertorium Kenta</a>. <a href="#" onclick="openDisclaimer();return false">Zastrzeżenie</a>.</div>
+  </div>`;
+  const rq=document.getElementById('rq');
+  rq.addEventListener('input',e=>{state.rquery=e.target.value; clearTimeout(rq._t); rq._t=setTimeout(()=>{renderHomeRep(seg);bindSeg();caretEnd(document.getElementById('rq'));},120);});
+  bindRubricRows(); bindChapters(); bindCaseBar();
+}
+function bindChapters(){ view.querySelectorAll('[data-ch]').forEach(el=>{ el.onclick=()=>{state.chapter=el.dataset.ch;state.screen='chapter';state.browseLimit=300;render();window.scrollTo(0,0);}; }); }
+
+function rubricRow(r){
+  const on=caseSet.has(r.id);
+  const n=Object.keys(r.rem).length;
+  return `<div class="rrow ${on?'on':''}" role="button" tabindex="0" data-rub="${r.id}">
+    <span class="add">${tickSvg}</span>
+    <div class="rt"><b>${esc(r.path)}</b><span>${esc(r.pl)}</span></div>
+    <span class="rn">${n}</span></div>`;
+}
+function bindRubricRows(){
+  view.querySelectorAll('[data-rub]').forEach(el=>{
+    el.onclick=()=>{ const id=el.dataset.rub; if(caseSet.has(id))caseSet.delete(id); else caseSet.add(id); persistCase(); el.classList.toggle('on'); refreshCaseBar(); };
+  });
+}
+
+function caseBar(){
+  if(!caseSet.size) return '';
+  return `<div class="casebar" id="casebar"><button id="caseBtn">Analizuj objawy <span class="b">${caseSet.size}</span></button></div>`;
+}
+function bindCaseBar(){ const b=document.getElementById('caseBtn'); if(b) b.onclick=openCase; }
+function refreshCaseBar(){
+  let host=document.getElementById('casebar');
+  if(caseSet.size && !host){ render(); return; }
+  if(!caseSet.size && host){ host.remove(); return; }
+  if(host){ const b=host.querySelector('.b'); if(b) b.textContent=caseSet.size; }
+}
+
+/* ---------- CHAPTER browse ---------- */
+function renderChapter(){
+  const all=rubricsByChapter(state.chapter);
+  const shown=all.slice(0, state.browseLimit);
+  const more = all.length>shown.length;
+  view.innerHTML=`<div class="screen">
+    <div class="grouphdr">${esc(CH_PL[state.chapter]||state.chapter)}<span class="more">${all.length} rubryk</span></div>
+    <div class="list">${shown.map(rubricRow).join('')}</div>
+    ${more?`<div class="grouphdr"><span></span><span class="more" id="moreBtn">Pokaż więcej (${all.length-shown.length})</span></div>`:''}
+    ${caseBar()}
+  </div>`;
+  bindRubricRows(); bindCaseBar();
+  const mb=document.getElementById('moreBtn'); if(mb) mb.onclick=()=>{state.browseLimit+=400;render();};
+}
+
+/* ---------- CASE sheet ---------- */
+function openCase(){
+  const items=[...caseSet].map(id=>KENT.rubrics.find(r=>r.id===id)).filter(Boolean);
+  const list=items.map(r=>`<div class="ci"><span class="dot" style="background:var(--accent)"></span>
+     <div style="flex:1;min-width:0"><div style="font-size:14.5px">${esc(r.path)}</div><div style="font-size:12px;color:var(--label3)">${esc(r.pl)}</div></div>
+     <button data-del="${r.id}" style="border:0;background:none;color:#c0392b;font-size:13px;cursor:pointer;flex:none">Usuń</button></div>`).join('');
+  openSheet(`<h3>Koszyk objawów</h3><div class="lat">${items.length} rubryk wybranych do analizy</div>
+    <div class="cov">${list||'<div class="ci">Koszyk jest pusty.</div>'}</div>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" id="analyze" ${items.length?'':'disabled'}>Repertoryzuj (${items.length})</button>
+    <button class="close" id="clearCase">Wyczyść koszyk</button>`);
+  sheetbody.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{caseSet.delete(b.dataset.del);persistCase();openCase();refreshCaseBar();});
+  const an=document.getElementById('analyze'); if(an) an.onclick=()=>{closeSheet(); state.screen='rresult'; render(); window.scrollTo(0,0);};
+  document.getElementById('clearCase').onclick=()=>{ caseSet.clear(); persistCase(); closeSheet(); render(); };
+}
+
+/* ---------- WIZARD flow ---------- */
+function topicById(id){return TOPICS.find(t=>t.id===id);}
+function startTopic(id){ state.topic=topicById(id); state.screen='wflow'; state.idx=0; state.picks={}; render(); window.scrollTo(0,0); }
+function selectedWizardRubrics(){
+  const s=new Set(); if(state.topic) s.add(state.topic.base);
+  Object.values(state.picks).forEach(set=>set.forEach(r=>s.add(r)));
+  return [...s];
+}
+function togglePick(qid,rub){ if(!state.picks[qid])state.picks[qid]=new Set(); const set=state.picks[qid]; set.has(rub)?set.delete(rub):set.add(rub); render(); }
+
+function renderFlow(){
+  const t=state.topic, qs=t.qs, total=qs.length, qid=qs[state.idx], q=Q[qid];
+  const picked=state.picks[qid]||new Set(), last=state.idx===total-1;
+  const chips=q[2].map(([label,rub])=>{ const on=picked.has(rub);
+    return `<button class="chip ${on?'on':''}" data-rub="${rub}" data-q="${qid}"><span class="tick">${tickSvg}</span><span>${esc(label)}</span></button>`;}).join('');
+  view.innerHTML=`<div class="screen">
+    <div class="prog-wrap"><div class="prog"><i style="width:${Math.round((state.idx+1)/total*100)}%"></i></div><div class="prog-lbl">Pytanie ${state.idx+1} z ${total}</div></div>
+    <div class="q-eyebrow">${esc(t.pl)}</div><h2 class="q-title">${esc(q[0])}</h2>${q[1]?`<div class="q-hint">${esc(q[1])}</div>`:''}
+    <div class="chips">${chips}</div>
+    <div class="actions">${state.idx>0?`<button class="btn btn-ghost" id="back">Wstecz</button>`:''}<button class="btn btn-primary" id="next">${last?'Pokaż leki':(picked.size?'Dalej':'Pomiń')}</button></div>
+  </div>`;
+  view.querySelectorAll('.chip').forEach(c=>c.onclick=()=>togglePick(c.dataset.q,c.dataset.rub));
+  const back=document.getElementById('back'); if(back)back.onclick=()=>{state.idx--;render();};
+  document.getElementById('next').onclick=()=>{ if(last){state.screen='wresult';selOpen=false;render();window.scrollTo(0,0);} else {state.idx++;render();window.scrollTo(0,0);} };
+}
+
+function renderWizardResult(){
+  const rubrics=selectedWizardRubrics().map(id=>{ const r=RUB[id]; const rem={}; for(const k in r[2])rem[k.toLowerCase()]=r[2][k]; return {label:r[0],en:r[1],rem}; });
+  renderResults({title:"Najlepiej dopasowane leki", sub:"Repertoryzacja na podstawie odpowiedzi w kreatorze.", rubrics, backScreen:'wizard'});
+}
+function renderRepResult(){
+  const rubrics=[...caseSet].map(id=>KENT.rubrics.find(r=>r.id===id)).filter(Boolean).map(r=>({label:r.path,en:r.pl,rem:r.rem}));
+  renderResults({title:"Analiza repertoryzacyjna", sub:"Leki uszeregowane wg liczby pokrytych rubryk i sumy stopni Kenta.", rubrics, backScreen:'rep'});
+}
+
+/* ---------- SHARED results renderer ---------- */
+function renderResults(opt){
+  const rubrics=opt.rubrics;
+  const ranked=repertorize(rubrics).filter(r=>r.count>0);
+  const top=ranked.slice(0,10);
+  const maxScore=top.length?top[0].score:1;
+  const cards=top.map((r,i)=>{ const pct=Math.max(14,Math.round(r.score/maxScore*100));
+    return `<div class="rmd" role="button" tabindex="0" data-rem="${esc(r.rem)}">
+      <div class="rank">${i+1}</div>
+      <div class="ring" style="background:conic-gradient(var(--accent) ${pct}%, rgba(60,60,67,.12) 0)"><span>${pct}%</span></div>
+      <div class="info"><b>${esc(remName(r.rem))}</b><div class="lat">${esc(r.rem)}.</div>
+      <div class="meta">Pokrywa <strong>${r.count}</strong> z ${rubrics.length} objawów · suma ${r.score}</div></div>${chevR}</div>`;}).join('');
+  const selItems=rubrics.map(r=>`<div class="sel-item">${esc(r.label)}<em>${esc(r.en||'')}</em></div>`).join('');
+  view.innerHTML=`<div class="screen">
+    <div class="res-head"><h2>${esc(opt.title)}</h2><p>${esc(opt.sub)}</p></div>
+    <div class="sel-bar ${selOpen?'open':''}" id="selbar"><div class="toggle" id="seltoggle">
+      <svg viewBox="0 0 22 22" width="20" height="20" fill="none" style="color:var(--accent)"><path d="M4 6h14M4 11h14M4 16h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <b>Wybrane objawy</b><span class="cnt">${rubrics.length} ${chevDown()}</span></div><div class="body">${selItems}</div></div>
+    ${top.length?cards:`<div class="empty">Za mało danych. Wróć i dodaj więcej objawów.</div>`}
+    <button class="btn btn-primary" style="width:100%;margin-top:6px" id="restart">${opt.backScreen==='rep'?'Wróć do repertorium':'Nowa analiza'}</button>
+    <div class="foot">Wynik nie jest diagnozą ani zaleceniem leczenia. <a href="#" onclick="openDisclaimer();return false">Zastrzeżenie i bezpieczeństwo</a></div>
+  </div>`;
+  document.getElementById('seltoggle').onclick=()=>{selOpen=!selOpen;render();};
+  document.getElementById('restart').onclick=()=>{ if(opt.backScreen==='rep'){state.screen='home';state.tab='rep';render();} else goHome('wizard'); window.scrollTo(0,0); };
+  view.querySelectorAll('[data-rem]').forEach(el=>{ el.onclick=()=>openRemedy(el.dataset.rem,rubrics); el.onkeydown=e=>{if(e.key==='Enter'){openRemedy(el.dataset.rem,rubrics);}}; });
+}
+function chevDown(){return '<svg viewBox="0 0 12 8" width="11" height="8" style="margin-left:4px" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+
+/* ---------- SHEETS ---------- */
+const backdrop=document.getElementById('backdrop'), sheet=document.getElementById('sheet'), sheetbody=document.getElementById('sheetbody');
+function openSheet(html){ sheetbody.innerHTML=html; backdrop.classList.add('show'); sheet.classList.add('show'); sheet.scrollTop=0; }
+function closeSheet(){ backdrop.classList.remove('show'); sheet.classList.remove('show'); }
+function openRemedy(rem,rubrics){
+  const key=remKeynote(rem);
+  const cov=rubrics.filter(r=>r.rem[rem]).map(r=>{ const g=r.rem[rem];
+    return `<div class="ci"><span class="dot" style="background:${rgColor(g)}"></span>${esc(r.label)}<span class="gl">stopień ${g}</span></div>`;}).join('');
+  openSheet(`<h3>${esc(remName(rem))}</h3><div class="lat">${esc(rem)}.</div>
+    ${key?`<div class="key">${esc(key)}</div>`:''}
+    <div class="sub">Pokrywa Twoje objawy</div><div class="cov">${cov||'<div class="ci">—</div>'}</div>
+    <button class="close" onclick="closeSheet()">Zamknij</button>`);
+}
+function openDisclaimer(){
+  openSheet(`<h3>Zastrzeżenie i bezpieczeństwo</h3><div class="lat">Przeczytaj, zanim skorzystasz z wyników</div>
+    <div class="disc">
+      <p>To narzędzie <strong>edukacyjne</strong>, oparte na <strong>Repertorium Kenta</strong> (J.T. Kent, 1897) — historycznym dziele homeopatycznym w domenie publicznej.</p>
+      <p>Wynik <strong>nie jest diagnozą</strong>, poradą medyczną ani zaleceniem leczenia. Homeopatia nie ma potwierdzonej naukowo skuteczności wykraczającej poza efekt placebo i <strong>nie zastępuje</strong> leczenia o udowodnionym działaniu.</p>
+      <div class="warn">Przy objawach nasilonych, nietypowych, długotrwałych lub niepokojących skontaktuj się z lekarzem. W stanach nagłych dzwoń pod numer alarmowy <strong>112</strong>.</div>
+      <p style="color:var(--label3);font-size:13px">Tryb „Repertorium” wczytuje dane z pliku kent-repertory.json (generowanego skryptem build_kent.py). Wierność oryginałowi zależy od poprawnego pobrania i parsowania źródła.</p>
+    </div><button class="close" onclick="closeSheet()">Rozumiem</button>`);
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
+
+/* ---------- START ---------- */
+view.innerHTML='<div class="screen"><div class="hero"><h1>Repertorium</h1><p>Ładowanie bazy…</p></div></div>';
+loadKent().then(()=>render());
+</script>
 </body>
 </html>
