@@ -236,7 +236,13 @@ const REM = {
   Symph:["Symphytum officinale","Żywokost lekarski","Urazy kości i gałki ocznej po tępym uderzeniu; przyspiesza zrastanie."],
   Berb:["Berberis vulgaris","Berberys zwyczajny","Promieniujące, zmienne, migoczące bóle nerek i pęcherza."],
   Tab:["Tabacum","Tytoń szlachetny","Choroba lokomocyjna ze śmiertelnymi mdłościami, bladością i zimnym potem; lepiej na świeżym powietrzu."],
-  Petr:["Petroleum","Olej skalny","Mdłości podróżne; szorstka, popękana skóra nasilona zimą."]
+  Petr:["Petroleum","Olej skalny","Mdłości podróżne; szorstka, popękana skóra nasilona zimą."],
+  "Urt-u":["Urtica urens","Pokrzywa żegawka","Piekąco-swędząca pokrzywka jak po oparzeniu pokrzywą; oparzenia I stopnia; nawroty po skorupiakach."],
+  Dulc:["Dulcamara","Psianka słodkogórz","Dolegliwości od zimna i wilgoci oraz przemoczenia; pokrzywka i wysypki przy zmianie na chłodną, mokrą pogodę."],
+  Caust:["Causticum","Causticum Hahnemanni","Powolne osłabienie i niedowłady; chrypka; oparzenia i blizny, które źle się goją."],
+  Mez:["Mezereum","Wawrzynek wilczełyko","Pęcherzyki z nieznośnym świądem i grubymi strupami; nerwobóle i półpasiec."],
+  "Ran-b":["Ranunculus bulbosus","Jaskier bulwiasty","Półpasiec i pęcherzyki z piekąco-kłującym bólem; ból międzyżebrowy; gorzej od dotyku i wilgoci."],
+  Sabad:["Sabadilla","Sabadyla","Napadowe kichanie, swędzenie nosa i podniebienia, łzawienie — sztandarowy lek kataru siennego."]
 };
 
 const RUB = {
@@ -393,7 +399,40 @@ const RUB = {
   cyst_canth:["Nieustanne parcie, palenie, mocz kroplami","Urination, constant urging, cutting, drops",{Canth:3,Merc:2}],
   cyst_apis:["Pęcherz — piekąco-kłujący, lepiej od zimna","Bladder, stinging, better cold",{Apis:3}],
   cyst_berb:["Ból promieniujący od nerek","Kidney, pain radiating",{Berb:3}],
-  cyst_staph:["Dolegliwości pęcherza po stosunku / cewnikowaniu","Bladder, complaints after coition",{Staph:3}]
+  cyst_staph:["Dolegliwości pęcherza po stosunku / cewnikowaniu","Bladder, complaints after coition",{Staph:3}],
+
+  // — pokrzywka —
+  urticaria:["Pokrzywka / bąble","Skin, urticaria",{Apis:3,"Urt-u":3,"Rhus-t":3,Dulc:2,Ars:2,Sulph:2,"Nat-m":2,Bell:2}],
+  urt_urtu:["Pokrzywka piekąco-swędząca, jak po pokrzywie","Urticaria, stinging, burning",{"Urt-u":3,Apis:2}],
+  urt_warmbed:["Pokrzywka — świąd gorszy od ciepła łóżka","Urticaria, worse warmth of bed",{Sulph:2,"Rhus-t":2,Dulc:2}],
+  urt_wet:["Pokrzywka po przemoczeniu / zimnej wilgoci","Urticaria, from cold wet, damp",{Dulc:3,"Rhus-t":2}],
+  urt_exert:["Pokrzywka po wysiłku, spoceniu lub od emocji","Urticaria, after exertion, sweat, emotion",{"Nat-m":2,Apis:2}],
+  urt_stomach:["Pokrzywka z dolegliwościami żołądka (po skorupiakach)","Urticaria, with gastric, after shellfish",{"Urt-u":2,Ars:2,"Carb-v":2}],
+  // — oparzenia —
+  burns:["Oparzenia","Skin, burns",{Canth:3,"Urt-u":3,Caust:2,Ars:2,Apis:2,Hep:2}],
+  burn_first:["Oparzenie I stopnia, piekący rumień","Burns, first degree, smarting",{"Urt-u":3,Canth:2}],
+  burn_blister:["Oparzenie z pęcherzami, palące","Burns, blisters, burning",{Canth:3,"Rhus-t":2}],
+  burn_old:["Oparzenia źle gojące się, blizny","Burns, slow healing, scars",{Caust:3}],
+  burn_coldapp:["Oparzenie — lepiej od zimnych okładów","Burns, better cold application",{Canth:2,"Urt-u":2}],
+  burn_warm:["Oparzenie — lepiej od ciepła (paradoksalnie)","Burns, better warmth",{Ars:2}],
+  // — ukąszenia owadów —
+  bites:["Ukąszenia / użądlenia owadów","Skin, stings of insects",{Apis:3,Led:3,"Urt-u":2,Staph:2,Hyper:2}],
+  bite_apis:["Użądlenie — gorący, czerwony obrzęk, lepiej od zimna","Stings, hot swelling, better cold",{Apis:3,"Urt-u":2}],
+  bite_led:["Ukąszenie — chłodny, sinawy obrzęk, lepiej od zimna","Stings, puffy, cold, better cold",{Led:3}],
+  bite_staph:["Ukąszenia — wielkie, swędzące bąble (komary)","Stings, large itching wheals, mosquito",{Staph:3,"Urt-u":2}],
+  bite_nerve:["Ukłucie — strzelający ból wzdłuż nerwu","Stings, shooting along nerve",{Hyper:3,Led:2}],
+  // — opryszczka / półpasiec —
+  herpes:["Opryszczka / półpasiec","Skin, herpes, vesicular eruptions",{"Rhus-t":3,"Nat-m":3,Mez:3,"Ran-b":3,Ars:2,Sulph:2,Sep:2,Apis:2}],
+  herpes_lips:["Opryszczka warg (po przeziębieniu / słońcu)","Herpes, labial, lips",{"Nat-m":3,"Rhus-t":2,Sep:2}],
+  herpes_zoster:["Półpasiec — pasmo pęcherzyków, piekący ból","Herpes zoster, burning",{"Ran-b":3,Mez:3,"Rhus-t":2}],
+  herpes_mez:["Wykwity — nieznośny świąd, grube strupy","Eruptions, itching intense, thick scabs",{Mez:3}],
+  herpes_rhus:["Wykwity — lepiej od ciepła, gorzej w wilgoci","Eruptions, better warmth, worse damp",{"Rhus-t":3}],
+  // — katar sienny / alergia —
+  hayfever:["Katar sienny / alergia sezonowa","Coryza, hay fever, allergic",{Sabad:3,"All-c":3,Euphr:3,"Nat-m":2,Ars:2,Sulph:2,Puls:2,"Nux-v":2}],
+  hay_sneeze:["Napadowe kichanie, swędzenie nosa i podniebienia","Hay fever, sneezing paroxysms, itching",{Sabad:3,"Nat-m":2}],
+  hay_acrid:["Wodnisty, gryzący katar; łagodne łzy","Hay fever, acrid coryza, bland tears",{"All-c":3}],
+  hay_eyes:["Gryzące łzawienie; łagodny katar","Hay fever, acrid tears, bland coryza",{Euphr:3}],
+  hay_itch:["Świąd oczu, podniebienia i gardła","Hay fever, itching eyes, palate, throat",{Sabad:2,"All-c":2}]
 };
 
 const Q = {
@@ -432,7 +471,12 @@ const Q = {
   vomit_kind:["Co charakteryzuje wymioty?","",[["Uporczywe nudności, język czysty","nausea_clean"],["Po zepsutym jedzeniu / zatrucie","vomit_food"],["Z biegunką, zimny pot, osłabienie","vomit_verat"],["Po przejedzeniu / używkach, odbijanie","vomit_nux"]]],
   constip_kind:["Co charakteryzuje zaparcie?","",[["Częste, nieskuteczne parcie","constip_nux"],["Brak parcia, suchy twardy stolec","constip_bry"],["Stolec cofa się / wymyka","constip_sil"],["Uczucie kuli / niepełnego wypróżnienia","constip_sep"]]],
   injury_type:["Jaki to uraz?","",[["Stłuczenie, „posiniaczenie”","injury_bruise"],["Rana kłuta (gwóźdź, ukłucie)","injury_punct"],["Uraz nerwów; strzelający ból","injury_nerve"],["Uraz ścięgien / okostnej (skręcenie)","injury_tendon"],["Rana cięta (nóż, zabieg)","injury_cut"],["Podbite oko / tępy uraz oka","injury_eye"]]],
-  cyst_kind:["Co czujesz przy pęcherzu?","",[["Nieustanne parcie, palenie, krople moczu","cyst_canth"],["Piekąco-kłujące, lepiej od zimna","cyst_apis"],["Ból promieniujący od nerek","cyst_berb"],["Po stosunku / cewnikowaniu","cyst_staph"]]]
+  cyst_kind:["Co czujesz przy pęcherzu?","",[["Nieustanne parcie, palenie, krople moczu","cyst_canth"],["Piekąco-kłujące, lepiej od zimna","cyst_apis"],["Ból promieniujący od nerek","cyst_berb"],["Po stosunku / cewnikowaniu","cyst_staph"]]],
+  urt_kind:["Co charakteryzuje pokrzywkę?","",[["Piekąco-swędząca, jak po pokrzywie","urt_urtu"],["Świąd gorszy od ciepła łóżka","urt_warmbed"],["Po przemoczeniu / zimnej wilgoci","urt_wet"],["Po wysiłku, spoceniu lub od emocji","urt_exert"],["Z dolegliwościami żołądka (po skorupiakach)","urt_stomach"]]],
+  burn_kind:["Jakie to oparzenie?","Przy rozległych lub głębokich oparzeniach pilnie do lekarza.",[["Zaczerwienienie, piekący ból (I stopień)","burn_first"],["Pęcherze, silne pieczenie","burn_blister"],["Źle się goi, stare oparzenie, blizny","burn_old"],["Lepiej od zimnych okładów","burn_coldapp"],["Lepiej od ciepła (paradoksalnie)","burn_warm"]]],
+  bite_kind:["Jak wygląda ukąszenie?","",[["Gorący, czerwony obrzęk, lepiej od zimna","bite_apis"],["Chłodny, sinawy obrzęk, lepiej od zimna","bite_led"],["Wielkie, swędzące bąble (komary)","bite_staph"],["Strzelający ból wzdłuż nerwu (ukłucie)","bite_nerve"]]],
+  herpes_kind:["Co charakteryzuje wykwity?","",[["Pęcherzyki na wargach (po przeziębieniu/słońcu)","herpes_lips"],["Pasmo pęcherzyków, piekący ból (półpasiec)","herpes_zoster"],["Nieznośny świąd, grube strupy","herpes_mez"],["Lepiej od ciepła, gorzej w wilgoci","herpes_rhus"]]],
+  hay_kind:["Co dominuje w alergii?","",[["Napadowe kichanie, swędzenie nosa/podniebienia","hay_sneeze"],["Wodnisty gryzący katar, łagodne łzy","hay_acrid"],["Gryzące łzy, łagodny katar","hay_eyes"],["Świąd oczu, podniebienia, gardła","hay_itch"]]]
 };
 
 const ICON = {
@@ -454,7 +498,10 @@ const ICON = {
   ear:'<path d="M8 9a4 4 0 1 1 8 0c0 2.4-2 3.2-2.8 4.6-.5.9-.2 2.2-1.2 3.1-1 .9-2.8.7-3.5-.4M10.5 9a1.6 1.6 0 0 1 3 .2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
   eye:'<path d="M3.5 12S7 6.5 12 6.5 20.5 12 20.5 12 17 17.5 12 17.5 3.5 12 3.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.6"/>',
   injury:'<rect x="3.5" y="9" width="17" height="6" rx="3" transform="rotate(-30 12 12)" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/><path d="M10 10.3l.6.6m2.8 2.2l.6.6m-3.4 0l3.4-3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
-  bladder:'<path d="M12 5c-3 1-5 3-5 6 0 3 2 5 5 5s5-2 5-5c0-3-2-5-5-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 16v3M10.5 19h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+  bladder:'<path d="M12 5c-3 1-5 3-5 6 0 3 2 5 5 5s5-2 5-5c0-3-2-5-5-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 16v3M10.5 19h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  flame:'<path d="M12 3.5c2.5 3 4.5 4.7 4.5 8.3a4.5 4.5 0 0 1-9 0c0-1.4.5-2.4 1.2-3.3.2 1 .9 1.7 1.8 1.7 1.1 0 1.6-1 .9-2.4-.8-1.6-.3-3 .6-4.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+  bug:'<ellipse cx="12" cy="13" rx="4" ry="5" stroke="currentColor" stroke-width="1.6"/><path d="M12 8V6m-2-1l1.4 1.4M14 5l-1.4 1.4M8 11H5m3 3H4.5M8 16.5l-2.5 1.5M16 11h3m-3 3h3.5M16 16.5l2.5 1.5M12 8.5v9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+  rash:'<circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="14.5" cy="8" r="1.3" fill="currentColor"/><circle cx="11" cy="13" r="1.3" fill="currentColor"/><circle cx="16" cy="13.5" r="1.3" fill="currentColor"/><circle cx="8" cy="15" r="1.3" fill="currentColor"/><circle cx="13.5" cy="17" r="1.3" fill="currentColor"/>'
 };
 
 const TOPICS = [
@@ -478,7 +525,12 @@ const TOPICS = [
   {id:"vomiting", pl:"Wymioty", icon:"stomach", kw:["wymioty","torsje","zwracanie","vomiting"], base:"vomiting", qs:["vomit_kind","thirst","temp","worse_time"]},
   {id:"constip", pl:"Zaparcie", icon:"stomach", kw:["zaparcie","zatwardzenie","stolec","constipation"], base:"constip", qs:["constip_kind","worse_time","mood"]},
   {id:"injury", pl:"Urazy, stłuczenia, rany", icon:"injury", kw:["uraz","stluczenie","stłuczenie","rana","kontuzja","skrecenie","skręcenie","injury"], base:"injury", qs:["injury_type","pain_relief","worse_time"]},
-  {id:"cystitis", pl:"Pieczenie przy oddawaniu moczu", icon:"bladder", kw:["pecherz","pęcherz","mocz","pieczenie","zapalenie pecherza","cystitis"], base:"cystitis", qs:["cyst_kind","thirst","temp","worse_time"]}
+  {id:"cystitis", pl:"Pieczenie przy oddawaniu moczu", icon:"bladder", kw:["pecherz","pęcherz","mocz","pieczenie","zapalenie pecherza","cystitis"], base:"cystitis", qs:["cyst_kind","thirst","temp","worse_time"]},
+  {id:"urticaria", pl:"Pokrzywka / bąble", icon:"rash", kw:["pokrzywka","bable","bąble","babel","swiad","świąd","alergia skorna","urticaria"], base:"urticaria", qs:["urt_kind","temp","worse_time"]},
+  {id:"burns", pl:"Oparzenia", icon:"flame", kw:["oparzenie","oparzenia","poparzenie","burn","burns"], base:"burns", qs:["burn_kind","worse_time"]},
+  {id:"bites", pl:"Ukąszenia / użądlenia owadów", icon:"bug", kw:["ukaszenie","ukąszenie","uzadlenie","użądlenie","komar","osa","pszczola","pszczoła","owad","bite","sting"], base:"bites", qs:["bite_kind","pain_relief"]},
+  {id:"herpes", pl:"Opryszczka / półpasiec", icon:"rash", kw:["opryszczka","polpasiec","półpasiec","herpes","zoster","pecherzyki","pęcherzyki"], base:"herpes", qs:["herpes_kind","temp","worse_time"]},
+  {id:"hayfever", pl:"Katar sienny / alergia", icon:"nose", kw:["katar sienny","alergia","uczulenie","pylenie","hay fever","sienny"], base:"hayfever", qs:["hay_kind","cor_mod","temp","better"]}
 ];
 
 /* unified remedy meta keyed by lowercase abbreviation */
@@ -715,7 +767,7 @@ function rgColor(g){ return g===3?'var(--g3)':g===2?'var(--g2)':'var(--g1)'; }
 /* =====================================================================
    STAN + persistencja koszyka
    ===================================================================== */
-let state = {tab:'wizard', screen:'home', topic:null, idx:0, picks:{}, wquery:"", rquery:"", chapter:null, browseLimit:300, gchap:null, gmain:null, gmainPL:"", gmquery:"", gvLimit:400};
+let state = {tab:'wizard', screen:'home', topic:null, idx:0, picks:{}, wquery:"", rquery:"", chapter:null, browseLimit:300};
 let caseSet = new Set();   // id rubryk Kenta w koszyku
 let selOpen = false;
 
@@ -741,9 +793,6 @@ function setNav(){
   else if(s==='wresult'){ navleft.style.visibility='visible'; navleftlbl.textContent='Start'; navtitle.textContent='Dopasowanie'; }
   else if(s==='chapter'){ navleft.style.visibility='visible'; navleftlbl.textContent='Rozdziały'; navtitle.textContent=state.chapter?(CH_PL[state.chapter]||state.chapter):''; }
   else if(s==='rresult'){ navleft.style.visibility='visible'; navleftlbl.textContent='Repertorium'; navtitle.textContent='Analiza'; }
-  else if(s==='gchap'){ navleft.style.visibility='visible'; navleftlbl.textContent='Kreator'; navtitle.textContent='Całe repertorium'; }
-  else if(s==='gmain'){ navleft.style.visibility='visible'; navleftlbl.textContent='Obszary'; navtitle.textContent=state.gchap?(CH_PL[state.gchap]||state.gchap):''; }
-  else if(s==='gvars'){ navleft.style.visibility='visible'; navleftlbl.textContent='Wstecz'; navtitle.textContent=state.gmainPL||''; }
 }
 navleft.onclick=()=>{
   const s=state.screen;
@@ -751,9 +800,6 @@ navleft.onclick=()=>{
   else if(s==='wresult') goHome('wizard');
   else if(s==='chapter'){ state.screen='home'; state.chapter=null; render(); }
   else if(s==='rresult'){ state.screen='home'; render(); }
-  else if(s==='gchap'){ goHome('wizard'); }
-  else if(s==='gmain'){ state.screen='gchap'; state.gchap=null; render(); window.scrollTo(0,0); }
-  else if(s==='gvars'){ state.screen='gmain'; render(); window.scrollTo(0,0); }
 };
 function goHome(tab){ state.screen='home'; if(tab)state.tab=tab; state.topic=null; state.idx=0; selOpen=false; render(); window.scrollTo(0,0); }
 
@@ -765,9 +811,6 @@ function render(){
   else if(s==='wresult') renderWizardResult();
   else if(s==='chapter') renderChapter();
   else if(s==='rresult') renderRepResult();
-  else if(s==='gchap') renderGChap();
-  else if(s==='gmain') renderGMain();
-  else if(s==='gvars') renderGVars();
 }
 
 /* ---------- HOME ---------- */
@@ -789,21 +832,16 @@ function renderHomeWizard(seg){
       <div class="ico">${svg(t.icon)}</div>
       <div class="tx"><b>${esc(t.pl)}</b><span>${esc(RUB[t.base][1])}</span></div>${chevR}</div>`).join('');
   view.innerHTML=`<div class="screen">
-    <div class="hero"><h1>Repertorium</h1><p>Wpisz dolegliwość i odpowiedz na pytania — albo przejdź krok po kroku przez całą książkę.</p></div>
+    <div class="hero"><h1>Repertorium</h1><p>Wpisz dolegliwość i odpowiedz na pytania — kreator dobierze rubryki i wskaże leki.</p></div>
     ${seg}
-    <div class="grouphdr">Całe repertorium</div>
-    <div class="list" style="margin-bottom:2px"><div class="row" id="guidedStart" role="button" tabindex="0">
-      <div class="ico">${svg('book')}</div>
-      <div class="tx"><b>Przejdź przez całą książkę</b><span>Krok po kroku: obszar → objaw → analiza</span></div>${chevR}</div></div>
-    <div class="grouphdr">Szybki start — częste dolegliwości</div>
     <div class="search"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <input id="q" type="search" enterkeyhint="search" placeholder="Wpisz dolegliwość…" value="${esc(state.wquery)}" autocomplete="off" autocapitalize="off"></div>
+    <div class="grouphdr">${q?'Wyniki':'Wybierz dolegliwość'}</div>
     ${rows?`<div class="list">${rows}</div>`:`<div class="empty">Brak dopasowań dla „${esc(state.wquery)}”.</div>`}
     <div class="foot">Źródło: <a href="http://www.homeoint.org/books/kentrep/" target="_blank" rel="noopener">Repertorium Kenta</a> (1897, domena publiczna). <a href="#" onclick="openDisclaimer();return false">Zastrzeżenie</a>.</div>
   </div>`;
   const input=document.getElementById('q');
   input.addEventListener('input',e=>{state.wquery=e.target.value;renderHomeWizard(seg);bindSeg();caretEnd(document.getElementById('q'));});
-  const gs=document.getElementById('guidedStart'); if(gs) gs.onclick=startGuided;
   bindTopics();
 }
 function bindTopics(){ view.querySelectorAll('[data-topic]').forEach(el=>{ el.onclick=()=>startTopic(el.dataset.topic); el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startTopic(el.dataset.topic);}}; }); }
@@ -866,8 +904,6 @@ function caseBar(){
 }
 function bindCaseBar(){ const b=document.getElementById('caseBtn'); if(b) b.onclick=openCase; }
 function refreshCaseBar(){
-  const ta=document.getElementById('toAnalyze');
-  if(ta){ ta.textContent='Analizuj ('+caseSet.size+')'; ta.disabled=!caseSet.size; return; }
   let host=document.getElementById('casebar');
   if(caseSet.size && !host){ render(); return; }
   if(!caseSet.size && host){ host.remove(); return; }
@@ -889,81 +925,7 @@ function renderChapter(){
   const mb=document.getElementById('moreBtn'); if(mb) mb.onclick=()=>{state.browseLimit+=400;render();};
 }
 
-/* ---------- KREATOR: przewodnik przez całe repertorium ---------- */
-function startGuided(){ state.screen='gchap'; state.gchap=null; state.gmain=null; state.gmquery=""; render(); window.scrollTo(0,0); }
-
-function mainRubricsOf(ch){
-  const map=new Map();
-  for(const r of KENT.rubrics){
-    if(r.ch!==ch) continue;
-    const mEN=r.path.split(', ')[0];
-    const cur=map.get(mEN);
-    if(cur){ cur.n++; } else map.set(mEN,{en:mEN, pl:r.pathPL.split(', ')[0], n:1});
-  }
-  return [...map.values()].sort((a,b)=>a.pl.localeCompare(b.pl,'pl'));
-}
-function variantsOf(ch,mainEN){ return KENT.rubrics.filter(r=>r.ch===ch && r.path.split(', ')[0]===mainEN); }
-
-function renderGChap(){
-  const chs=chapterCounts();
-  view.innerHTML=`<div class="screen">
-    <div class="prog-wrap"><div class="prog"><i style="width:33%"></i></div><div class="prog-lbl">Krok 1 z 3 · wybierz obszar ciała / sferę</div></div>
-    <h2 class="q-title" style="margin-top:18px">Czego dotyczy dolegliwość?</h2>
-    <div class="list" style="margin-top:16px">${chs.map(c=>`<div class="row" role="button" tabindex="0" data-gchap="${esc(c.ch)}">
-      <div class="ico">${svg('book')}</div><div class="tx"><b>${esc(c.pl)}</b><span>${esc(c.ch)}</span></div>
-      <span class="cnt">${c.n}</span>${chevR}</div>`).join('')}</div>
-    ${caseBar()}
-  </div>`;
-  view.querySelectorAll('[data-gchap]').forEach(el=>el.onclick=()=>{ state.gchap=el.dataset.gchap; state.gmquery=""; state.screen='gmain'; render(); window.scrollTo(0,0); });
-  bindCaseBar();
-}
-
-function renderGMain(){
-  const q=state.gmquery.trim().toLowerCase();
-  let mains=mainRubricsOf(state.gchap);
-  if(q) mains=mains.filter(m=>m.pl.toLowerCase().includes(q)||m.en.toLowerCase().includes(q));
-  const shown=mains.slice(0,400);
-  const rows=shown.map(m=>`<div class="row" role="button" tabindex="0" data-gmain="${esc(m.en)}">
-    <div class="tx"><b>${esc(m.pl)}</b>${m.en!==m.pl?`<span>${esc(m.en)}</span>`:''}</div>
-    <span class="cnt">${m.n}</span>${chevR}</div>`).join('');
-  view.innerHTML=`<div class="screen">
-    <div class="prog-wrap"><div class="prog"><i style="width:66%"></i></div><div class="prog-lbl">Krok 2 z 3 · ${esc(CH_PL[state.gchap]||state.gchap)} — wybierz objaw główny</div></div>
-    <div class="search" style="margin-top:14px"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <input id="gm" type="search" enterkeyhint="search" placeholder="Szukaj objawu (np. ból, lęk, kaszel)…" value="${esc(state.gmquery)}" autocomplete="off" autocapitalize="off"></div>
-    <div class="grouphdr">Objawy główne<span class="more">${mains.length}${mains.length>400?' · pokazano 400':''}</span></div>
-    ${rows?`<div class="list">${rows}</div>`:`<div class="empty">Brak objawów dla „${esc(state.gmquery)}”.</div>`}
-    ${caseBar()}
-  </div>`;
-  const gm=document.getElementById('gm');
-  gm.addEventListener('input',e=>{ state.gmquery=e.target.value; clearTimeout(gm._t); gm._t=setTimeout(()=>{renderGMain();caretEnd(document.getElementById('gm'));},120); });
-  view.querySelectorAll('[data-gmain]').forEach(el=>el.onclick=()=>{
-    state.gmain=el.dataset.gmain;
-    const v=variantsOf(state.gchap,state.gmain);
-    state.gmainPL=(v[0]&&v[0].pathPL.split(', ')[0])||state.gmain;
-    state.gvLimit=400; state.screen='gvars'; render(); window.scrollTo(0,0);
-  });
-  bindCaseBar();
-}
-
-function renderGVars(){
-  const all=variantsOf(state.gchap,state.gmain);
-  const shown=all.slice(0,state.gvLimit);
-  const more=all.length>shown.length;
-  const multi=all.length>1;
-  view.innerHTML=`<div class="screen">
-    <div class="prog-wrap"><div class="prog"><i style="width:100%"></i></div><div class="prog-lbl">Krok 3 z 3 · zaznacz pasujące objawy</div></div>
-    <h2 class="q-title" style="margin-top:14px">${esc(state.gmainPL)}</h2>
-    <div class="q-hint">${multi?'Dotknij wszystkich wariantów/modalności, które pasują. Dodają się do koszyka.':'Dotknij, aby dodać ten objaw do koszyka.'}</div>
-    <div class="list" style="margin-top:14px">${shown.map(rubricRow).join('')}</div>
-    ${more?`<div class="grouphdr"><span></span><span class="more" id="moreBtn">Pokaż więcej (${all.length-shown.length})</span></div>`:''}
-    <div class="actions"><button class="btn btn-ghost" id="another">+ Inny objaw</button><button class="btn btn-primary" id="toAnalyze" ${caseSet.size?'':'disabled'}>Analizuj (${caseSet.size})</button></div>
-  </div>`;
-  bindRubricRows();
-  const mb=document.getElementById('moreBtn'); if(mb) mb.onclick=()=>{state.gvLimit+=400;render();};
-  document.getElementById('another').onclick=()=>{ state.screen='gchap'; render(); window.scrollTo(0,0); };
-  document.getElementById('toAnalyze').onclick=()=>{ if(caseSet.size){ state.screen='rresult'; render(); window.scrollTo(0,0);} };
-}
-
+/* ---------- CASE sheet ---------- */
 function openCase(){
   const items=[...caseSet].map(id=>KENT.rubrics.find(r=>r.id===id)).filter(Boolean);
   const list=items.map(r=>`<div class="ci"><span class="dot" style="background:var(--accent)"></span>
