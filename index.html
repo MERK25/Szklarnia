@@ -633,7 +633,7 @@ function rgColor(g){ return g===3?'var(--g3)':g===2?'var(--g2)':'var(--g1)'; }
 /* =====================================================================
    STAN + persistencja koszyka
    ===================================================================== */
-let state = {tab:'wizard', screen:'home', topic:null, idx:0, picks:{}, wquery:"", rquery:"", chapter:null, browseLimit:300};
+let state = {tab:'wizard', screen:'home', topic:null, idx:0, picks:{}, wquery:"", rquery:"", chapter:null, browseLimit:300, gchap:null, gmain:null, gmainPL:"", gmquery:"", gvLimit:400};
 let caseSet = new Set();   // id rubryk Kenta w koszyku
 let selOpen = false;
 
@@ -659,6 +659,9 @@ function setNav(){
   else if(s==='wresult'){ navleft.style.visibility='visible'; navleftlbl.textContent='Start'; navtitle.textContent='Dopasowanie'; }
   else if(s==='chapter'){ navleft.style.visibility='visible'; navleftlbl.textContent='Rozdziały'; navtitle.textContent=state.chapter?(CH_PL[state.chapter]||state.chapter):''; }
   else if(s==='rresult'){ navleft.style.visibility='visible'; navleftlbl.textContent='Repertorium'; navtitle.textContent='Analiza'; }
+  else if(s==='gchap'){ navleft.style.visibility='visible'; navleftlbl.textContent='Kreator'; navtitle.textContent='Całe repertorium'; }
+  else if(s==='gmain'){ navleft.style.visibility='visible'; navleftlbl.textContent='Obszary'; navtitle.textContent=state.gchap?(CH_PL[state.gchap]||state.gchap):''; }
+  else if(s==='gvars'){ navleft.style.visibility='visible'; navleftlbl.textContent='Wstecz'; navtitle.textContent=state.gmainPL||''; }
 }
 navleft.onclick=()=>{
   const s=state.screen;
@@ -666,6 +669,9 @@ navleft.onclick=()=>{
   else if(s==='wresult') goHome('wizard');
   else if(s==='chapter'){ state.screen='home'; state.chapter=null; render(); }
   else if(s==='rresult'){ state.screen='home'; render(); }
+  else if(s==='gchap'){ goHome('wizard'); }
+  else if(s==='gmain'){ state.screen='gchap'; state.gchap=null; render(); window.scrollTo(0,0); }
+  else if(s==='gvars'){ state.screen='gmain'; render(); window.scrollTo(0,0); }
 };
 function goHome(tab){ state.screen='home'; if(tab)state.tab=tab; state.topic=null; state.idx=0; selOpen=false; render(); window.scrollTo(0,0); }
 
@@ -677,6 +683,9 @@ function render(){
   else if(s==='wresult') renderWizardResult();
   else if(s==='chapter') renderChapter();
   else if(s==='rresult') renderRepResult();
+  else if(s==='gchap') renderGChap();
+  else if(s==='gmain') renderGMain();
+  else if(s==='gvars') renderGVars();
 }
 
 /* ---------- HOME ---------- */
@@ -698,16 +707,21 @@ function renderHomeWizard(seg){
       <div class="ico">${svg(t.icon)}</div>
       <div class="tx"><b>${esc(t.pl)}</b><span>${esc(RUB[t.base][1])}</span></div>${chevR}</div>`).join('');
   view.innerHTML=`<div class="screen">
-    <div class="hero"><h1>Repertorium</h1><p>Wpisz dolegliwość i odpowiedz na pytania — kreator dobierze rubryki i wskaże leki.</p></div>
+    <div class="hero"><h1>Repertorium</h1><p>Wpisz dolegliwość i odpowiedz na pytania — albo przejdź krok po kroku przez całą książkę.</p></div>
     ${seg}
+    <div class="grouphdr">Całe repertorium</div>
+    <div class="list" style="margin-bottom:2px"><div class="row" id="guidedStart" role="button" tabindex="0">
+      <div class="ico">${svg('book')}</div>
+      <div class="tx"><b>Przejdź przez całą książkę</b><span>Krok po kroku: obszar → objaw → analiza</span></div>${chevR}</div></div>
+    <div class="grouphdr">Szybki start — częste dolegliwości</div>
     <div class="search"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <input id="q" type="search" enterkeyhint="search" placeholder="Wpisz dolegliwość…" value="${esc(state.wquery)}" autocomplete="off" autocapitalize="off"></div>
-    <div class="grouphdr">${q?'Wyniki':'Wybierz dolegliwość'}</div>
     ${rows?`<div class="list">${rows}</div>`:`<div class="empty">Brak dopasowań dla „${esc(state.wquery)}”.</div>`}
     <div class="foot">Źródło: <a href="http://www.homeoint.org/books/kentrep/" target="_blank" rel="noopener">Repertorium Kenta</a> (1897, domena publiczna). <a href="#" onclick="openDisclaimer();return false">Zastrzeżenie</a>.</div>
   </div>`;
   const input=document.getElementById('q');
   input.addEventListener('input',e=>{state.wquery=e.target.value;renderHomeWizard(seg);bindSeg();caretEnd(document.getElementById('q'));});
+  const gs=document.getElementById('guidedStart'); if(gs) gs.onclick=startGuided;
   bindTopics();
 }
 function bindTopics(){ view.querySelectorAll('[data-topic]').forEach(el=>{ el.onclick=()=>startTopic(el.dataset.topic); el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();startTopic(el.dataset.topic);}}; }); }
@@ -770,6 +784,8 @@ function caseBar(){
 }
 function bindCaseBar(){ const b=document.getElementById('caseBtn'); if(b) b.onclick=openCase; }
 function refreshCaseBar(){
+  const ta=document.getElementById('toAnalyze');
+  if(ta){ ta.textContent='Analizuj ('+caseSet.size+')'; ta.disabled=!caseSet.size; return; }
   let host=document.getElementById('casebar');
   if(caseSet.size && !host){ render(); return; }
   if(!caseSet.size && host){ host.remove(); return; }
@@ -791,7 +807,81 @@ function renderChapter(){
   const mb=document.getElementById('moreBtn'); if(mb) mb.onclick=()=>{state.browseLimit+=400;render();};
 }
 
-/* ---------- CASE sheet ---------- */
+/* ---------- KREATOR: przewodnik przez całe repertorium ---------- */
+function startGuided(){ state.screen='gchap'; state.gchap=null; state.gmain=null; state.gmquery=""; render(); window.scrollTo(0,0); }
+
+function mainRubricsOf(ch){
+  const map=new Map();
+  for(const r of KENT.rubrics){
+    if(r.ch!==ch) continue;
+    const mEN=r.path.split(', ')[0];
+    const cur=map.get(mEN);
+    if(cur){ cur.n++; } else map.set(mEN,{en:mEN, pl:r.pathPL.split(', ')[0], n:1});
+  }
+  return [...map.values()].sort((a,b)=>a.pl.localeCompare(b.pl,'pl'));
+}
+function variantsOf(ch,mainEN){ return KENT.rubrics.filter(r=>r.ch===ch && r.path.split(', ')[0]===mainEN); }
+
+function renderGChap(){
+  const chs=chapterCounts();
+  view.innerHTML=`<div class="screen">
+    <div class="prog-wrap"><div class="prog"><i style="width:33%"></i></div><div class="prog-lbl">Krok 1 z 3 · wybierz obszar ciała / sferę</div></div>
+    <h2 class="q-title" style="margin-top:18px">Czego dotyczy dolegliwość?</h2>
+    <div class="list" style="margin-top:16px">${chs.map(c=>`<div class="row" role="button" tabindex="0" data-gchap="${esc(c.ch)}">
+      <div class="ico">${svg('book')}</div><div class="tx"><b>${esc(c.pl)}</b><span>${esc(c.ch)}</span></div>
+      <span class="cnt">${c.n}</span>${chevR}</div>`).join('')}</div>
+    ${caseBar()}
+  </div>`;
+  view.querySelectorAll('[data-gchap]').forEach(el=>el.onclick=()=>{ state.gchap=el.dataset.gchap; state.gmquery=""; state.screen='gmain'; render(); window.scrollTo(0,0); });
+  bindCaseBar();
+}
+
+function renderGMain(){
+  const q=state.gmquery.trim().toLowerCase();
+  let mains=mainRubricsOf(state.gchap);
+  if(q) mains=mains.filter(m=>m.pl.toLowerCase().includes(q)||m.en.toLowerCase().includes(q));
+  const shown=mains.slice(0,400);
+  const rows=shown.map(m=>`<div class="row" role="button" tabindex="0" data-gmain="${esc(m.en)}">
+    <div class="tx"><b>${esc(m.pl)}</b>${m.en!==m.pl?`<span>${esc(m.en)}</span>`:''}</div>
+    <span class="cnt">${m.n}</span>${chevR}</div>`).join('');
+  view.innerHTML=`<div class="screen">
+    <div class="prog-wrap"><div class="prog"><i style="width:66%"></i></div><div class="prog-lbl">Krok 2 z 3 · ${esc(CH_PL[state.gchap]||state.gchap)} — wybierz objaw główny</div></div>
+    <div class="search" style="margin-top:14px"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="gm" type="search" enterkeyhint="search" placeholder="Szukaj objawu (np. ból, lęk, kaszel)…" value="${esc(state.gmquery)}" autocomplete="off" autocapitalize="off"></div>
+    <div class="grouphdr">Objawy główne<span class="more">${mains.length}${mains.length>400?' · pokazano 400':''}</span></div>
+    ${rows?`<div class="list">${rows}</div>`:`<div class="empty">Brak objawów dla „${esc(state.gmquery)}”.</div>`}
+    ${caseBar()}
+  </div>`;
+  const gm=document.getElementById('gm');
+  gm.addEventListener('input',e=>{ state.gmquery=e.target.value; clearTimeout(gm._t); gm._t=setTimeout(()=>{renderGMain();caretEnd(document.getElementById('gm'));},120); });
+  view.querySelectorAll('[data-gmain]').forEach(el=>el.onclick=()=>{
+    state.gmain=el.dataset.gmain;
+    const v=variantsOf(state.gchap,state.gmain);
+    state.gmainPL=(v[0]&&v[0].pathPL.split(', ')[0])||state.gmain;
+    state.gvLimit=400; state.screen='gvars'; render(); window.scrollTo(0,0);
+  });
+  bindCaseBar();
+}
+
+function renderGVars(){
+  const all=variantsOf(state.gchap,state.gmain);
+  const shown=all.slice(0,state.gvLimit);
+  const more=all.length>shown.length;
+  const multi=all.length>1;
+  view.innerHTML=`<div class="screen">
+    <div class="prog-wrap"><div class="prog"><i style="width:100%"></i></div><div class="prog-lbl">Krok 3 z 3 · zaznacz pasujące objawy</div></div>
+    <h2 class="q-title" style="margin-top:14px">${esc(state.gmainPL)}</h2>
+    <div class="q-hint">${multi?'Dotknij wszystkich wariantów/modalności, które pasują. Dodają się do koszyka.':'Dotknij, aby dodać ten objaw do koszyka.'}</div>
+    <div class="list" style="margin-top:14px">${shown.map(rubricRow).join('')}</div>
+    ${more?`<div class="grouphdr"><span></span><span class="more" id="moreBtn">Pokaż więcej (${all.length-shown.length})</span></div>`:''}
+    <div class="actions"><button class="btn btn-ghost" id="another">+ Inny objaw</button><button class="btn btn-primary" id="toAnalyze" ${caseSet.size?'':'disabled'}>Analizuj (${caseSet.size})</button></div>
+  </div>`;
+  bindRubricRows();
+  const mb=document.getElementById('moreBtn'); if(mb) mb.onclick=()=>{state.gvLimit+=400;render();};
+  document.getElementById('another').onclick=()=>{ state.screen='gchap'; render(); window.scrollTo(0,0); };
+  document.getElementById('toAnalyze').onclick=()=>{ if(caseSet.size){ state.screen='rresult'; render(); window.scrollTo(0,0);} };
+}
+
 function openCase(){
   const items=[...caseSet].map(id=>KENT.rubrics.find(r=>r.id===id)).filter(Boolean);
   const list=items.map(r=>`<div class="ci"><span class="dot" style="background:var(--accent)"></span>
