@@ -228,7 +228,15 @@ const REM = {
   Spong:["Spongia tosta","Gąbka prażona","Suchy, szczekający kaszel — „piła w desce”; gorzej przed północą."],
   Sulph:["Sulphur","Siarka","Pieczenie i świąd gorsze od ciepła i mycia; gorąco stóp. Nawroty, „nieuporządkowany” obraz."],
   Verat:["Veratrum album","Ciemiernik biały","Biegunka z zimnym potem, bladością i skrajnym osłabieniem; ziębnięcie."],
-  "All-c":["Allium cepa","Cebula","Wodnisty, gryzący wyciek z nosa i łagodne łzawienie; gorzej w ciepłym pokoju, lepiej na powietrzu."]
+  "All-c":["Allium cepa","Cebula","Wodnisty, gryzący wyciek z nosa i łagodne łzawienie; gorzej w ciepłym pokoju, lepiej na powietrzu."],
+  Canth:["Cantharis vesicatoria","Pryszczel lekarski","Gwałtowne pieczenie i parcie; nieustanne bolesne parcie na mocz z palącym bólem; oparzenia z pęcherzami."],
+  Staph:["Staphysagria","Ostróżka polna","Skutki tłumionej złości i upokorzenia; rany cięte i chirurgiczne; jęczmienie; dolegliwości pęcherza po stosunku."],
+  Hyper:["Hypericum perforatum","Dziurawiec zwyczajny","Urazy bogato unerwionych okolic; rany kłute; strzelający ból biegnący wzdłuż nerwów."],
+  Ruta:["Ruta graveolens","Ruta zwyczajna","Urazy ścięgien, okostnej, nadgarstka i kolana; przemęczenie i pieczenie oczu."],
+  Symph:["Symphytum officinale","Żywokost lekarski","Urazy kości i gałki ocznej po tępym uderzeniu; przyspiesza zrastanie."],
+  Berb:["Berberis vulgaris","Berberys zwyczajny","Promieniujące, zmienne, migoczące bóle nerek i pęcherza."],
+  Tab:["Tabacum","Tytoń szlachetny","Choroba lokomocyjna ze śmiertelnymi mdłościami, bladością i zimnym potem; lepiej na świeżym powietrzu."],
+  Petr:["Petroleum","Olej skalny","Mdłości podróżne; szorstka, popękana skóra nasilona zimą."]
 };
 
 const RUB = {
@@ -334,7 +342,58 @@ const RUB = {
   mood_anx:["Lęk, niepokój","Mind, anxious",{Ars:3,Acon:3,Phos:2,Calc:2,Gels:2}],
   mood_indiff:["Apatia, obojętność","Indifference",{Sep:3,"Phos-ac":3,"Nat-m":2,Puls:2}],
   worse_consol:["Gorzej, gdy ktoś pociesza","Worse from consolation",{"Nat-m":3,Ign:2,Sil:2,Sep:2}],
-  better_consol:["Lepiej od pocieszania","Better from consolation",{Puls:3,Phos:2}]
+  better_consol:["Lepiej od pocieszania","Better from consolation",{Puls:3,Phos:2}],
+
+  // — ząb —
+  toothache:["Ból zęba","Teeth, pain",{Cham:3,Merc:3,Bell:3,"Mag-phos":3,Coff:3,"Nux-v":2,Puls:2,Hep:2,Staph:2,Bry:2,Sil:2,Sulph:2}],
+  tooth_cold:["Ząb — gorzej od zimna / zimnych napojów","Teeth, pain, cold agg",{Merc:3,Staph:2,Calc:2,Sulph:2,"Nux-v":2}],
+  tooth_warm:["Ząb — gorzej od ciepła / ciepłych napojów","Teeth, pain, warmth agg",{Cham:3,Puls:3,Coff:2,Bell:2}],
+  tooth_unbearable:["Ząb — ból nie do zniesienia, doprowadza do rozpaczy","Teeth, pain, unbearable",{Cham:3,Coff:2}],
+  tooth_neuralgic:["Ząb — ból strzelający, lepiej od ciepła","Teeth, pain, neuralgic, better warmth",{"Mag-phos":3,Coff:2,Cham:2}],
+  teething:["Ząbkowanie (u dziecka)","Teeth, dentition, difficult",{Cham:3,Calc:2,Bell:2,"Mag-phos":2,Sil:2,Merc:2}],
+  // — ucho —
+  earache:["Ból ucha","Ear, pain",{Bell:3,Puls:3,Cham:3,Merc:3,Hep:3,"Ferr-p":2,Acon:2,Sil:2,Sulph:2,Lyc:2}],
+  ear_night_weepy:["Ucho — w nocy, dziecko płaczliwe i niepocieszone","Ear, pain, night, child weeping",{Puls:3,Cham:2}],
+  ear_cham:["Ucho — nieznośny ból, lepiej gdy noszone","Ear, pain, unbearable, better carried",{Cham:3}],
+  ear_supp:["Ucho — ropienie, wrażliwość na zimno i dotyk","Ear, suppuration, sensitive cold",{Hep:3,Merc:2,Sil:2,Puls:2}],
+  ear_early:["Ucho — wczesna faza, gorączka, zaczerwienienie","Ear, inflammation, early stage",{"Ferr-p":3,Acon:2,Bell:2}],
+  // — oko —
+  eyeinfl:["Oko — zapalenie, zaczerwienienie","Eye, inflammation",{Bell:3,Puls:3,Euphr:3,Apis:3,Merc:2,Sulph:2,Acon:2,Hep:2}],
+  eye_bland:["Oko — gęsta, łagodna wydzielina","Eye, discharge, thick, bland",{Puls:3,Euphr:2}],
+  eye_acrid:["Oko — gryzące łzawienie","Eye, lachrymation, acrid",{Euphr:3,Merc:2}],
+  eye_apis:["Powieki — obrzęk piekący, lepiej od zimna","Eye, lids, oedema, burning, better cold",{Apis:3}],
+  eye_bell:["Oko — gorące, pulsujące, światłowstręt","Eye, redness, throbbing, photophobia",{Bell:3,Acon:2}],
+  // — choroba lokomocyjna —
+  motionsick:["Choroba lokomocyjna / mdłości w podróży","Nausea, motion of car or ship",{Cocc:3,Tab:3,Petr:3,"Nux-v":2,Ip:2,Sep:2}],
+  motion_vertigo:["Zawroty i nudności od ruchu pojazdu","Vertigo, nausea, from motion",{Cocc:3,Tab:2,Petr:2}],
+  motion_deathly:["Mdłości śmiertelne, bladość, zimny pot","Nausea, deathly, pallor, cold sweat",{Tab:3,Verat:2}],
+  motion_smell:["Mdłości gorsze od zapachów","Nausea, worse odors",{Cocc:2,Tab:2,"Nux-v":2}],
+  motion_closedeyes:["Lepiej z zamkniętymi oczami, leżąc","Nausea, better closing eyes, lying",{Cocc:2,Tab:2}],
+  // — wymioty —
+  vomiting:["Wymioty","Vomiting",{Ip:3,"Nux-v":3,Ars:3,Verat:3,Puls:2,Bry:2,Phos:2,"Carb-v":2,Cocc:2}],
+  vomit_food:["Wymioty po zepsutym jedzeniu / zatruciu","Vomiting, spoiled food, agg",{Ars:3,"Nux-v":2,"Carb-v":2,Puls:2}],
+  vomit_verat:["Wymioty z biegunką i zimnym potem","Vomiting, with diarrhoea, cold sweat",{Verat:3,Ars:2}],
+  vomit_nux:["Wymioty po przejedzeniu / używkach, odbijanie","Vomiting, after excess, eructations",{"Nux-v":3,"Carb-v":2}],
+  // — zaparcie —
+  constip:["Zaparcie","Constipation",{"Nux-v":3,Bry:3,Sulph:3,Sep:3,Lyc:2,Sil:2,Calc:2}],
+  constip_nux:["Zaparcie — częste, nieskuteczne parcie","Constipation, ineffectual urging, frequent",{"Nux-v":3,Lyc:2,Sep:2}],
+  constip_bry:["Zaparcie — brak parcia, suchy, twardy stolec","Constipation, no urging, dry hard stool",{Bry:3,Sulph:2,"Nat-m":2}],
+  constip_sil:["Zaparcie — stolec cofa się / wymyka","Constipation, stool recedes when partly expelled",{Sil:3}],
+  constip_sep:["Zaparcie — uczucie kuli, niepełne wypróżnienie","Constipation, ball sensation, incomplete",{Sep:3,"Nux-v":2,Lyc:2}],
+  // — urazy —
+  injury:["Urazy, stłuczenia, rany","Injuries, mechanical",{Arn:3,Led:3,Hyper:3,Ruta:3,Staph:2,Symph:2,"Rhus-t":2,Bell:2}],
+  injury_bruise:["Stłuczenie, uczucie „posiniaczenia”","Injury, bruise, contusion",{Arn:3,"Rhus-t":2,Led:2}],
+  injury_punct:["Rana kłuta (gwóźdź, ukłucie)","Wounds, punctured",{Led:3,Hyper:2}],
+  injury_nerve:["Uraz okolic bogato unerwionych; strzelający ból","Injury, nerves rich parts; shooting pain",{Hyper:3}],
+  injury_tendon:["Uraz ścięgien / okostnej (skręcenie, nadgarstek)","Injury, tendons, periosteum",{Ruta:3,"Rhus-t":2,Arn:2}],
+  injury_cut:["Rana cięta (nóż, zabieg)","Wounds, incised, clean cut",{Staph:3}],
+  injury_eye:["Podbite oko / tępy uraz gałki ocznej","Eye, injury, blunt; black eye",{Led:3,Symph:2,Arn:2}],
+  // — pęcherz —
+  cystitis:["Pieczenie przy oddawaniu moczu","Bladder, inflammation; urination, burning",{Canth:3,Apis:3,Merc:2,Sulph:2,Berb:2,Staph:2,"Nux-v":2,Puls:2,Sep:2}],
+  cyst_canth:["Nieustanne parcie, palenie, mocz kroplami","Urination, constant urging, cutting, drops",{Canth:3,Merc:2}],
+  cyst_apis:["Pęcherz — piekąco-kłujący, lepiej od zimna","Bladder, stinging, better cold",{Apis:3}],
+  cyst_berb:["Ból promieniujący od nerek","Kidney, pain radiating",{Berb:3}],
+  cyst_staph:["Dolegliwości pęcherza po stosunku / cewnikowaniu","Bladder, complaints after coition",{Staph:3}]
 };
 
 const Q = {
@@ -363,7 +422,17 @@ const Q = {
   pain_mod:["Co dzieje się z bólem stawów / mięśni?","",[["Gorzej przy 1. ruchu, lepiej od dalszego","pain_first_motion"],["Gorzej od każdego ruchu","pain_any_motion"],["Gorzej w zimnie i wilgoci","pain_cold_damp"],["Po urazie, „posiniaczenie”","pain_bruised"],["Sztywność poranna","pain_stiff_am"]]],
   pain_relief:["Co łagodzi ból?","",[["Ciepło","pain_warm"],["Zimne okłady","pain_cold"]]],
   skin_kind:["Jak wygląda zmiana skórna?","",[["Świąd gorszy od ciepła","skin_itch_warm"],["Pieczenie lepsze od ciepła","skin_burn_warm"],["Piekąco-kłujący obrzęk","skin_sting_cold"],["Sączące, pęcherzykowe","skin_moist"],["Sucha, szorstka","skin_dry"],["Ropiejące","skin_supp"]]],
-  men_kind:["Co dokucza przy miesiączce?","",[["Bolesne skurcze","menses_cramp"],["Opóźnione, skąpe","menses_late"],["Wczesne, obfite","menses_early"],["Drażliwość","menses_irrit"],["Płaczliwość, zmienność","menses_weepy"]]]
+  men_kind:["Co dokucza przy miesiączce?","",[["Bolesne skurcze","menses_cramp"],["Opóźnione, skąpe","menses_late"],["Wczesne, obfite","menses_early"],["Drażliwość","menses_irrit"],["Płaczliwość, zmienność","menses_weepy"]]],
+  tooth_mod:["Co dzieje się z bólem zęba?","",[["Gorzej od zimna / zimnych napojów","tooth_cold"],["Gorzej od ciepła / ciepłych napojów","tooth_warm"],["Nie do zniesienia, doprowadza do rozpaczy","tooth_unbearable"],["Strzelający, lepiej od ciepła","tooth_neuralgic"]]],
+  tooth_when:["Co go wywołuje lub nasila?","",[["Gorzej w nocy","worse_night"],["Po przeziębieniu / zimnym wietrze","after_cold_wind"],["U dziecka podczas ząbkowania","teething"]]],
+  ear_kind:["Jak wygląda ból ucha?","",[["W nocy, dziecko płaczliwe i niepocieszone","ear_night_weepy"],["Nieznośny, dziecko wściekłe, lepiej noszone","ear_cham"],["Z ropieniem, wrażliwość na zimno i dotyk","ear_supp"],["Wczesna faza, gorączka, zaczerwienienie","ear_early"]]],
+  ear_onset:["Jak się zaczęło?","",[["Nagle, po zimnym wietrze","after_cold_wind"],["Powoli, z przeziębieniem","onset_slow"]]],
+  eye_kind:["Co dominuje w oku?","",[["Gęsta, łagodna wydzielina","eye_bland"],["Gryzące łzawienie","eye_acrid"],["Obrzęk powiek piekący, lepiej od zimna","eye_apis"],["Gorące, pulsujące, światłowstręt","eye_bell"]]],
+  motion_kind:["Jak znosisz jazdę / podróż?","",[["Zawroty i nudności od ruchu","motion_vertigo"],["Śmiertelne mdłości, bladość, zimny pot","motion_deathly"],["Gorzej od zapachów (jedzenie, dym)","motion_smell"],["Lepiej z zamkniętymi oczami, leżąc","motion_closedeyes"]]],
+  vomit_kind:["Co charakteryzuje wymioty?","",[["Uporczywe nudności, język czysty","nausea_clean"],["Po zepsutym jedzeniu / zatrucie","vomit_food"],["Z biegunką, zimny pot, osłabienie","vomit_verat"],["Po przejedzeniu / używkach, odbijanie","vomit_nux"]]],
+  constip_kind:["Co charakteryzuje zaparcie?","",[["Częste, nieskuteczne parcie","constip_nux"],["Brak parcia, suchy twardy stolec","constip_bry"],["Stolec cofa się / wymyka","constip_sil"],["Uczucie kuli / niepełnego wypróżnienia","constip_sep"]]],
+  injury_type:["Jaki to uraz?","",[["Stłuczenie, „posiniaczenie”","injury_bruise"],["Rana kłuta (gwóźdź, ukłucie)","injury_punct"],["Uraz nerwów; strzelający ból","injury_nerve"],["Uraz ścięgien / okostnej (skręcenie)","injury_tendon"],["Rana cięta (nóż, zabieg)","injury_cut"],["Podbite oko / tępy uraz oka","injury_eye"]]],
+  cyst_kind:["Co czujesz przy pęcherzu?","",[["Nieustanne parcie, palenie, krople moczu","cyst_canth"],["Piekąco-kłujące, lepiej od zimna","cyst_apis"],["Ból promieniujący od nerek","cyst_berb"],["Po stosunku / cewnikowaniu","cyst_staph"]]]
 };
 
 const ICON = {
@@ -380,7 +449,12 @@ const ICON = {
   bone:'<path d="M8 8a2 2 0 1 0-1.7-3A2 2 0 1 0 5 8l5.5 5.5M16 16a2 2 0 1 0 1.7 3A2 2 0 1 0 19 16l-5.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
   hand:'<path d="M9 12V6.5a1.3 1.3 0 0 1 2.6 0V11m0-.5V5.3a1.3 1.3 0 0 1 2.6 0V11m0-.3V6.4a1.3 1.3 0 0 1 2.6 0V13c0 3.5-2 6-5 6-2.2 0-3.4-1-4.5-2.7L5 13.4a1.3 1.3 0 0 1 2-1.6L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   flower:'<circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M12 10V6m0 12v-4m2-2h4M6 12h4m1.3-1.3L8.5 8m7 7-2.8-2.8m0-1.4L15.5 8m-7 7 2.8-2.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
-  book:'<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H18v15H6.5A1.5 1.5 0 0 0 5 20.5V5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 17.5A1.5 1.5 0 0 1 6.5 16H18" stroke="currentColor" stroke-width="1.6"/>'
+  book:'<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H18v15H6.5A1.5 1.5 0 0 0 5 20.5V5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 17.5A1.5 1.5 0 0 1 6.5 16H18" stroke="currentColor" stroke-width="1.6"/>',
+  tooth:'<path d="M7 4.5C5.4 4.5 4.3 5.8 4.4 7.4c.1 1.3.6 2 .9 4 .3 1.8.2 4.6 1.4 4.6.9 0 .9-1.4 1.3-2.7.3-1 .6-1.6 1-1.6s.7.6 1 1.6c.4 1.3.4 2.7 1.3 2.7 1.2 0 1.1-2.8 1.4-4.6.3-2 .8-2.7.9-4C19.7 5.8 18.6 4.5 17 4.5c-1.6 0-2.3.9-3.5.9S8.6 4.5 7 4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+  ear:'<path d="M8 9a4 4 0 1 1 8 0c0 2.4-2 3.2-2.8 4.6-.5.9-.2 2.2-1.2 3.1-1 .9-2.8.7-3.5-.4M10.5 9a1.6 1.6 0 0 1 3 .2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  eye:'<path d="M3.5 12S7 6.5 12 6.5 20.5 12 20.5 12 17 17.5 12 17.5 3.5 12 3.5 12Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.6"/>',
+  injury:'<rect x="3.5" y="9" width="17" height="6" rx="3" transform="rotate(-30 12 12)" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/><path d="M10 10.3l.6.6m2.8 2.2l.6.6m-3.4 0l3.4-3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
+  bladder:'<path d="M12 5c-3 1-5 3-5 6 0 3 2 5 5 5s5-2 5-5c0-3-2-5-5-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 16v3M10.5 19h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
 };
 
 const TOPICS = [
@@ -396,7 +470,15 @@ const TOPICS = [
   {id:"grief", pl:"Smutek / żal", icon:"heart", kw:["smutek","zal","żal","strata","grief","depresja"], base:"grief", qs:["grief_kind","consol","mood","worse_time"]},
   {id:"pain", pl:"Bóle stawów / mięśni", icon:"bone", kw:["stawy","miesnie","mięśnie","ból stawów","reumatyzm","kregoslup","kręgosłup"], base:"pain_jm", qs:["pain_mod","pain_relief","temp","worse_time"]},
   {id:"skin", pl:"Dolegliwości skórne", icon:"hand", kw:["skora","skóra","swiad","świąd","wysypka","skin","alergia"], base:"skin", qs:["skin_kind","temp","worse_time"]},
-  {id:"menses", pl:"Dolegliwości menstruacyjne", icon:"flower", kw:["miesiaczka","miesiączka","menstruacja","pms","okres","menses"], base:"menses", qs:["men_kind","temp","mood","consol"]}
+  {id:"menses", pl:"Dolegliwości menstruacyjne", icon:"flower", kw:["miesiaczka","miesiączka","menstruacja","pms","okres","menses"], base:"menses", qs:["men_kind","temp","mood","consol"]},
+  {id:"toothache", pl:"Ból zęba", icon:"tooth", kw:["zab","ząb","zeba","zęba","ból zęba","tooth"], base:"toothache", qs:["tooth_mod","tooth_when","temp","worse_time"]},
+  {id:"earache", pl:"Ból ucha", icon:"ear", kw:["ucho","ból ucha","ucha","zapalenie ucha","ear"], base:"earache", qs:["ear_kind","ear_onset","temp","worse_time"]},
+  {id:"eyeinfl", pl:"Zapalenie spojówek / ból oka", icon:"eye", kw:["oko","oka","spojowki","spojówki","zapalenie oka","eye","conjunctivitis"], base:"eyeinfl", qs:["eye_kind","temp","better","worse_time"]},
+  {id:"motionsick", pl:"Choroba lokomocyjna", icon:"stomach", kw:["lokomocyjna","podroz","podróż","mdlosci w podrozy","kinetoza","auto","statek","motion"], base:"motionsick", qs:["motion_kind","better","thirst"]},
+  {id:"vomiting", pl:"Wymioty", icon:"stomach", kw:["wymioty","torsje","zwracanie","vomiting"], base:"vomiting", qs:["vomit_kind","thirst","temp","worse_time"]},
+  {id:"constip", pl:"Zaparcie", icon:"stomach", kw:["zaparcie","zatwardzenie","stolec","constipation"], base:"constip", qs:["constip_kind","worse_time","mood"]},
+  {id:"injury", pl:"Urazy, stłuczenia, rany", icon:"injury", kw:["uraz","stluczenie","stłuczenie","rana","kontuzja","skrecenie","skręcenie","injury"], base:"injury", qs:["injury_type","pain_relief","worse_time"]},
+  {id:"cystitis", pl:"Pieczenie przy oddawaniu moczu", icon:"bladder", kw:["pecherz","pęcherz","mocz","pieczenie","zapalenie pecherza","cystitis"], base:"cystitis", qs:["cyst_kind","thirst","temp","worse_time"]}
 ];
 
 /* unified remedy meta keyed by lowercase abbreviation */
