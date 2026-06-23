@@ -288,7 +288,8 @@ const REM = {
   Anac:["Anacardium orientale","Nanercz wschodni","Kontaktowe zapalenie skóry z pęcherzykami i świądem; uczucie zatkania i słaba pamięć; ulga od jedzenia."],
   "Nux-m":["Nux moschata","Gałka muszkatołowa","Ogromna suchość ust bez pragnienia; senność i skłonność do omdleń; wzdęcia."],
   Aeth:["Aethusa cynapium","Blekot pospolity","Niemowlęta nietolerujące mleka: gwałtowne wymioty zsiadłego mleka, osłabienie i senność."],
-  Samb:["Sambucus nigra","Bez czarny","Niemowlę budzi się z nagłą dusznością i zatkanym, suchym nosem blokującym ssanie; obfite poty przy zasypianiu."]
+  Samb:["Sambucus nigra","Bez czarny","Niemowlę budzi się z nagłą dusznością i zatkanym, suchym nosem blokującym ssanie; obfite poty przy zasypianiu."],
+  Iod:["Iodum","Jod","Chudnięcie mimo wilczego apetytu; niepokój, gorąco, przyspieszone bicie serca; pogorszenie w spoczynku i cieple."]
 };
 
 const RUB = {
@@ -1157,7 +1158,148 @@ const RUB = {
   feverchild:["Gorączka u dziecka","Fever, children",{Acon:3,Bell:3,"Ferr-p":3,Cham:2,Gels:2,Puls:2}],
   fch_acon:["Gorączka nagła po zimnym wietrze / przestrachu, niepokój","Fever, child, sudden, after cold or fright",{Acon:3}],
   fch_bell:["Wysoka gorączka, czerwona gorąca twarz, rozszerzone źrenice","Fever, child, high, red face, dilated pupils",{Bell:3}],
-  fch_cham:["Gorączka przy ząbkowaniu, jeden policzek czerwony, złość","Fever, child, dentition, one cheek red",{Cham:3,"Ferr-p":2}]
+  fch_cham:["Gorączka przy ząbkowaniu, jeden policzek czerwony, złość","Fever, child, dentition, one cheek red",{Cham:3,"Ferr-p":2}],
+
+  // — nadciśnienie (objawowo) —
+  hypertension:["Nadciśnienie (objawowe wsparcie)","Generalities, hypertension",{Glon:3,Bell:3,Lach:2,"Nat-m":2,"Bar-c":2,Sulph:2}],
+  htn_glon:["Pulsujące uderzenia krwi, gorzej od gorąca i wysiłku","Hypertension, throbbing, worse heat, exertion",{Glon:3,Bell:2}],
+  htn_lach:["Z uderzeniami gorąca, gorzej po śnie, ucisk szyi nieznośny","Hypertension, flushes, worse after sleep",{Lach:3}],
+  htn_natm:["U napiętych, z bólem głowy, łaknieniem soli","Hypertension, tense, headache, craves salt",{"Nat-m":3}],
+  // — niedoczynność tarczycy —
+  hypothyroid:["Niedoczynność tarczycy (objawy)","Generalities, hypothyroid",{Calc:3,Graph:2,Sep:2,Lyc:2,"Bar-c":2}],
+  hypo_calc:["Ziębnięcie, ospałość, przyrost masy, poty głowy","Hypothyroid, chilly, sluggish, weight gain",{Calc:3}],
+  hypo_graph:["Ospałość, zaparcie, sucha skóra, skłonność do tycia","Hypothyroid, sluggish, constipation, dry skin",{Graph:3}],
+  hypo_sep:["Wyczerpanie, obojętność, uczucie opadania","Hypothyroid, exhausted, indifferent",{Sep:3}],
+  // — nadczynność tarczycy —
+  hyperthyroid:["Nadczynność tarczycy (objawy)","Generalities, hyperthyroid",{Iod:3,"Nat-m":2,Lyc:2,Phos:2,Lach:2}],
+  hyper_iod:["Chudnięcie mimo apetytu, niepokój, gorąco, kołatanie","Hyperthyroid, weight loss, restless, hot",{Iod:3}],
+  hyper_phos:["Drżenie, kołatanie, nadwrażliwość, pragnienie zimnej wody","Hyperthyroid, trembling, palpitation",{Phos:3}],
+  hyper_lach:["Z uderzeniami gorąca, nietolerancja ucisku","Hyperthyroid, flushes, intolerance pressure",{Lach:3}],
+  // — wole —
+  goitre:["Wole / powiększenie tarczycy","Throat, goitre",{Iod:3,Calc:2,Spong:2,Lyc:2,Lach:2}],
+  goit_iod:["Wole z chudnięciem i niepokojem","Goitre, with weight loss, restless",{Iod:3}],
+  goit_spong:["Wole, uczucie ucisku, gorzej od dotyku","Goitre, sense of constriction",{Spong:3}],
+  goit_calc:["Wole u osób wrażliwych na zimno, ospałych","Goitre, chilly, sluggish",{Calc:3}],
+  // — neuropatia (drętwienie/pieczenie) —
+  diabeticneuropathy:["Neuropatia — drętwienie / pieczenie stóp","Extremities, neuropathy",{Phos:3,Hyper:2,Acon:2,Caust:2}],
+  dn_phos:["Pieczenie i mrowienie stóp, drętwienie","Neuropathy, burning, tingling feet",{Phos:3}],
+  dn_hyper:["Strzelający ból nerwów stóp i dłoni","Neuropathy, shooting nerve pain",{Hyper:3}],
+  dn_caust:["Drętwienie z osłabieniem, gorzej w nocy","Neuropathy, numbness, weakness, night",{Caust:3,Acon:2}],
+  // — przewlekłe zmęczenie —
+  chronicfatigue:["Przewlekłe zmęczenie","Generalities, chronic fatigue",{"Kali-p":3,"Phos-ac":3,Chin:2,Gels:2,Sep:2,Calc:2}],
+  cf_kalip:["Przewlekłe zmęczenie nerwowe po długim stresie","Chronic fatigue, nervous, after stress",{"Kali-p":3}],
+  cf_phosac:["Apatia i otępienie, wyczerpanie po chorobie / żalu","Chronic fatigue, apathy, after illness",{"Phos-ac":3}],
+  cf_gels:["Ociężałość, osłabienie mięśni, drżenie","Chronic fatigue, dullness, weak muscles",{Gels:3}],
+  // — rozlane bóle mięśniowe —
+  fibromyalgia:["Rozlane bóle mięśniowe (fibromialgia)","Generalities, fibromyalgia",{"Rhus-t":3,Arn:2,Caust:2,Bry:2,Calc:2}],
+  fib_rhus:["Rozlana sztywność i ból, lepiej od ruchu i ciepła","Fibromyalgia, stiffness, better motion, warmth",{"Rhus-t":3}],
+  fib_arn:["Ciało jak posiniaczone, bolesne punkty, obawa dotyku","Fibromyalgia, bruised, tender points",{Arn:3}],
+  fib_caust:["Ból z osłabieniem ścięgien, gorzej w suchym zimnie","Fibromyalgia, weakness, stiffness, worse dry cold",{Caust:3}],
+  // — osłabienie pamięci —
+  memoryloss:["Osłabienie pamięci","Mind, memory, weakness",{"Bar-c":3,Anac:2,Lyc:2,Alum:2,"Phos-ac":2}],
+  mem_barc:["Słaba pamięć i powolność (np. u starszych)","Memory weak, slow, aged",{"Bar-c":3}],
+  mem_anac:["Nagła utrata pamięci, brak pewności siebie","Memory, sudden loss, lack of confidence",{Anac:3}],
+  mem_lyc:["Mylenie słów i liter, lęk przed wystąpieniami","Memory, mistakes words, anticipation",{Lyc:3,Alum:2}],
+  // — drżenie rąk —
+  tremor:["Drżenie rąk","Extremities, trembling, hands",{Gels:3,Zinc:2,Agar:2,Merc:2,Phos:2}],
+  trem_gels:["Drżenie z osłabieniem, po emocjach / tremie","Tremor, with weakness, from emotion",{Gels:3}],
+  trem_zinc:["Drżenie z niepokojem ruchowym, wyczerpanie nerwowe","Tremor, with restlessness, nervous exhaustion",{Zinc:3}],
+  trem_merc:["Drżenie rąk, gorzej przy ruchu zamierzonym","Tremor, hands, worse intentional motion",{Merc:3,Agar:2}],
+  // — kurcz pisarski —
+  writerscramp:["Kurcz pisarski","Extremities, writers cramp",{"Mag-phos":3,Cupr:2,Caust:2,Sil:2}],
+  wc_magp:["Bolesny skurcz dłoni, lepiej od ciepła","Writers cramp, painful spasm, better warmth",{"Mag-phos":3}],
+  wc_cupr:["Gwałtowny kurcz palców przy pisaniu","Writers cramp, violent, fingers",{Cupr:3}],
+  wc_caust:["Sztywność i osłabienie ścięgien dłoni","Writers cramp, stiffness, weakness",{Caust:3,Sil:2}],
+  // — zwyrodnienie stawów —
+  osteoarthritis:["Choroba zwyrodnieniowa stawów","Extremities, osteoarthritis",{"Rhus-t":3,Bry:2,Calc:2,Caust:2,Led:2,Colch:2}],
+  oa_rhus:["Sztywność gorsza w spoczynku i rano, lepiej od ruchu","Osteoarthritis, stiffness, better motion",{"Rhus-t":3}],
+  oa_bry:["Stawy gorzej od najmniejszego ruchu, lepiej w bezruchu","Osteoarthritis, worse motion, better rest",{Bry:3}],
+  oa_calc:["Stawy gorsze od zimna i wilgoci","Osteoarthritis, worse cold, damp",{Calc:3,Caust:2}],
+  // — zamrożony bark —
+  frozenshoulder:["Zamrożony bark","Extremities, shoulder, frozen",{Sang:3,"Rhus-t":2,Bry:2,"Ferr-p":2}],
+  fs_sang:["Bark prawy, nie może unieść ręki","Frozen shoulder, right, cannot raise arm",{Sang:3}],
+  fs_ferr:["Bark lewy, gorzej w nocy i od podnoszenia","Shoulder, left, worse night, raising",{"Ferr-p":3}],
+  fs_rhus:["Sztywność, lepiej od ruchu i ciepła","Shoulder, stiffness, better motion, warmth",{"Rhus-t":3}],
+  // — osteoporoza —
+  osteoporosis:["Osłabienie kości / osteoporoza","Bones, osteoporosis, weakness",{Calc:3,"Calc-p":3,Sil:2,Symph:2}],
+  osteo_calc:["Słabe kości i zęby, wolne gojenie, wrażliwość na zimno","Osteoporosis, weak bones, chilly",{Calc:3}],
+  osteo_calcp:["Osłabienie kości, bóle, słaby zrost","Osteoporosis, weak bones, slow union",{"Calc-p":3}],
+  osteo_sil:["Krucha budowa, słabe kości, brak odporności","Osteoporosis, frail, weak",{Sil:3}],
+  // — owrzodzenie żylne —
+  varicoseulcer:["Owrzodzenie żylne podudzia","Skin, varicose ulcer",{Ham:3,Calc:2,"Carb-v":2,Lach:2,Ars:2}],
+  vu_ham:["Owrzodzenie obolałe, sączące krew żylną","Varicose ulcer, sore, venous bleeding",{Ham:3}],
+  vu_carb:["Owrzodzenie sine, powolne gojenie, palenie","Varicose ulcer, bluish, slow, burning",{"Carb-v":3,Lach:2}],
+  vu_ars:["Owrzodzenie z palącym bólem, lepiej od ciepła","Varicose ulcer, burning, better warmth",{Ars:3}],
+  // — niedosłuch —
+  hearingloss:["Niedosłuch / pogorszenie słuchu","Ear, hearing, impaired",{Chin:2,Caust:2,Petr:2,Phos:2,Sil:2}],
+  hl_caust:["Niedosłuch z szumem, echo własnego głosu","Hearing loss, with tinnitus, reverberation",{Caust:3}],
+  hl_chin:["Niedosłuch po utracie płynów / osłabieniu","Hearing loss, after loss of fluids",{Chin:3}],
+  hl_petr:["Niedosłuch z uczuciem zatkania, gorzej w wilgoci","Hearing loss, stopped sensation",{Petr:3,Phos:2}],
+  // — klasterowy ból głowy —
+  clusterheadache:["Klasterowy ból głowy","Head, cluster headache",{Glon:3,Spig:3,Sang:2,Bell:2}],
+  clh_glon:["Napadowy, rozsadzający ból wokół oka, fale gorąca","Cluster headache, bursting, around eye",{Glon:3}],
+  clh_spig:["Ostry, kłujący ból lewego oka i skroni, gorzej od ruchu","Cluster headache, left eye, stabbing",{Spig:3}],
+  clh_sang:["Prawostronny, z nudnościami, okresowy","Cluster headache, right, periodic",{Sang:3}],
+  // — porażenie nerwu twarzowego —
+  bellspalsy:["Porażenie nerwu twarzowego (Bella)","Face, paralysis, Bell",{Caust:3,Acon:2,Gels:2,Bell:2}],
+  bp_caust:["Porażenie połowy twarzy po przeziębieniu / przeciągu","Facial palsy, after cold, draft",{Caust:3}],
+  bp_acon:["Nagłe porażenie po zimnym wietrze, drętwienie","Facial palsy, sudden, after cold wind",{Acon:3}],
+  bp_gels:["Opadanie powieki / kącika ust z osłabieniem","Facial palsy, drooping, weakness",{Gels:3,Bell:2}],
+  // — bolesne miesiączki / endometrioza —
+  endometriosis:["Bardzo bolesne miesiączki / endometrioza","Female, dysmenorrhoea, severe",{"Mag-phos":3,Coloc:3,Sep:2,Lach:2,Cham:2}],
+  endo_magp:["Bardzo bolesne miesiączki, ulga od ciepła i ucisku","Severe dysmenorrhoea, better warmth, pressure",{"Mag-phos":3,Coloc:2}],
+  endo_sep:["Ból z uczuciem opadania, drażliwość, wyczerpanie","Dysmenorrhoea, bearing-down, irritable",{Sep:3}],
+  endo_lach:["Ból gorszy przed krwawieniem, ulga gdy popłynie","Dysmenorrhoea, worse before flow",{Lach:3}],
+  // — suchość pochwy —
+  vaginaldryness:["Suchość pochwy","Female, vagina, dryness",{Sep:3,"Nat-m":2,Lyc:2,Bell:2}],
+  vd_sep:["Suchość i ból przy współżyciu, brak ochoty, opadanie","Vaginal dryness, painful coition, aversion",{Sep:3}],
+  vd_natm:["Suchość z bólem, po tłumionych emocjach","Vaginal dryness, after grief",{"Nat-m":3}],
+  vd_lyc:["Suchość i pieczenie, gorzej po menopauzie","Vaginal dryness, burning, menopause",{Lyc:2,Bell:2}],
+  // — zaburzenia erekcji —
+  erectiledys:["Zaburzenia erekcji / osłabienie","Male, erection, weak",{Lyc:3,Caust:2,Con:2,"Phos-ac":2}],
+  ed_lyc:["Z brakiem pewności siebie, lęk przed porażką","Erectile, lack of confidence, anticipation",{Lyc:3}],
+  ed_phosac:["Osłabienie po wyczerpaniu, nadużyciu, żalu","Erectile, after exhaustion, excess, grief",{"Phos-ac":3,Con:2}],
+  ed_caust:["Stopniowe osłabienie po długiej chorobie","Erectile, gradual weakness",{Caust:3}],
+  // — zapalenie opłucnej —
+  pleurisy:["Zapalenie opłucnej (kłujący ból przy oddychaniu)","Chest, pleurisy",{Bry:3,Acon:2,"Ran-b":2}],
+  pleur_bry:["Ostry, kłujący ból przy oddychaniu; gorzej od ruchu","Pleurisy, stitching pain, worse breathing",{Bry:3}],
+  pleur_acon:["Nagły początek z gorączką i niepokojem","Pleurisy, sudden onset, fever, anxious",{Acon:3}],
+  pleur_ranb:["Kłujący ból klatki, gorzej od dotyku i pogody","Chest, stitching, worse touch, weather",{"Ran-b":3}],
+  // — przewlekłe zapalenie zatok —
+  chronicsinusitis:["Przewlekłe zapalenie zatok","Nose, sinusitis, chronic",{"Kali-bi":3,Sil:2,Hep:2,Thuj:2,Merc:2}],
+  csin_kalibi:["Gęsta, ciągnąca wydzielina, ból nasady nosa","Chronic sinusitis, thick stringy, root of nose",{"Kali-bi":3}],
+  csin_sil:["Nawracające, z ropieniem, wrażliwość na zimno","Chronic sinusitis, suppuration, sensitive cold",{Sil:3,Hep:2}],
+  csin_thuj:["Gęsta zielona wydzielina, skłonność do polipów","Chronic sinusitis, green discharge, polyps",{Thuj:3}],
+  // — kurcz powiek —
+  blepharospasm:["Kurcz / drganie powiek","Eye, lids, spasm, blepharospasm",{Agar:3,Zinc:2,"Mag-phos":2}],
+  bsp_agar:["Drganie i kurcz powiek, mruganie","Eyelids, twitching, spasm",{Agar:3}],
+  bsp_zinc:["Kurcz powiek z niepokojem, zmęczeniem oczu","Eyelids, spasm, restless, eyestrain",{Zinc:3}],
+  bsp_magp:["Kurczowe drganie, lepiej od ciepła","Eyelids, spasm, better warmth",{"Mag-phos":3}],
+  // — łuszczyca —
+  psoriasis:["Łuszczyca","Skin, psoriasis",{Ars:3,Sulph:2,Graph:2,Sep:2,Petr:2}],
+  pso_ars:["Suche, łuszczące się, palące zmiany; lepiej od ciepła","Psoriasis, dry, scaly, burning, better warmth",{Ars:3}],
+  pso_sulph:["Czerwone, swędzące, gorzej od ciepła i mycia","Psoriasis, red, itching, worse warmth, washing",{Sulph:3}],
+  pso_graph:["Zmiany w fałdach, sączące lepki płyn, pęknięcia","Psoriasis, folds, oozing, cracks",{Graph:3,Petr:2}],
+  // — nawracające infekcje / niska odporność —
+  lowimmunity:["Nawracające infekcje / niska odporność","Generalities, low immunity, recurrent infections",{"Bar-c":3,Calc:3,Sil:2,Sulph:2}],
+  imm_barc:["Nawracające infekcje gardła i uszu u dzieci","Recurrent infections, throat, ears, children",{"Bar-c":3}],
+  imm_calc:["Częste przeziębienia u wrażliwych na zimno, pocących się","Recurrent colds, chilly, sweaty",{Calc:3}],
+  imm_sil:["Skłonność do ropień, słabe gojenie, wrażliwość na zimno","Low immunity, suppuration tendency",{Sil:3}],
+  // — nadwrażliwość zębów —
+  teethsensitivity:["Nadwrażliwość zębów","Teeth, sensitive",{Merc:2,Staph:2,Calc:2,"Mag-phos":2}],
+  tsen_staph:["Zęby wrażliwe, szybko psujące się, ciemniejące","Teeth, sensitive, decay rapidly",{Staph:3}],
+  tsen_merc:["Zęby wrażliwe ze ślinotokiem, krwawiące dziąsła","Teeth, sensitive, salivation, bleeding gums",{Merc:3}],
+  tsen_calc:["Wrażliwość na zimno i ciepło, słabe szkliwo","Teeth, sensitive to cold and heat",{Calc:3}],
+  // — zapalenie / krwawienie dziąseł —
+  gingivitis:["Zapalenie / krwawienie dziąseł","Mouth, gums, inflammation, bleeding",{Merc:3,"Nat-m":2,Kreos:2,Phos:2,"Carb-v":2}],
+  ging_merc:["Dziąsła obrzęknięte, krwawiące, ślinotok, cuchnący oddech","Gums, swollen, bleeding, salivation",{Merc:3}],
+  ging_kreos:["Dziąsła krwawiące, cofające się, cuchnące","Gums, bleeding, receding, foul",{Kreos:3,"Carb-v":2}],
+  ging_phos:["Dziąsła łatwo krwawiące przy szczotkowaniu","Gums, bleed easily, brushing",{Phos:3,"Nat-m":2}],
+  // — przewlekły kaszel —
+  chroniccough:["Przewlekły / uporczywy kaszel","Cough, chronic, lingering",{Dros:3,Sulph:2,Phos:2,Sang:2,Hep:2}],
+  cc_dros:["Uporczywy, napadowy kaszel po infekcji, gorzej w nocy","Chronic cough, spasmodic, after infection",{Dros:3}],
+  cc_phos:["Suchy, drażniący kaszel, pieczenie w klatce","Chronic cough, dry, burning chest",{Phos:3}],
+  cc_sulph:["Nawracający, zaniedbany kaszel, gorzej od ciepła","Chronic cough, neglected, relapsing",{Sulph:3,Sang:2}]
 };
 
 const Q = {
@@ -1336,7 +1478,35 @@ const Q = {
   wint_kind:["Jak wygląda sucha skóra?","",[["Szorstka, swędząca, gorzej zimą","wint_petr"],["Wielka suchość, gorzej od ciepła łóżka","wint_alum"],["Łuszcząca, pieczenie lepsze od ciepła","wint_ars"]]],
   sore_kind:["Jak wyglądają odleżyny?","",[["Obolałe, posiniaczone miejsca ucisku","sore_arn"],["Sine, powolne gojenie, osłabienie","sore_carb"],["Piekące, czerwone, gorzej od ciepła","sore_sulph"]]],
   ccold_kind:["Jak zaczyna się przeziębienie?","",[["Nagle po zimnym wietrze, niepokój","ccold_acon"],["Łagodnie, lekka gorączka","ccold_ferr"],["Powoli, ociężałość, kichanie, dreszcze","ccold_gels"]]],
-  fch_kind:["Jak wygląda gorączka u dziecka?","",[["Nagła po zimnie / przestrachu, niepokój","fch_acon"],["Wysoka, czerwona twarz, rozszerzone źrenice","fch_bell"],["Przy ząbkowaniu, jeden policzek czerwony","fch_cham"]]]
+  fch_kind:["Jak wygląda gorączka u dziecka?","",[["Nagła po zimnie / przestrachu, niepokój","fch_acon"],["Wysoka, czerwona twarz, rozszerzone źrenice","fch_bell"],["Przy ząbkowaniu, jeden policzek czerwony","fch_cham"]]],
+  htn_kind:["Co towarzyszy nadciśnieniu?","Nadciśnienie wymaga stałej kontroli lekarskiej.",[["Pulsujące uderzenia, gorzej od gorąca i wysiłku","htn_glon"],["Uderzenia gorąca, gorzej po śnie, ucisk szyi","htn_lach"],["Napięcie, ból głowy, łaknienie soli","htn_natm"]]],
+  hypo_kind:["Co dominuje przy niedoczynności?","",[["Ziębnięcie, ospałość, przyrost masy","hypo_calc"],["Zaparcie, sucha skóra, tycie","hypo_graph"],["Wyczerpanie, obojętność, opadanie","hypo_sep"]]],
+  hyper_kind:["Co dominuje przy nadczynności?","",[["Chudnięcie mimo apetytu, niepokój, gorąco","hyper_iod"],["Drżenie, kołatanie, nadwrażliwość","hyper_phos"],["Uderzenia gorąca, nietolerancja ucisku","hyper_lach"]]],
+  goit_kind:["Jak wygląda wole?","",[["Z chudnięciem i niepokojem","goit_iod"],["Uczucie ucisku, gorzej od dotyku","goit_spong"],["U wrażliwych na zimno, ospałych","goit_calc"]]],
+  dn_kind:["Jak wygląda neuropatia?","Przy cukrzycy konieczna kontrola u lekarza.",[["Pieczenie i mrowienie stóp","dn_phos"],["Strzelający ból nerwów","dn_hyper"],["Drętwienie z osłabieniem, gorzej w nocy","dn_caust"]]],
+  cf_kind:["Skąd przewlekłe zmęczenie?","",[["Nerwowe, po długim stresie","cf_kalip"],["Apatia, po chorobie / żalu","cf_phosac"],["Ociężałość, osłabienie mięśni","cf_gels"]]],
+  fib_kind:["Jak wyglądają bóle mięśniowe?","",[["Sztywność, lepiej od ruchu i ciepła","fib_rhus"],["Ciało jak posiniaczone, bolesne punkty","fib_arn"],["Z osłabieniem, gorzej w suchym zimnie","fib_caust"]]],
+  mem_kind:["Jak wygląda osłabienie pamięci?","",[["Powolność, np. u starszych","mem_barc"],["Nagła utrata, brak pewności","mem_anac"],["Mylenie słów, lęk przed wystąpieniami","mem_lyc"]]],
+  trem_kind:["Jak wygląda drżenie?","",[["Z osłabieniem, po emocjach","trem_gels"],["Z niepokojem, wyczerpaniem nerwowym","trem_zinc"],["Gorzej przy ruchu zamierzonym","trem_merc"]]],
+  wc_kind:["Jak wygląda kurcz pisarski?","",[["Bolesny skurcz, lepiej od ciepła","wc_magp"],["Gwałtowny kurcz palców","wc_cupr"],["Sztywność i osłabienie ścięgien","wc_caust"]]],
+  oa_kind:["Co dzieje się ze stawami?","",[["Sztywność, lepiej od ruchu","oa_rhus"],["Gorzej od każdego ruchu, lepiej w bezruchu","oa_bry"],["Gorzej od zimna i wilgoci","oa_calc"]]],
+  fs_kind:["Jak wygląda zamrożony bark?","",[["Prawy, nie może unieść ręki","fs_sang"],["Lewy, gorzej w nocy i od podnoszenia","fs_ferr"],["Sztywność, lepiej od ruchu i ciepła","fs_rhus"]]],
+  osteo_kind:["Co charakteryzuje osłabienie kości?","",[["Słabe kości i zęby, wrażliwość na zimno","osteo_calc"],["Bóle, słaby zrost","osteo_calcp"],["Krucha budowa, brak odporności","osteo_sil"]]],
+  vu_kind:["Jak wygląda owrzodzenie żylne?","",[["Obolałe, sączące krew żylną","vu_ham"],["Sine, powolne gojenie, palenie","vu_carb"],["Z palącym bólem, lepiej od ciepła","vu_ars"]]],
+  hl_kind:["Jak wygląda niedosłuch?","",[["Z szumem, echo własnego głosu","hl_caust"],["Po utracie płynów / osłabieniu","hl_chin"],["Z uczuciem zatkania, gorzej w wilgoci","hl_petr"]]],
+  clh_kind:["Jak wygląda klasterowy ból głowy?","",[["Rozsadzający wokół oka, fale gorąca","clh_glon"],["Kłujący ból lewego oka i skroni","clh_spig"],["Prawostronny, z nudnościami, okresowy","clh_sang"]]],
+  bp_kind:["Jak wygląda porażenie twarzy?","Nagłe porażenie wymaga pilnej oceny lekarskiej.",[["Po przeziębieniu / przeciągu","bp_caust"],["Nagłe, po zimnym wietrze","bp_acon"],["Opadanie powieki/ust z osłabieniem","bp_gels"]]],
+  endo_kind:["Jak wyglądają bolesne miesiączki?","",[["Skurczowe, ulga od ciepła i ucisku","endo_magp"],["Z opadaniem, drażliwością, wyczerpaniem","endo_sep"],["Gorzej przed krwawieniem, ulga gdy popłynie","endo_lach"]]],
+  vd_kind:["Co charakteryzuje suchość pochwy?","",[["Ból przy współżyciu, brak ochoty, opadanie","vd_sep"],["Z bólem, po tłumionych emocjach","vd_natm"],["Pieczenie, po menopauzie","vd_lyc"]]],
+  ed_kind:["Co charakteryzuje osłabienie erekcji?","",[["Brak pewności siebie, lęk przed porażką","ed_lyc"],["Po wyczerpaniu, nadużyciu, żalu","ed_phosac"],["Stopniowe, po długiej chorobie","ed_caust"]]],
+  pleur_kind:["Jak wygląda ból opłucnej?","Ból w klatce wymaga oceny lekarskiej.",[["Kłujący przy oddychaniu, gorzej od ruchu","pleur_bry"],["Nagły, z gorączką i niepokojem","pleur_acon"],["Gorszy od dotyku i zmiany pogody","pleur_ranb"]]],
+  csin_kind:["Jak wyglądają przewlekłe zatoki?","",[["Gęsta, ciągnąca wydzielina, ból nasady nosa","csin_kalibi"],["Z ropieniem, wrażliwość na zimno","csin_sil"],["Zielona wydzielina, polipy","csin_thuj"]]],
+  bsp_kind:["Jak wygląda kurcz powiek?","",[["Drganie i kurcz, mruganie","bsp_agar"],["Z niepokojem, zmęczeniem oczu","bsp_zinc"],["Kurczowe, lepiej od ciepła","bsp_magp"]]],
+  pso_kind:["Jak wygląda łuszczyca?","",[["Suche, łuszczące, palące; lepiej od ciepła","pso_ars"],["Czerwone, swędzące, gorzej od ciepła i mycia","pso_sulph"],["W fałdach, sączące, pęknięcia","pso_graph"]]],
+  imm_kind:["Jak wyglądają nawracające infekcje?","",[["Gardła i uszu u dzieci","imm_barc"],["Częste przeziębienia, marznięcie, poty","imm_calc"],["Skłonność do ropień, słabe gojenie","imm_sil"]]],
+  tsen_kind:["Co charakteryzuje nadwrażliwość zębów?","",[["Szybko psujące się, ciemniejące","tsen_staph"],["Ze ślinotokiem, krwawiące dziąsła","tsen_merc"],["Wrażliwość na zimno i ciepło","tsen_calc"]]],
+  ging_kind:["Jak wyglądają dziąsła?","",[["Obrzęknięte, krwawiące, ślinotok","ging_merc"],["Krwawiące, cofające się, cuchnące","ging_kreos"],["Łatwo krwawiące przy szczotkowaniu","ging_phos"]]],
+  cc_kind:["Jak wygląda przewlekły kaszel?","",[["Napadowy, po infekcji, gorzej w nocy","cc_dros"],["Suchy, drażniący, pieczenie w klatce","cc_phos"],["Nawracający, zaniedbany","cc_sulph"]]]
 };
 
 const ICON = {
@@ -1525,7 +1695,35 @@ const TOPICS = [
   {id:"winteritch", pl:"Sucha, swędząca skóra (zima)", icon:"rash", kw:["sucha skora","swiad zimowy","winter itch","swedzenie zima","szorstka skora"], base:"winteritch", qs:["wint_kind","temp","worse_time"]},
   {id:"bedsores", pl:"Odleżyny", icon:"rash", kw:["odlezyny","decubitus","bedsores","rany od lezenia"], base:"bedsores", qs:["sore_kind","temp"]},
   {id:"commoncold", pl:"Pierwsze objawy przeziębienia", icon:"nose", kw:["pierwsze objawy przeziebienia","poczatek przeziebienia","common cold","lapie mnie cos"], base:"commoncold", qs:["ccold_kind","temp","worse_time"]},
-  {id:"feverchild", pl:"Gorączka u dziecka", icon:"fever", kw:["goraczka u dziecka","goraczka dziecko","fever child","wysoka temperatura dziecko"], base:"feverchild", qs:["fch_kind","temp","worse_time"]}
+  {id:"feverchild", pl:"Gorączka u dziecka", icon:"fever", kw:["goraczka u dziecka","goraczka dziecko","fever child","wysoka temperatura dziecko"], base:"feverchild", qs:["fch_kind","temp","worse_time"]},
+  {id:"hypertension", pl:"Nadciśnienie (wsparcie)", icon:"head", kw:["nadcisnienie","cisnienie","hypertension","wysokie cisnienie"], base:"hypertension", qs:["htn_kind","temp","worse_time"]},
+  {id:"hypothyroid", pl:"Niedoczynność tarczycy", icon:"drop", kw:["niedoczynnosc tarczycy","tarczyca","hypothyroid","hashimoto"], base:"hypothyroid", qs:["hypo_kind","temp","mood"]},
+  {id:"hyperthyroid", pl:"Nadczynność tarczycy", icon:"fever", kw:["nadczynnosc tarczycy","tarczyca nadczynnosc","hyperthyroid","gravesa"], base:"hyperthyroid", qs:["hyper_kind","temp","mood"]},
+  {id:"goitre", pl:"Wole / tarczyca", icon:"throat", kw:["wole","powiekszona tarczyca","goitre","guz tarczycy"], base:"goitre", qs:["goit_kind","temp"]},
+  {id:"diabeticneuropathy", pl:"Neuropatia — pieczenie/drętwienie stóp", icon:"bone", kw:["neuropatia","drętwienie stop","pieczenie stop","neuropathy","cukrzycowa"], base:"diabeticneuropathy", qs:["dn_kind","worse_time"]},
+  {id:"chronicfatigue", pl:"Przewlekłe zmęczenie", icon:"moon", kw:["przewlekle zmeczenie","chroniczne zmeczenie","cfs","wyczerpanie chroniczne"], base:"chronicfatigue", qs:["cf_kind","mood","temp"]},
+  {id:"fibromyalgia", pl:"Rozlane bóle mięśniowe", icon:"bone", kw:["fibromialgia","rozlane bole","miesnie bol","fibromyalgia"], base:"fibromyalgia", qs:["fib_kind","pain_relief","temp"]},
+  {id:"memoryloss", pl:"Osłabienie pamięci", icon:"cloud", kw:["pamiec","oslabienie pamieci","zapominanie","memory","koncentracja pamiec"], base:"memoryloss", qs:["mem_kind","mood"]},
+  {id:"tremor", pl:"Drżenie rąk", icon:"bone", kw:["drzenie rak","trzesa sie rece","tremor","drzaczka"], base:"tremor", qs:["trem_kind","worse_time"]},
+  {id:"writerscramp", pl:"Kurcz pisarski", icon:"hand", kw:["kurcz pisarski","skurcz dloni pisanie","writers cramp"], base:"writerscramp", qs:["wc_kind","temp"]},
+  {id:"osteoarthritis", pl:"Zwyrodnienie stawów", icon:"bone", kw:["zwyrodnienie stawow","artroza","osteoarthritis","choroba zwyrodnieniowa"], base:"osteoarthritis", qs:["oa_kind","pain_relief","temp"]},
+  {id:"frozenshoulder", pl:"Zamrożony bark", icon:"bone", kw:["zamrozony bark","bark frozen","frozen shoulder","zesztywnienie barku"], base:"frozenshoulder", qs:["fs_kind","pain_relief","worse_time"]},
+  {id:"osteoporosis", pl:"Osłabienie kości / osteoporoza", icon:"bone", kw:["osteoporoza","slabe kosci","osteoporosis","odwapnienie"], base:"osteoporosis", qs:["osteo_kind","temp"]},
+  {id:"varicoseulcer", pl:"Owrzodzenie żylne podudzia", icon:"drop", kw:["owrzodzenie zylne","owrzodzenie podudzia","venous ulcer","rana na nodze"], base:"varicoseulcer", qs:["vu_kind","temp"]},
+  {id:"hearingloss", pl:"Niedosłuch", icon:"ear", kw:["niedoslch","niedosłuch","pogorszenie sluchu","hearing loss","gorzej slysze"], base:"hearingloss", qs:["hl_kind","temp"]},
+  {id:"clusterheadache", pl:"Klasterowy ból głowy", icon:"head", kw:["klasterowy bol glowy","cluster headache","bol wokol oka napadowy"], base:"clusterheadache", qs:["clh_kind","temp","worse_time"]},
+  {id:"bellspalsy", pl:"Porażenie nerwu twarzowego", icon:"head", kw:["porazenie nerwu twarzowego","bell","facial palsy","opadniety kacik ust"], base:"bellspalsy", qs:["bp_kind","temp"]},
+  {id:"endometriosis", pl:"Bardzo bolesne miesiączki / endometrioza", icon:"flower", kw:["endometrioza","bardzo bolesne miesiaczki","silne bole miesiaczkowe","endometriosis"], base:"endometriosis", qs:["endo_kind","temp","mood"]},
+  {id:"vaginaldryness", pl:"Suchość pochwy", icon:"flower", kw:["suchosc pochwy","sucho intymnie","vaginal dryness","atrofia"], base:"vaginaldryness", qs:["vd_kind","mood"]},
+  {id:"erectiledys", pl:"Zaburzenia erekcji", icon:"bladder", kw:["zaburzenia erekcji","impotencja","erectile","slaba erekcja"], base:"erectiledys", qs:["ed_kind","mood"]},
+  {id:"pleurisy", pl:"Zapalenie opłucnej", icon:"lungs", kw:["zapalenie oplucnej","oplucna","pleurisy","klucie przy oddychaniu"], base:"pleurisy", qs:["pleur_kind","worse_time"]},
+  {id:"chronicsinusitis", pl:"Przewlekłe zapalenie zatok", icon:"nose", kw:["przewlekle zatoki","chroniczne zatoki","chronic sinusitis","zatoki nawracajace"], base:"chronicsinusitis", qs:["csin_kind","temp"]},
+  {id:"blepharospasm", pl:"Kurcz / drganie powiek", icon:"eye", kw:["drganie powieki","kurcz powiek","blepharospasm","tik powieki"], base:"blepharospasm", qs:["bsp_kind","worse_time"]},
+  {id:"psoriasis", pl:"Łuszczyca", icon:"rash", kw:["luszczyca","psoriasis","srebrzyste luski","plamy luszczace"], base:"psoriasis", qs:["pso_kind","temp","worse_time"]},
+  {id:"lowimmunity", pl:"Nawracające infekcje / odporność", icon:"fever", kw:["niska odpornosc","nawracajace infekcje","czeste przeziebienia","odpornosc","immunity"], base:"lowimmunity", qs:["imm_kind","temp"]},
+  {id:"teethsensitivity", pl:"Nadwrażliwość zębów", icon:"tooth", kw:["nadwrazliwosc zebow","wrazliwe zeby","teeth sensitive","reagowanie na zimno zeby"], base:"teethsensitivity", qs:["tsen_kind","temp"]},
+  {id:"gingivitis", pl:"Zapalenie / krwawienie dziąseł", icon:"tooth", kw:["zapalenie dziasel","krwawiace dziasla","gingivitis","paradontoza"], base:"gingivitis", qs:["ging_kind","worse_time"]},
+  {id:"chroniccough", pl:"Przewlekły / uporczywy kaszel", icon:"lungs", kw:["przewlekly kaszel","uporczywy kaszel","chronic cough","kaszel nie mija"], base:"chroniccough", qs:["cc_kind","temp","worse_time"]}
 ];
 
 /* unified remedy meta keyed by lowercase abbreviation */
