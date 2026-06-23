@@ -170,6 +170,23 @@
 
   .foot{margin-top:24px;text-align:center;color:var(--label3);font-size:12px;line-height:1.5}
   .foot a{color:var(--accent);text-decoration:none}
+
+  /* tryb ciemny — grafit */
+  body.dark{
+    --bg:#16181c; --canvas:#0d0e10; --card:#1e2227;
+    --label:#f3f4f6; --label2:#aab0b8; --label3:#71777f;
+    --sep:rgba(255,255,255,.08); --sep2:rgba(255,255,255,.17);
+    --accent:#34c98a; --accent-press:#2bb079; --accent-tint:rgba(52,201,138,.16);
+    --g3:#34c98a; --g2:#5fae8b; --g1:#41544a;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.55);
+  }
+  body.dark .nav{background:rgba(22,24,28,.82)}
+  body.dark .seg{background:rgba(255,255,255,.07)}
+  body.dark .seg button.on{background:#2a2f37}
+  body.dark .search input{background:rgba(255,255,255,.07)}
+  body.dark .ring{background:#2a2f37}
+  body.dark .banner.demo{background:#2a2410}
+  body.dark .disc .warn{background:#2a1f10;border-color:#5a4520;color:#f0c890}
 </style>
 </head>
 <body>
@@ -180,6 +197,9 @@
       <span id="navleftlbl">Wstecz</span>
     </button>
     <div class="title" id="navtitle">Repertorium</div>
+    <button id="navtheme" class="right icnbtn" aria-label="Tryb jasny/ciemny" onclick="toggleTheme()">
+      <svg viewBox="0 0 22 22" width="20" height="20" fill="none"><path d="M18 13.5A7.5 7.5 0 1 1 9 4.2a5.8 5.8 0 0 0 9 9.3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </button>
     <button id="navright" class="right icnbtn" aria-label="Informacje" onclick="openDisclaimer()">
       <svg viewBox="0 0 22 22" width="22" height="22" fill="none"><circle cx="11" cy="11" r="9.2" stroke="currentColor" stroke-width="1.6"/><circle cx="11" cy="6.6" r="1.15" fill="currentColor"/><path d="M11 9.8v6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
@@ -1299,7 +1319,42 @@ const RUB = {
   chroniccough:["Przewlekły / uporczywy kaszel","Cough, chronic, lingering",{Dros:3,Sulph:2,Phos:2,Sang:2,Hep:2}],
   cc_dros:["Uporczywy, napadowy kaszel po infekcji, gorzej w nocy","Chronic cough, spasmodic, after infection",{Dros:3}],
   cc_phos:["Suchy, drażniący kaszel, pieczenie w klatce","Chronic cough, dry, burning chest",{Phos:3}],
-  cc_sulph:["Nawracający, zaniedbany kaszel, gorzej od ciepła","Chronic cough, neglected, relapsing",{Sulph:3,Sang:2}]
+  cc_sulph:["Nawracający, zaniedbany kaszel, gorzej od ciepła","Chronic cough, neglected, relapsing",{Sulph:3,Sang:2}],
+
+  // — pogłębienie: ból głowy (charakter) —
+  headc_full:["Głowa — rozsadzający, pełny ból","Head, pain, bursting, full",{Bell:3,Glon:2,Bry:2,Acon:2}],
+  headc_band:["Głowa — jak ściśnięta opaską","Head, pain, as from a band",{Gels:3,"Nat-m":2,Sulph:2}],
+  headc_nail:["Głowa — jak wbity gwóźdź / punktowy","Head, pain, as from a nail",{Ign:3,Coff:2,Thuj:2,"Nux-v":2}],
+  headc_wave:["Głowa — falujący, narasta i opada","Head, pain, waves",{Sang:2,Spig:2,Glon:2,Bell:2}],
+  // — pogłębienie: kaszel (wyzwalacz) —
+  cought_tickle:["Kaszel od łaskotania w gardle / krtani","Cough, from tickling in throat",{Dros:3,Hep:2,Cham:2,Bell:2}],
+  cought_talk:["Kaszel od mówienia, śmiechu, śpiewu","Cough, from talking, laughing",{Dros:3,Phos:2,"Arg-n":2}],
+  cought_lying:["Kaszel po położeniu się wieczorem","Cough, on lying down, evening",{Dros:3,Puls:2,Con:2}],
+  // — pogłębienie: lęk (wyzwalacz) —
+  anxt_news:["Lęk po złych wieściach / szoku","Anxiety, after bad news, shock",{Gels:3,Ign:2,Acon:2}],
+  anxt_family:["Lęk o bliskich / o przyszłość","Anxiety, about others, future",{Phos:3,Ars:2,Calc:2}],
+  anxt_heart:["Lęk z biciem serca i ciasnotą w klatce","Anxiety, with palpitation, constriction",{Acon:3,Cact:2,Ars:2}],
+  // — pogłębienie: gorączka (przebieg) —
+  fevc_stages:["Gorączka — dreszcz, potem żar, potem pot (kolejno)","Fever, chill then heat then sweat",{Ars:2,"Nux-v":2,"Eup-per":2,Gels:2}],
+  fevc_dry:["Gorączka — suchy, palący żar bez potu","Fever, dry burning heat, no sweat",{Acon:3,Bell:2,Bry:2}],
+  fevc_sweat:["Gorączka — obfity pot bez ulgi","Fever, profuse sweat without relief",{Merc:3,Bry:2,"Rhus-t":2}],
+  fevc_alt:["Gorączka — naprzemienne dreszcze i gorąco","Fever, alternating chill and heat",{"Nux-v":2,Ars:2,"Eup-per":2}],
+  // — pogłębienie: gardło (charakter) —
+  throatc_dry:["Gardło — suchość, zadrapanie, surowość","Throat, dry, scraping, raw",{Bell:2,Bry:2,Acon:2,Phos:2}],
+  throatc_lump:["Gardło — uczucie kuli / zaciskania","Throat, lump, constriction",{Lach:3,Ign:2,"Nat-m":2}],
+  throatc_ear:["Gardło — ból promieniujący do ucha przy przełykaniu","Throat, pain extending to ear",{Hep:2,Phyt:2,"Nit-ac":2,Lach:2}],
+  // — pogłębienie: żołądek (charakter) —
+  stomc_stone:["Żołądek — uczucie kamienia / zalegania","Stomach, weight, as from a stone",{"Nux-v":3,Bry:2,Puls:2}],
+  stomc_empty:["Żołądek — puste, słabe uczucie","Stomach, empty, faint feeling",{Sep:2,Phos:2,Sulph:2,Ign:2}],
+  stomc_acid:["Żołądek — kwaśne odbijanie, zgaga","Stomach, sour eructations, acidity",{"Nux-v":2,"Carb-v":2,Calc:2,Lyc:2}],
+  // — pogłębienie: sen (rodzaj zaburzenia) —
+  sleept_wake:["Sen — budzenie i niemożność ponownego zaśnięcia","Sleep, waking, cannot sleep again",{"Nux-v":3,Coff:2,Sil:2,Ars:2}],
+  sleept_restless:["Sen — niespokojny, z koszmarami / rzucaniem","Sleep, restless, dreams, tossing",{"Rhus-t":2,Ars:2,Stram:2,Cham:2}],
+  sleept_early:["Sen — budzenie nad ranem (3–5)","Sleep, waking early morning",{"Nux-v":3,Sulph:2}],
+  // — pogłębienie: stawy (wyzwalacz) —
+  paint_touch:["Stawy — gorzej od dotyku i ucisku","Joints, worse touch, pressure",{Bry:2,Arn:2,Led:2,Lach:2}],
+  paint_night:["Stawy — gorzej w nocy w łóżku","Joints, worse at night in bed",{Merc:2,"Rhus-t":2,Led:2,Sulph:2}],
+  paint_warmth:["Stawy — gorzej od ciepła łóżka, lepiej od chłodu","Joints, worse warmth of bed",{Led:3,Puls:2,Sulph:2}]
 };
 
 const Q = {
@@ -1506,7 +1561,15 @@ const Q = {
   imm_kind:["Jak wyglądają nawracające infekcje?","",[["Gardła i uszu u dzieci","imm_barc"],["Częste przeziębienia, marznięcie, poty","imm_calc"],["Skłonność do ropień, słabe gojenie","imm_sil"]]],
   tsen_kind:["Co charakteryzuje nadwrażliwość zębów?","",[["Szybko psujące się, ciemniejące","tsen_staph"],["Ze ślinotokiem, krwawiące dziąsła","tsen_merc"],["Wrażliwość na zimno i ciepło","tsen_calc"]]],
   ging_kind:["Jak wyglądają dziąsła?","",[["Obrzęknięte, krwawiące, ślinotok","ging_merc"],["Krwawiące, cofające się, cuchnące","ging_kreos"],["Łatwo krwawiące przy szczotkowaniu","ging_phos"]]],
-  cc_kind:["Jak wygląda przewlekły kaszel?","",[["Napadowy, po infekcji, gorzej w nocy","cc_dros"],["Suchy, drażniący, pieczenie w klatce","cc_phos"],["Nawracający, zaniedbany","cc_sulph"]]]
+  cc_kind:["Jak wygląda przewlekły kaszel?","",[["Napadowy, po infekcji, gorzej w nocy","cc_dros"],["Suchy, drażniący, pieczenie w klatce","cc_phos"],["Nawracający, zaniedbany","cc_sulph"]]],
+  head_char:["Jaki charakter ma ból głowy?","",[["Rozsadzający, pełny","headc_full"],["Jak ściśnięta opaską","headc_band"],["Jak wbity gwóźdź","headc_nail"],["Falujący, narasta i opada","headc_wave"]]],
+  cough_trigger:["Co wyzwala kaszel?","",[["Łaskotanie w gardle","cought_tickle"],["Mówienie, śmiech, śpiew","cought_talk"],["Położenie się wieczorem","cought_lying"],["Zimne powietrze","cough_cold_air"]]],
+  anx_trigger:["Co wyzwala lęk?","",[["Złe wieści / szok","anxt_news"],["Lęk o bliskich / przyszłość","anxt_family"],["Z biciem serca i ciasnotą","anxt_heart"],["Trema przed wydarzeniem","anx_antic"]]],
+  fever_course:["Jak przebiega gorączka?","",[["Dreszcz → żar → pot (kolejno)","fevc_stages"],["Suchy żar bez potu","fevc_dry"],["Obfity pot bez ulgi","fevc_sweat"],["Naprzemienne dreszcze i gorąco","fevc_alt"]]],
+  throat_char:["Jaki charakter ma ból gardła?","",[["Suchość, zadrapanie","throatc_dry"],["Uczucie kuli / zaciskania","throatc_lump"],["Promieniuje do ucha przy przełykaniu","throatc_ear"],["Lepiej od ciepłych napojów","throat_warm_dr"]]],
+  stomach_char:["Jaki charakter dolegliwości żołądka?","",[["Uczucie kamienia / zalegania","stomc_stone"],["Puste, słabe uczucie","stomc_empty"],["Kwaśne odbijanie, zgaga","stomc_acid"],["Skurczowy ból, lepiej od zgięcia","cramp_bend"]]],
+  sleep_type:["Jaki masz problem ze snem?","",[["Trudność z zaśnięciem (natłok myśli)","sleep_mind"],["Budzenie i brak ponownego snu","sleept_wake"],["Niespokojny sen, koszmary","sleept_restless"],["Budzenie nad ranem (3–5)","sleept_early"]]],
+  pain_trigger:["Co prowokuje ból stawów?","",[["Dotyk i ucisk","paint_touch"],["Noc w łóżku","paint_night"],["Ciepło łóżka (lepiej od chłodu)","paint_warmth"],["Zmiana pogody, wilgoć","pain_cold_damp"]]]
 };
 
 const ICON = {
@@ -1535,17 +1598,17 @@ const ICON = {
 };
 
 const TOPICS = [
-  {id:"head", pl:"Ból głowy", icon:"head", kw:["glowa","głowa","ból głowy","migrena","head"], base:"head_pain", qs:["head_loc","head_mod","worse_time","temp","thirst","mood"]},
-  {id:"fever", pl:"Gorączka / przeziębienie", icon:"fever", kw:["goraczka","gorączka","przeziebienie","przeziębienie","grypa","fever"], base:"fever", qs:["fever_onset","fever_state","temp","thirst","worse_time"]},
-  {id:"cough", pl:"Kaszel", icon:"lungs", kw:["kaszel","cough"], base:"cough", qs:["cough_kind","cough_when","temp","worse_time"]},
-  {id:"throat", pl:"Ból gardła", icon:"throat", kw:["gardlo","gardło","throat","angina"], base:"throat", qs:["throat_side","throat_relief","temp","thirst"]},
+  {id:"head", pl:"Ból głowy", icon:"head", kw:["glowa","głowa","ból głowy","migrena","head"], base:"head_pain", qs:["head_loc","head_char","head_mod","worse_time","temp","thirst","mood"]},
+  {id:"fever", pl:"Gorączka / przeziębienie", icon:"fever", kw:["goraczka","gorączka","przeziebienie","przeziębienie","grypa","fever"], base:"fever", qs:["fever_onset","fever_course","fever_state","temp","thirst","worse_time"]},
+  {id:"cough", pl:"Kaszel", icon:"lungs", kw:["kaszel","cough"], base:"cough", qs:["cough_kind","cough_trigger","cough_when","temp","worse_time"]},
+  {id:"throat", pl:"Ból gardła", icon:"throat", kw:["gardlo","gardło","throat","angina"], base:"throat", qs:["throat_side","throat_char","throat_relief","temp","thirst"]},
   {id:"coryza", pl:"Katar / nieżyt nosa", icon:"nose", kw:["katar","nos","coryza","nieżyt"], base:"coryza", qs:["cor_kind","cor_mod","temp","better"]},
-  {id:"stomach", pl:"Żołądek / niestrawność", icon:"stomach", kw:["zoladek","żołądek","nudnosci","nudności","niestrawnosc","mdlosci","stomach"], base:"stomach", qs:["stom_kind","stom_eat","worse_time","mood"]},
+  {id:"stomach", pl:"Żołądek / niestrawność", icon:"stomach", kw:["zoladek","żołądek","nudnosci","nudności","niestrawnosc","mdlosci","stomach"], base:"stomach", qs:["stom_kind","stomach_char","stom_eat","worse_time","mood"]},
   {id:"diarr", pl:"Biegunka", icon:"drop", kw:["biegunka","rozwolnienie","diarrhoea","stolec"], base:"diarr", qs:["diarr_kind","temp","thirst","worse_time"]},
-  {id:"sleep", pl:"Bezsenność", icon:"moon", kw:["sen","bezsennosc","bezsenność","spanie","sleep"], base:"sleep", qs:["sleep_kind","mood","worse_time"]},
-  {id:"anx", pl:"Lęk / niepokój", icon:"cloud", kw:["lek","lęk","niepokoj","niepokój","stres","panika","anxiety"], base:"anx", qs:["anx_kind","temp","thirst","consol"]},
+  {id:"sleep", pl:"Bezsenność", icon:"moon", kw:["sen","bezsennosc","bezsenność","spanie","sleep"], base:"sleep", qs:["sleep_kind","sleep_type","mood","worse_time"]},
+  {id:"anx", pl:"Lęk / niepokój", icon:"cloud", kw:["lek","lęk","niepokoj","niepokój","stres","panika","anxiety"], base:"anx", qs:["anx_kind","anx_trigger","temp","thirst","consol"]},
   {id:"grief", pl:"Smutek / żal", icon:"heart", kw:["smutek","zal","żal","strata","grief","depresja"], base:"grief", qs:["grief_kind","consol","mood","worse_time"]},
-  {id:"pain", pl:"Bóle stawów / mięśni", icon:"bone", kw:["stawy","miesnie","mięśnie","ból stawów","reumatyzm","kregoslup","kręgosłup"], base:"pain_jm", qs:["pain_mod","pain_relief","temp","worse_time"]},
+  {id:"pain", pl:"Bóle stawów / mięśni", icon:"bone", kw:["stawy","miesnie","mięśnie","ból stawów","reumatyzm","kregoslup","kręgosłup"], base:"pain_jm", qs:["pain_mod","pain_trigger","pain_relief","temp","worse_time"]},
   {id:"skin", pl:"Dolegliwości skórne", icon:"hand", kw:["skora","skóra","swiad","świąd","wysypka","skin","alergia"], base:"skin", qs:["skin_kind","temp","worse_time"]},
   {id:"menses", pl:"Dolegliwości menstruacyjne", icon:"flower", kw:["miesiaczka","miesiączka","menstruacja","pms","okres","menses"], base:"menses", qs:["men_kind","temp","mood","consol"]},
   {id:"toothache", pl:"Ból zęba", icon:"tooth", kw:["zab","ząb","zeba","zęba","ból zęba","tooth"], base:"toothache", qs:["tooth_mod","tooth_when","temp","worse_time"]},
@@ -2219,6 +2282,22 @@ function openDisclaimer(){
     </div><button class="close" onclick="closeSheet()">Rozumiem</button>`);
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
+
+/* ---------- MOTYW (jasny/ciemny grafit) ---------- */
+function applyTheme(dark){
+  document.body.classList.toggle('dark', !!dark);
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content', dark?'#0d0e10':'#edefea');
+}
+function toggleTheme(){
+  const dark=!document.body.classList.contains('dark');
+  applyTheme(dark);
+  try{ localStorage.setItem('kent_theme', dark?'dark':'light'); }catch(e){}
+}
+(function initTheme(){
+  let pref=null; try{ pref=localStorage.getItem('kent_theme'); }catch(e){}
+  if(pref===null && window.matchMedia) pref=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  applyTheme(pref==='dark');
+})();
 
 /* ---------- START ---------- */
 view.innerHTML='<div class="screen"><div class="hero"><h1>Repertorium</h1><p>Ładowanie bazy…</p></div></div>';
