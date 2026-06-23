@@ -242,7 +242,20 @@ const REM = {
   Caust:["Causticum","Causticum Hahnemanni","Powolne osłabienie i niedowłady; chrypka; oparzenia i blizny, które źle się goją."],
   Mez:["Mezereum","Wawrzynek wilczełyko","Pęcherzyki z nieznośnym świądem i grubymi strupami; nerwobóle i półpasiec."],
   "Ran-b":["Ranunculus bulbosus","Jaskier bulwiasty","Półpasiec i pęcherzyki z piekąco-kłującym bólem; ból międzyżebrowy; gorzej od dotyku i wilgoci."],
-  Sabad:["Sabadilla","Sabadyla","Napadowe kichanie, swędzenie nosa i podniebienia, łzawienie — sztandarowy lek kataru siennego."]
+  Sabad:["Sabadilla","Sabadyla","Napadowe kichanie, swędzenie nosa i podniebienia, łzawienie — sztandarowy lek kataru siennego."],
+  Aesc:["Aesculus hippocastanum","Kasztanowiec","Hemoroidy z uczuciem pełności i drzazg w odbycie; ból krzyża."],
+  Ham:["Hamamelis virginiana","Oczar wirginijski","Bierne, sączące krwawienia żylne; obolałe żylaki i hemoroidy."],
+  Aloe:["Aloe socotrina","Aloes","Hemoroidy jak kiść winogron; nagła, niepewna biegunka; ciężar w odbycie."],
+  Cupr:["Cuprum metallicum","Miedź metaliczna","Gwałtowne skurcze i kurcze (łydki, brzuch), zaczynają się od palców; ulga po łyku zimnej wody."],
+  "Eup-per":["Eupatorium perfoliatum","Sadziec przerośnięty","Grypa z rozłamującym bólem kości i gałek ocznych; uczucie łamania kości."],
+  Chin:["China officinalis","Chinowiec","Osłabienie po utracie płynów (poty, biegunka, krwawienie); wzdęcia; nadwrażliwość."],
+  "Kali-p":["Kali phosphoricum","Fosforan potasu","Wyczerpanie nerwowe po przepracowaniu lub stresie; osłabienie z drażliwością i lękiem."],
+  "Arg-n":["Argentum nitricum","Azotan srebra","Lęk antycypacyjny z biegunką; chrypka mówców i śpiewaków; pośpiech; łaknienie słodyczy."],
+  "Kali-bi":["Kali bichromicum","Dwuchromian potasu","Gęsta, ciągnąca się, żółta wydzielina; ból u nasady nosa; zapalenie zatok."],
+  Con:["Conium maculatum","Szczwół plamisty","Zawroty głowy przy obracaniu głowy i odwracaniu się w łóżku; powolne osłabienie."],
+  Op:["Opium","Mak lekarski","Skutki przestrachu z odrętwieniem i bezruchem; senność, zatrzymanie; brak reakcji na ból."],
+  Lach:["Lachesis muta","Żararaka niema","Lewa strona; nietolerancja ucisku i ciasnych ubrań; uderzenia gorąca; gorzej po śnie."],
+  Sang:["Sanguinaria canadensis","Sangwinaria kanadyjska","Uderzenia gorąca i pieczenie policzków; prawostronny ból głowy; dolegliwości menopauzy."]
 };
 
 const RUB = {
@@ -432,7 +445,86 @@ const RUB = {
   hay_sneeze:["Napadowe kichanie, swędzenie nosa i podniebienia","Hay fever, sneezing paroxysms, itching",{Sabad:3,"Nat-m":2}],
   hay_acrid:["Wodnisty, gryzący katar; łagodne łzy","Hay fever, acrid coryza, bland tears",{"All-c":3}],
   hay_eyes:["Gryzące łzawienie; łagodny katar","Hay fever, acrid tears, bland coryza",{Euphr:3}],
-  hay_itch:["Świąd oczu, podniebienia i gardła","Hay fever, itching eyes, palate, throat",{Sabad:2,"All-c":2}]
+  hay_itch:["Świąd oczu, podniebienia i gardła","Hay fever, itching eyes, palate, throat",{Sabad:2,"All-c":2}],
+
+  // — hemoroidy —
+  haemorrhoids:["Hemoroidy / żylaki odbytu","Rectum, haemorrhoids",{Aesc:3,Ham:3,"Nux-v":3,Sulph:3,Aloe:3,Puls:2,Sep:2,Lyc:2,Acon:2}],
+  hem_bleed:["Hemoroidy krwawiące (krew żylna)","Haemorrhoids, bleeding",{Ham:3,Phos:2,"Nux-v":2,Sulph:2}],
+  hem_aesc:["Odbyt — uczucie pełności i drzazg","Rectum, fullness, splinters sensation",{Aesc:3}],
+  hem_aloe:["Hemoroidy jak winogrona, lepiej od zimna","Haemorrhoids, like grapes, better cold",{Aloe:3}],
+  hem_itch:["Odbyt — świąd i pieczenie, gorzej od ciepła","Rectum, itching, burning",{Sulph:3,Aloe:2,"Nux-v":2}],
+  // — kac —
+  hangover:["Kac / dolegliwości po alkoholu","Ailments from alcohol",{"Nux-v":3,"Carb-v":3,Sulph:2,Ars:2,Lach:2,Bry:2}],
+  hang_nux:["Po alkoholu — ból głowy, mdłości, drażliwość rano","After alcohol, headache, nausea, morning",{"Nux-v":3,Bry:2}],
+  hang_carb:["Po alkoholu — osłabienie, wzdęcia, łaknienie powietrza","After alcohol, weakness, flatulence, air",{"Carb-v":3}],
+  hang_bry:["Po alkoholu — pragnienie, gorzej od ruchu","After alcohol, thirst, worse motion",{Bry:3,"Nux-v":2}],
+  // — zgaga / refluks —
+  heartburn:["Zgaga / refluks","Stomach, heartburn, acidity",{"Nux-v":3,Puls:3,"Carb-v":3,Ars:2,Sulph:2,Lyc:2,Phos:2,Bry:2}],
+  heart_nux:["Zgaga po używkach / przejedzeniu","Heartburn, after stimulants, excess",{"Nux-v":3,"Carb-v":2}],
+  heart_puls:["Zgaga po tłustym, odbijanie smakiem potraw","Heartburn, after fat food, tasting food",{Puls:3,"Carb-v":2}],
+  heart_ars:["Pieczenie żołądka łagodzone ciepłem","Stomach, burning, better warmth",{Ars:3,Phos:2}],
+  // — kolka —
+  colic:["Kolka jelitowa / bolesny skurcz brzucha","Abdomen, colic, cramping",{Coloc:3,"Mag-phos":3,Cham:3,"Nux-v":2,Bry:2,Cupr:2}],
+  colic_magp:["Kolka — ulga od ciepła i ucisku","Colic, better warmth and pressure",{"Mag-phos":3,Coloc:2}],
+  colic_anger:["Kolka po gniewie / ze złością","Colic, after anger",{Coloc:3,Cham:2,Staph:2}],
+  colic_cupr:["Kolka — gwałtowny skurcz, brzuch jak deska","Colic, violent, spasmodic",{Cupr:3,Coloc:2}],
+  colic_cham:["Kolka u dziecka, wygięte, nieukojone","Colic, infants, arching, inconsolable",{Cham:3,Coloc:2}],
+  // — grypa —
+  grippe:["Grypa / objawy grypowe","Generalities, influenza",{Gels:3,Bry:3,"Rhus-t":3,"Eup-per":3,Ars:2,"Nux-v":2,"Ferr-p":2,Bell:2}],
+  grippe_gels:["Grypa — ociężałość, dreszcze wzdłuż pleców, brak pragnienia","Influenza, dullness, chills along back",{Gels:3}],
+  grippe_eup:["Grypa — rozłamujący ból kości i gałek ocznych","Influenza, aching bones, eyeballs",{"Eup-per":3}],
+  grippe_rhus:["Grypa — bóle, niepokój, lepiej od ruchu","Influenza, aching, better motion",{"Rhus-t":3}],
+  grippe_bry:["Grypa — gorzej od ruchu, pragnienie, drażliwość","Influenza, worse motion, thirst",{Bry:3}],
+  // — wyczerpanie —
+  exhaustion:["Wyczerpanie / rekonwalescencja","Generalities, weakness, prostration",{"Phos-ac":3,Chin:3,"Kali-p":3,Gels:2,Cocc:2,Ars:2,Sep:2,Calc:2}],
+  exh_chin:["Wyczerpanie po utracie płynów (poty, biegunka, krwawienie)","Weakness after loss of fluids",{Chin:3,"Phos-ac":2}],
+  exh_kalip:["Wyczerpanie nerwowe po przepracowaniu / stresie","Nervous exhaustion, mental overwork",{"Kali-p":3,"Phos-ac":2}],
+  exh_cocc:["Wyczerpanie po nieprzespanych nocach","Weakness, loss of sleep",{Cocc:3,"Kali-p":2}],
+  // — ból krzyża —
+  backache:["Ból krzyża / lumbago","Back, pain, lumbar region",{"Rhus-t":3,Bry:3,"Nux-v":3,Calc:2,Sulph:2,Sep:2,"Mag-phos":2}],
+  back_nux:["Ból krzyża — musi usiąść, by się obrócić; gorzej rano","Back, pain, must sit up to turn",{"Nux-v":3}],
+  back_strain:["Ból krzyża po dźwignięciu / przeciążeniu","Back, pain, from lifting, strain",{"Rhus-t":3,Calc:2,Arn:2}],
+  // — rwa kulszowa —
+  sciatica:["Rwa kulszowa","Extremities, sciatica",{Coloc:3,"Mag-phos":3,"Rhus-t":3,Bry:2,"Nux-v":2,Lyc:2}],
+  sciatica_coloc:["Rwa — strzelający ból, ulga od ciepła i ucisku","Sciatica, better warmth and pressure",{Coloc:3,"Mag-phos":3}],
+  sciatica_rhus:["Rwa — gorzej w spoczynku, lepiej od ruchu i ciepła","Sciatica, better motion and warmth",{"Rhus-t":3}],
+  // — skurcze nóg —
+  legcramps:["Skurcze łydek / nóg","Extremities, cramps, calves",{Cupr:3,"Mag-phos":3,"Nux-v":2,Sulph:2,Verat:2,Calc:2}],
+  cramp_night:["Skurcze łydek w nocy","Cramps, calves, night",{Cupr:3,Sulph:2,"Nux-v":2}],
+  cramp_warm:["Skurcze — ulga od ciepła i ucisku","Cramps, better warmth, pressure",{"Mag-phos":3,Coloc:2}],
+  cramp_cupr:["Skurcze gwałtowne, zaczynają się od palców","Cramps, violent, beginning in toes/fingers",{Cupr:3}],
+  // — chrypka —
+  hoarseness:["Chrypka / utrata głosu","Larynx, hoarseness, voice lost",{Caust:3,Phos:3,"Carb-v":3,Spong:2,"Arg-n":2,Bell:2,Acon:2,Hep:2}],
+  hoarse_caust:["Chrypka po przeziębieniu / przemęczeniu głosu","Hoarseness, from cold, overuse",{Caust:3,Phos:2}],
+  hoarse_argn:["Chrypka mówców i śpiewaków","Hoarseness, singers, speakers",{"Arg-n":3,"Carb-v":2}],
+  hoarse_carb:["Chrypka gorsza wieczorem, surowość krtani","Hoarseness, worse evening",{"Carb-v":3,Phos:2}],
+  hoarse_acon:["Krtań — sucho, szczekająco, po zimnym wietrze","Larynx, dry, barking, after cold wind",{Acon:2,Spong:2,Hep:2}],
+  // — zatoki —
+  sinusitis:["Zapalenie zatok","Nose, sinuses, inflammation",{"Kali-bi":3,Merc:3,Puls:3,Hep:2,Sil:2,Sulph:2,Lyc:2}],
+  sinus_kalibi:["Zatoki — gęsta, ciągnąca wydzielina, ból nasady nosa","Sinus, thick stringy discharge, root of nose",{"Kali-bi":3}],
+  sinus_puls:["Zatoki — gęsta łagodna wydzielina, lepiej na powietrzu","Sinus, thick bland, better open air",{Puls:3}],
+  sinus_hep:["Zatoki — ropienie, wrażliwość na zimno i dotyk","Sinus, suppuration, sensitive cold",{Hep:3,Sil:2,Merc:2}],
+  sinus_pressure:["Zatoki — ucisk gorszy od pochylania","Sinus, pain worse stooping",{"Kali-bi":2,Bry:2,Merc:2}],
+  // — krwawienie z nosa —
+  nosebleed:["Krwawienie z nosa","Nose, epistaxis",{Ham:3,Phos:3,"Ferr-p":3,Bell:2,Bry:2,Ip:2,Acon:2}],
+  nose_phos:["Krwawienie obfite, jasnoczerwone","Epistaxis, profuse, bright",{Phos:3,"Ferr-p":2}],
+  nose_ham:["Krwawienie ciemne, żylne, sączące","Epistaxis, dark, venous",{Ham:3}],
+  nose_bell:["Krwawienie przy uderzeniu krwi do głowy, twarz czerwona","Epistaxis, with congestion, red face",{Bell:2,Acon:2,"Ferr-p":2}],
+  // — zawroty głowy —
+  vertigo:["Zawroty głowy","Vertigo",{Cocc:3,Con:3,Bry:3,Gels:3,Phos:2,Puls:2,Bell:2,"Nux-v":2}],
+  vertigo_motion:["Zawroty od ruchu / jazdy, z nudnościami","Vertigo, from motion, with nausea",{Cocc:3,Tab:2,Petr:2}],
+  vertigo_con:["Zawroty przy obracaniu głowy i w łóżku","Vertigo, turning head, turning in bed",{Con:3}],
+  vertigo_bry:["Zawroty przy wstawaniu, gorzej od ruchu","Vertigo, rising, worse motion",{Bry:3}],
+  vertigo_gels:["Zawroty z ociężałością i drżeniem","Vertigo, dullness, trembling",{Gels:3}],
+  // — przestrach / szok —
+  fright:["Skutki przestrachu / szoku","Ailments from fright, shock",{Acon:3,Op:3,Ign:3,Gels:3,Verat:2,Puls:2}],
+  fright_op:["Po szoku — odrętwienie, bezruch, senność","After fright, stupor, immobility",{Op:3,Gels:2}],
+  // — uderzenia gorąca / menopauza —
+  hotflush:["Uderzenia gorąca / menopauza","Generalities, flushes of heat, menopause",{Lach:3,Sang:3,Sep:3,Sulph:2,Puls:2,Bell:2}],
+  flush_lach:["Uderzenia gorąca gorsze po śnie; nietolerancja ucisku","Hot flushes, worse after sleep, tight clothes",{Lach:3}],
+  flush_sang:["Uderzenia gorąca, pieczenie policzków, prawostronny ból głowy","Hot flushes, burning cheeks, right headache",{Sang:3}],
+  flush_sep:["Menopauza — opadanie, obojętność, lepiej od ruchu","Menopause, sinking, indifference, better motion",{Sep:3}],
+  flush_sulph:["Gorąco, zwłaszcza stóp, gorzej w nocy","Heat, esp. feet, worse night",{Sulph:3}]
 };
 
 const Q = {
@@ -476,7 +568,22 @@ const Q = {
   burn_kind:["Jakie to oparzenie?","Przy rozległych lub głębokich oparzeniach pilnie do lekarza.",[["Zaczerwienienie, piekący ból (I stopień)","burn_first"],["Pęcherze, silne pieczenie","burn_blister"],["Źle się goi, stare oparzenie, blizny","burn_old"],["Lepiej od zimnych okładów","burn_coldapp"],["Lepiej od ciepła (paradoksalnie)","burn_warm"]]],
   bite_kind:["Jak wygląda ukąszenie?","",[["Gorący, czerwony obrzęk, lepiej od zimna","bite_apis"],["Chłodny, sinawy obrzęk, lepiej od zimna","bite_led"],["Wielkie, swędzące bąble (komary)","bite_staph"],["Strzelający ból wzdłuż nerwu (ukłucie)","bite_nerve"]]],
   herpes_kind:["Co charakteryzuje wykwity?","",[["Pęcherzyki na wargach (po przeziębieniu/słońcu)","herpes_lips"],["Pasmo pęcherzyków, piekący ból (półpasiec)","herpes_zoster"],["Nieznośny świąd, grube strupy","herpes_mez"],["Lepiej od ciepła, gorzej w wilgoci","herpes_rhus"]]],
-  hay_kind:["Co dominuje w alergii?","",[["Napadowe kichanie, swędzenie nosa/podniebienia","hay_sneeze"],["Wodnisty gryzący katar, łagodne łzy","hay_acrid"],["Gryzące łzy, łagodny katar","hay_eyes"],["Świąd oczu, podniebienia, gardła","hay_itch"]]]
+  hay_kind:["Co dominuje w alergii?","",[["Napadowe kichanie, swędzenie nosa/podniebienia","hay_sneeze"],["Wodnisty gryzący katar, łagodne łzy","hay_acrid"],["Gryzące łzy, łagodny katar","hay_eyes"],["Świąd oczu, podniebienia, gardła","hay_itch"]]],
+  hem_kind:["Co charakteryzuje hemoroidy?","",[["Krwawiące (krew żylna)","hem_bleed"],["Uczucie pełności i drzazg w odbycie","hem_aesc"],["Wystające jak winogrona, lepiej od zimna","hem_aloe"],["Świąd i pieczenie, gorzej od ciepła","hem_itch"],["Z zaparciem i nieskutecznym parciem","constip_nux"]]],
+  hang_kind:["Co dominuje po alkoholu?","",[["Ból głowy, mdłości, drażliwość rano","hang_nux"],["Osłabienie, wzdęcia, potrzeba powietrza","hang_carb"],["Pragnienie, sucho, gorzej od ruchu","hang_bry"]]],
+  heart_kind:["Co charakteryzuje zgagę?","",[["Po używkach / przejedzeniu, kwaśne odbijanie","heart_nux"],["Po tłustym, odbijanie smakiem potraw","heart_puls"],["Wzdęcia, pełność, odbijanie","bloating"],["Pieczenie łagodzone ciepłem, niepokój","heart_ars"]]],
+  colic_kind:["Co przynosi ulgę / charakteryzuje kolkę?","",[["Ulga od zgięcia wpół i mocnego ucisku","cramp_bend"],["Ulga od ciepła i ucisku, strzelający ból","colic_magp"],["Po gniewie / ze złością","colic_anger"],["Gwałtowny skurcz, brzuch jak deska","colic_cupr"],["U dziecka, wygięte, nieukojone","colic_cham"]]],
+  grippe_kind:["Jak wygląda grypa?","",[["Ociężałość, dreszcze, brak pragnienia","grippe_gels"],["Rozłamujący ból kości i gałek ocznych","grippe_eup"],["Bóle, niepokój, lepiej od ruchu","grippe_rhus"],["Gorzej od ruchu, pragnienie, drażliwość","grippe_bry"]]],
+  exh_kind:["Skąd to wyczerpanie?","",[["Po utracie płynów (poty, biegunka, krwawienie)","exh_chin"],["Po przepracowaniu / stresie","exh_kalip"],["Apatia, otępienie po żalu","grief_apathy"],["Po nieprzespanych nocach","exh_cocc"]]],
+  back_kind:["Co dzieje się z bólem krzyża?","",[["Sztywność, gorzej przy 1. ruchu, lepiej od dalszego","pain_first_motion"],["Gorzej od najmniejszego ruchu, lepiej w bezruchu","pain_any_motion"],["Musi usiąść, by się obrócić; gorzej rano","back_nux"],["Po dźwignięciu / nadwyrężeniu","back_strain"]]],
+  sciatica_kind:["Co dzieje się z rwą?","",[["Strzelający ból, ulga od ciepła i ucisku","sciatica_coloc"],["Gorzej w spoczynku, lepiej od ruchu i ciepła","sciatica_rhus"],["Gorzej od najmniejszego ruchu, lepiej w bezruchu","pain_any_motion"],["Gorzej w zimnie i wilgoci","pain_cold_damp"]]],
+  cramp_kind:["Jakie to skurcze?","",[["Nocne skurcze łydek","cramp_night"],["Ulga od ciepła i ucisku","cramp_warm"],["Gwałtowne, zaczynają się od palców","cramp_cupr"]]],
+  hoarse_kind:["Co charakteryzuje chrypkę?","",[["Po przeziębieniu / przemęczeniu głosu","hoarse_caust"],["U mówców i śpiewaków, z tremą","hoarse_argn"],["Gorzej wieczorem, surowość krtani","hoarse_carb"],["Sucho, szczekająco, po zimnym wietrze","hoarse_acon"]]],
+  sinus_kind:["Co dominuje w zatokach?","",[["Gęsta, ciągnąca żółta wydzielina; ból nasady nosa","sinus_kalibi"],["Gęsta łagodna wydzielina, lepiej na powietrzu","sinus_puls"],["Ropienie, wrażliwość na zimno i dotyk","sinus_hep"],["Ucisk gorszy od pochylania","sinus_pressure"]]],
+  nose_kind:["Jak wygląda krwawienie z nosa?","",[["Obfite, jasnoczerwone","nose_phos"],["Ciemna, sącząca się krew żylna","nose_ham"],["Przy uderzeniu krwi do głowy, twarz czerwona","nose_bell"]]],
+  vertigo_kind:["Co wywołuje zawroty?","",[["Ruch / jazda, z nudnościami","vertigo_motion"],["Obracanie głowy lub odwracanie się w łóżku","vertigo_con"],["Wstawanie, podnoszenie głowy; gorzej od ruchu","vertigo_bry"],["Ociężałość i drżenie (grypowe osłabienie)","vertigo_gels"]]],
+  fright_kind:["Jak zareagowałeś na przestrach / szok?","",[["Nagły lęk, niepokój, lęk przed śmiercią","anx_panic"],["Odrętwienie, bezruch, senność","fright_op"],["Żal, wzdychanie, zmienność","grief_recent"],["Biegunka / drżenie z tremy","diarr_fright"]]],
+  flush_kind:["Jak wyglądają uderzenia gorąca?","",[["Gorsze po śnie, nietolerancja ucisku / ciasnych ubrań","flush_lach"],["Pieczenie policzków, prawostronny ból głowy","flush_sang"],["Uczucie opadania, obojętność, lepiej od ruchu","flush_sep"],["Gorąco stóp, gorzej w nocy","flush_sulph"]]]
 };
 
 const ICON = {
@@ -530,7 +637,22 @@ const TOPICS = [
   {id:"burns", pl:"Oparzenia", icon:"flame", kw:["oparzenie","oparzenia","poparzenie","burn","burns"], base:"burns", qs:["burn_kind","worse_time"]},
   {id:"bites", pl:"Ukąszenia / użądlenia owadów", icon:"bug", kw:["ukaszenie","ukąszenie","uzadlenie","użądlenie","komar","osa","pszczola","pszczoła","owad","bite","sting"], base:"bites", qs:["bite_kind","pain_relief"]},
   {id:"herpes", pl:"Opryszczka / półpasiec", icon:"rash", kw:["opryszczka","polpasiec","półpasiec","herpes","zoster","pecherzyki","pęcherzyki"], base:"herpes", qs:["herpes_kind","temp","worse_time"]},
-  {id:"hayfever", pl:"Katar sienny / alergia", icon:"nose", kw:["katar sienny","alergia","uczulenie","pylenie","hay fever","sienny"], base:"hayfever", qs:["hay_kind","cor_mod","temp","better"]}
+  {id:"hayfever", pl:"Katar sienny / alergia", icon:"nose", kw:["katar sienny","alergia","uczulenie","pylenie","hay fever","sienny"], base:"hayfever", qs:["hay_kind","cor_mod","temp","better"]},
+  {id:"haemorrhoids", pl:"Hemoroidy", icon:"drop", kw:["hemoroidy","zylaki odbytu","żylaki","guzki krwawnicze","haemorrhoids"], base:"haemorrhoids", qs:["hem_kind","worse_time","mood"]},
+  {id:"hangover", pl:"Kac / po alkoholu", icon:"stomach", kw:["kac","alkohol","po alkoholu","przepicie","hangover"], base:"hangover", qs:["hang_kind","thirst","mood"]},
+  {id:"heartburn", pl:"Zgaga / refluks", icon:"flame", kw:["zgaga","refluks","kwasota","kwaśnica","pieczenie","heartburn"], base:"heartburn", qs:["heart_kind","stom_eat","temp"]},
+  {id:"colic", pl:"Kolka jelitowa", icon:"stomach", kw:["kolka","skurcz brzucha","kurcz","colic","wzdecia bolesne"], base:"colic", qs:["colic_kind","temp","mood"]},
+  {id:"grippe", pl:"Grypa", icon:"fever", kw:["grypa","grypowe","influenza","flu","przeziebienie z bolem kosci"], base:"grippe", qs:["grippe_kind","temp","thirst","worse_time"]},
+  {id:"exhaustion", pl:"Wyczerpanie / rekonwalescencja", icon:"moon", kw:["wyczerpanie","oslabienie","osłabienie","przemeczenie","rekonwalescencja","brak energii","wypalenie"], base:"exhaustion", qs:["exh_kind","mood","temp"]},
+  {id:"backache", pl:"Ból krzyża / lumbago", icon:"bone", kw:["krzyz","krzyż","lumbago","ból plecow","ból pleców","dolny odcinek","kregoslup"], base:"backache", qs:["back_kind","pain_relief","temp","worse_time"]},
+  {id:"sciatica", pl:"Rwa kulszowa", icon:"bone", kw:["rwa kulszowa","kulszowy","ischias","sciatica","ból nogi"], base:"sciatica", qs:["sciatica_kind","pain_relief","worse_time"]},
+  {id:"legcramps", pl:"Skurcze łydek / nóg", icon:"bone", kw:["skurcze","skurcz lydki","łydki","kurcze nog","cramps"], base:"legcramps", qs:["cramp_kind","temp","worse_time"]},
+  {id:"hoarseness", pl:"Chrypka / utrata głosu", icon:"throat", kw:["chrypka","utrata glosu","głos","zapalenie krtani","laryngitis","hoarseness"], base:"hoarseness", qs:["hoarse_kind","temp","worse_time"]},
+  {id:"sinusitis", pl:"Zapalenie zatok", icon:"nose", kw:["zatoki","zapalenie zatok","sinusitis","ból zatok"], base:"sinusitis", qs:["sinus_kind","temp","better"]},
+  {id:"nosebleed", pl:"Krwawienie z nosa", icon:"nose", kw:["krwawienie z nosa","krwotok","nos krwawi","epistaxis","nosebleed"], base:"nosebleed", qs:["nose_kind","worse_time"]},
+  {id:"vertigo", pl:"Zawroty głowy", icon:"head", kw:["zawroty","zawroty glowy","vertigo","kreci sie","równowaga"], base:"vertigo", qs:["vertigo_kind","worse_time","temp"]},
+  {id:"fright", pl:"Skutki przestrachu / szoku", icon:"cloud", kw:["przestrach","szok","strach","trauma","po wypadku","fright","shock"], base:"fright", qs:["fright_kind","mood","worse_time"]},
+  {id:"hotflush", pl:"Uderzenia gorąca / menopauza", icon:"flame", kw:["uderzenia goraca","menopauza","klimakterium","hot flush","wary"], base:"hotflush", qs:["flush_kind","temp","mood"]}
 ];
 
 /* unified remedy meta keyed by lowercase abbreviation */
