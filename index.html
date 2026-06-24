@@ -171,6 +171,9 @@
   .foot{margin-top:24px;text-align:center;color:var(--label3);font-size:12px;line-height:1.5}
   .foot a{color:var(--accent);text-decoration:none}
 
+  .alpha{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.08em;padding:14px 4px 6px}
+  .alpha:first-child{padding-top:2px}
+
   /* tryb ciemny — grafit */
   body.dark{
     --bg:#16181c; --canvas:#0d0e10; --card:#1e2227;
@@ -1354,7 +1357,43 @@ const RUB = {
   // — pogłębienie: stawy (wyzwalacz) —
   paint_touch:["Stawy — gorzej od dotyku i ucisku","Joints, worse touch, pressure",{Bry:2,Arn:2,Led:2,Lach:2}],
   paint_night:["Stawy — gorzej w nocy w łóżku","Joints, worse at night in bed",{Merc:2,"Rhus-t":2,Led:2,Sulph:2}],
-  paint_warmth:["Stawy — gorzej od ciepła łóżka, lepiej od chłodu","Joints, worse warmth of bed",{Led:3,Puls:2,Sulph:2}]
+  paint_warmth:["Stawy — gorzej od ciepła łóżka, lepiej od chłodu","Joints, worse warmth of bed",{Led:3,Puls:2,Sulph:2}],
+
+  // — więcej opcji: ból głowy (lokalizacja/modalności) —
+  head_right:["Głowa — ból prawostronny","Head, pain, right side",{Sang:3,Lyc:2,Bell:2,Chel:2}],
+  head_left:["Głowa — ból lewostronny","Head, pain, left side",{Spig:3,Lach:2,"Nat-m":2}],
+  head_behind_eyes:["Głowa — ból za oczami / u nasady nosa","Head, pain, behind eyes, root of nose",{Gels:2,"Kali-bi":2,Sil:2,Spig:2}],
+  head_light:["Głowa — gorzej od światła i hałasu","Head, pain, worse light, noise",{Bell:3,Sil:2,"Nux-v":2,"Nat-m":2}],
+  head_coldapp:["Głowa — lepiej od zimnych okładów","Head, pain, better cold applications",{Puls:2,Apis:2,"Nat-m":2,Glon:2}],
+  head_warmth:["Głowa — lepiej od ciepła / owinięcia","Head, pain, better warmth, wrapping",{Sil:3,"Nux-v":2,"Mag-phos":2}],
+  head_sun:["Głowa — gorzej od słońca i upału","Head, pain, worse sun, heat",{Glon:3,Bell:2,"Nat-m":2,Lach:2}],
+  head_food:["Głowa — gorzej po jedzeniu / używkach","Head, pain, worse eating, stimulants",{"Nux-v":3,Bry:2,Lyc:2}],
+  // — więcej opcji: gorączka —
+  fever_redface:["Gorączka — czerwona, gorąca twarz, pulsowanie","Fever, red hot face, throbbing",{Bell:3,Acon:2,"Ferr-p":2}],
+  fever_chilly:["Gorączka — z dreszczami i marznięciem","Fever, with chilliness",{"Nux-v":3,"Rhus-t":2,Ars:2,Chin:2}],
+  fever_thirst_big:["Gorączka — z silnym pragnieniem zimnej wody","Fever, with great thirst, cold water",{Bry:3,Phos:2,Acon:2}],
+  fever_thirstless:["Gorączka — bez pragnienia","Fever, thirstless",{Puls:3,Gels:2,Apis:2}],
+  fever_bones:["Gorączka — bóle kostne, jakby połamany","Fever, bone pains, as if beaten",{"Eup-per":3,"Rhus-t":2,Bry:2}],
+  // — więcej opcji: kaszel —
+  cough_choking:["Kaszel — duszący, napadowy, z mdłościami","Cough, choking, paroxysmal, nausea",{Ip:3,Dros:2,Cupr:2,"Ant-t":2}],
+  cough_rattling:["Kaszel — z grzechotaniem śluzu, trudne odkrztuszanie","Cough, rattling, hard to expectorate",{"Ant-t":3,Ip:2,"Carb-v":2}],
+  cough_vomit:["Kaszel — z odruchem wymiotnym / wymiotami","Cough, with gagging, vomiting",{Dros:2,Bry:2,Ip:2,"Nux-v":2}],
+  // — więcej opcji: gardło —
+  throat_empty_sw:["Gardło — gorzej od pustego przełykania","Throat, worse empty swallowing",{Lach:3,Bell:2,Ign:2}],
+  throat_warm_app:["Gardło — lepiej od ciepłych okładów na szyję","Throat, better warm external applications",{Hep:3,"Rhus-t":2,Sil:2}],
+  // — więcej opcji: katar —
+  coryza_blocked:["Katar — zatkany, suchy nos, gorzej w nocy","Coryza, blocked, dry, worse night",{"Nux-v":3,Samb:2,Lyc:2}],
+  coryza_thick:["Katar — gęsta, żółto-zielona wydzielina","Coryza, thick, yellow-green discharge",{Puls:3,"Kali-bi":2,Hep:2}],
+  coryza_corrosive:["Katar — wyciek żrący, raniący nos / wargę","Coryza, corrosive, excoriating discharge",{Ars:3,"All-c":2,"Nit-ac":2}],
+  // — więcej opcji: ząb —
+  tooth_coldwater:["Ząb — ulga od zimnej wody w ustach","Teeth, pain, better cold water in mouth",{Coff:3,Puls:2}],
+  tooth_throb:["Ząb — pulsujący, gorzej w cieple łóżka","Teeth, pain, throbbing, worse warmth of bed",{Bell:2,Merc:2,Cham:2,Puls:2}],
+  // — więcej opcji: zawroty —
+  vertigo_up:["Zawroty — przy patrzeniu w górę","Vertigo, looking upward",{Puls:3,Sil:2}],
+  vertigo_tinn:["Zawroty — z szumem usznym i osłabieniem","Vertigo, with tinnitus, weakness",{Chin:3,Con:2}],
+  // — więcej opcji: miesiączka —
+  menses_back:["Miesiączka — ból promieniujący do krzyża / ud","Menses, pain extending to back, thighs",{"Mag-phos":2,Sep:2,Cham:2,Bell:2}],
+  menses_clots:["Miesiączka — krew ciemna, ze skrzepami","Menses, dark, clotted",{Cham:3,Bell:2,"Mag-phos":2,Puls:2}]
 };
 
 const Q = {
@@ -1364,15 +1403,15 @@ const Q = {
   thirst:["Jak z pragnieniem?","",[["Pragnienie zimnej wody","thirst_cold"],["Częste małe łyki","thirst_sips"],["Brak pragnienia","thirstless"]]],
   mood:["Nastrój, który dominuje?","",[["Drażliwość, złość","mood_irrit"],["Płaczliwość, potrzeba pocieszania","mood_weepy"],["Lęk, niepokój","mood_anx"],["Apatia, obojętność","mood_indiff"]]],
   consol:["A gdy ktoś próbuje pocieszać?","",[["Robi mi się lżej","better_consol"],["Robi mi się gorzej","worse_consol"]]],
-  head_loc:["Gdzie umiejscowiony jest ból głowy?","",[["Czoło / nad oczami","head_forehead"],["Skronie","head_temples"],["Potylica (tył głowy)","head_occiput"],["Pulsujący / cała głowa","head_throb"]]],
-  head_mod:["Co dzieje się z bólem głowy?","",[["Gorzej od ruchu","head_motion"],["Lepiej od ucisku","head_pressure"]]],
+  head_loc:["Gdzie umiejscowiony jest ból głowy?","",[["Czoło / nad oczami","head_forehead"],["Skronie","head_temples"],["Potylica (tył głowy)","head_occiput"],["Pulsujący / cała głowa","head_throb"],["Prawostronny","head_right"],["Lewostronny","head_left"],["Za oczami / nasada nosa","head_behind_eyes"]]],
+  head_mod:["Co dzieje się z bólem głowy?","",[["Gorzej od ruchu","head_motion"],["Lepiej od ucisku","head_pressure"],["Gorzej od światła i hałasu","head_light"],["Lepiej od zimnych okładów","head_coldapp"],["Lepiej od ciepła / owinięcia","head_warmth"],["Gorzej od słońca i upału","head_sun"],["Gorzej po jedzeniu / używkach","head_food"]]],
   fever_onset:["Jak zaczęła się dolegliwość?","",[["Nagle i gwałtownie","onset_sudden"],["Powoli, podstępnie","onset_slow"],["Po zimnym, suchym wietrze","after_cold_wind"],["Po przemoczeniu / wilgoci","after_wet"]]],
-  fever_state:["Co towarzyszy gorączce?","",[["Niepokój i lęk","fever_restless"],["Senność, otępienie","fever_drowsy"]]],
-  cough_kind:["Jaki to kaszel?","",[["Suchy","cough_dry"],["Wilgotny, z odkrztuszaniem","cough_loose"],["Szczekający","cough_barking"]]],
+  fever_state:["Co towarzyszy gorączce?","",[["Niepokój i lęk","fever_restless"],["Senność, otępienie","fever_drowsy"],["Czerwona, gorąca twarz, pulsowanie","fever_redface"],["Z dreszczami, marznięciem","fever_chilly"],["Silne pragnienie zimnej wody","fever_thirst_big"],["Bez pragnienia","fever_thirstless"],["Bóle kostne, jakby połamany","fever_bones"]]],
+  cough_kind:["Jaki to kaszel?","",[["Suchy","cough_dry"],["Wilgotny, z odkrztuszaniem","cough_loose"],["Szczekający","cough_barking"],["Duszący, napadowy, z mdłościami","cough_choking"],["Grzechotanie śluzu, trudne odkrztuszanie","cough_rattling"],["Z odruchem wymiotnym / wymiotami","cough_vomit"]]],
   cough_when:["Co go nasila?","",[["Noc","cough_night"],["Zimne powietrze","cough_cold_air"]]],
   throat_side:["Jak wygląda ból gardła?","",[["Bardziej prawa strona","throat_right"],["Gorzej przy przełykaniu","throat_swallow"],["Uczucie drzazgi / zadry","throat_splinter"]]],
-  throat_relief:["Co łagodzi gardło?","",[["Ciepłe napoje","throat_warm_dr"],["Zimne napoje","throat_cold_dr"]]],
-  cor_kind:["Jaki jest wyciek z nosa?","",[["Wodnisty, gryzący","coryza_acrid"],["Łagodny, z gryzącym łzawieniem","coryza_bland"],["Częste kichanie","coryza_sneeze"]]],
+  throat_relief:["Co łagodzi gardło?","",[["Ciepłe napoje","throat_warm_dr"],["Zimne napoje","throat_cold_dr"],["Gorzej od pustego przełykania","throat_empty_sw"],["Lepiej od ciepłych okładów na szyję","throat_warm_app"],["Promieniuje do ucha przy przełykaniu","throatc_ear"]]],
+  cor_kind:["Jaki jest wyciek z nosa?","",[["Wodnisty, gryzący","coryza_acrid"],["Łagodny, z gryzącym łzawieniem","coryza_bland"],["Częste kichanie","coryza_sneeze"],["Zatkany, suchy nos, gorzej w nocy","coryza_blocked"],["Gęsta, żółto-zielona wydzielina","coryza_thick"],["Wyciek żrący, raniący nos/wargę","coryza_corrosive"]]],
   cor_mod:["Gdzie czujesz się gorzej?","",[["W ciepłym pokoju","coryza_warm_room"],["Na świeżym / zimnym powietrzu","coryza_open_air"]]],
   stom_kind:["Co najbardziej dokucza w brzuchu?","",[["Nudności","nausea"],["Nudności uporczywe, język czysty","nausea_clean"],["Po przejedzeniu / tłustym","overeat"],["Wzdęcia, odbijanie","bloating"],["Skurcz lepszy od zgięcia","cramp_bend"]]],
   stom_eat:["A jedzenie?","",[["Gorzej po jedzeniu","worse_eating"],["Lepiej po jedzeniu","better_eating"]]],
@@ -1383,8 +1422,8 @@ const Q = {
   pain_mod:["Co dzieje się z bólem stawów / mięśni?","",[["Gorzej przy 1. ruchu, lepiej od dalszego","pain_first_motion"],["Gorzej od każdego ruchu","pain_any_motion"],["Gorzej w zimnie i wilgoci","pain_cold_damp"],["Po urazie, „posiniaczenie”","pain_bruised"],["Sztywność poranna","pain_stiff_am"]]],
   pain_relief:["Co łagodzi ból?","",[["Ciepło","pain_warm"],["Zimne okłady","pain_cold"]]],
   skin_kind:["Jak wygląda zmiana skórna?","",[["Świąd gorszy od ciepła","skin_itch_warm"],["Pieczenie lepsze od ciepła","skin_burn_warm"],["Piekąco-kłujący obrzęk","skin_sting_cold"],["Sączące, pęcherzykowe","skin_moist"],["Sucha, szorstka","skin_dry"],["Ropiejące","skin_supp"]]],
-  men_kind:["Co dokucza przy miesiączce?","",[["Bolesne skurcze","menses_cramp"],["Opóźnione, skąpe","menses_late"],["Wczesne, obfite","menses_early"],["Drażliwość","menses_irrit"],["Płaczliwość, zmienność","menses_weepy"]]],
-  tooth_mod:["Co dzieje się z bólem zęba?","",[["Gorzej od zimna / zimnych napojów","tooth_cold"],["Gorzej od ciepła / ciepłych napojów","tooth_warm"],["Nie do zniesienia, doprowadza do rozpaczy","tooth_unbearable"],["Strzelający, lepiej od ciepła","tooth_neuralgic"]]],
+  men_kind:["Co dokucza przy miesiączce?","",[["Bolesne skurcze","menses_cramp"],["Opóźnione, skąpe","menses_late"],["Wczesne, obfite","menses_early"],["Drażliwość","menses_irrit"],["Płaczliwość, zmienność","menses_weepy"],["Ból promieniujący do krzyża / ud","menses_back"],["Krew ciemna, ze skrzepami","menses_clots"]]],
+  tooth_mod:["Co dzieje się z bólem zęba?","",[["Gorzej od zimna / zimnych napojów","tooth_cold"],["Gorzej od ciepła / ciepłych napojów","tooth_warm"],["Nie do zniesienia, doprowadza do rozpaczy","tooth_unbearable"],["Strzelający, lepiej od ciepła","tooth_neuralgic"],["Ulga od zimnej wody w ustach","tooth_coldwater"],["Pulsujący, gorzej w cieple łóżka","tooth_throb"]]],
   tooth_when:["Co go wywołuje lub nasila?","",[["Gorzej w nocy","worse_night"],["Po przeziębieniu / zimnym wietrze","after_cold_wind"],["U dziecka podczas ząbkowania","teething"]]],
   ear_kind:["Jak wygląda ból ucha?","",[["W nocy, dziecko płaczliwe i niepocieszone","ear_night_weepy"],["Nieznośny, dziecko wściekłe, lepiej noszone","ear_cham"],["Z ropieniem, wrażliwość na zimno i dotyk","ear_supp"],["Wczesna faza, gorączka, zaczerwienienie","ear_early"]]],
   ear_onset:["Jak się zaczęło?","",[["Nagle, po zimnym wietrze","after_cold_wind"],["Powoli, z przeziębieniem","onset_slow"]]],
@@ -1411,7 +1450,7 @@ const Q = {
   hoarse_kind:["Co charakteryzuje chrypkę?","",[["Po przeziębieniu / przemęczeniu głosu","hoarse_caust"],["U mówców i śpiewaków, z tremą","hoarse_argn"],["Gorzej wieczorem, surowość krtani","hoarse_carb"],["Sucho, szczekająco, po zimnym wietrze","hoarse_acon"]]],
   sinus_kind:["Co dominuje w zatokach?","",[["Gęsta, ciągnąca żółta wydzielina; ból nasady nosa","sinus_kalibi"],["Gęsta łagodna wydzielina, lepiej na powietrzu","sinus_puls"],["Ropienie, wrażliwość na zimno i dotyk","sinus_hep"],["Ucisk gorszy od pochylania","sinus_pressure"]]],
   nose_kind:["Jak wygląda krwawienie z nosa?","",[["Obfite, jasnoczerwone","nose_phos"],["Ciemna, sącząca się krew żylna","nose_ham"],["Przy uderzeniu krwi do głowy, twarz czerwona","nose_bell"]]],
-  vertigo_kind:["Co wywołuje zawroty?","",[["Ruch / jazda, z nudnościami","vertigo_motion"],["Obracanie głowy lub odwracanie się w łóżku","vertigo_con"],["Wstawanie, podnoszenie głowy; gorzej od ruchu","vertigo_bry"],["Ociężałość i drżenie (grypowe osłabienie)","vertigo_gels"]]],
+  vertigo_kind:["Co wywołuje zawroty?","",[["Ruch / jazda, z nudnościami","vertigo_motion"],["Obracanie głowy lub odwracanie się w łóżku","vertigo_con"],["Wstawanie, podnoszenie głowy; gorzej od ruchu","vertigo_bry"],["Ociężałość i drżenie (grypowe osłabienie)","vertigo_gels"],["Przy patrzeniu w górę","vertigo_up"],["Z szumem usznym i osłabieniem","vertigo_tinn"]]],
   fright_kind:["Jak zareagowałeś na przestrach / szok?","",[["Nagły lęk, niepokój, lęk przed śmiercią","anx_panic"],["Odrętwienie, bezruch, senność","fright_op"],["Żal, wzdychanie, zmienność","grief_recent"],["Biegunka / drżenie z tremy","diarr_fright"]]],
   flush_kind:["Jak wyglądają uderzenia gorąca?","",[["Gorsze po śnie, nietolerancja ucisku / ciasnych ubrań","flush_lach"],["Pieczenie policzków, prawostronny ból głowy","flush_sang"],["Uczucie opadania, obojętność, lepiej od ruchu","flush_sep"],["Gorąco stóp, gorzej w nocy","flush_sulph"]]],
   palp_kind:["Co charakteryzuje kołatanie?","",[["Z lękiem i strachem przed śmiercią","palp_acon"],["Ucisk jak żelazna obręcz na sercu","palp_cact"],["Gwałtowne, słyszalne, gorzej od ruchu","palp_spig"],["Gorzej leżąc na lewym boku","palp_left"]]],
@@ -2083,17 +2122,22 @@ function renderHome(){
 
 function renderHomeWizard(seg){
   const q=state.wquery.trim().toLowerCase();
-  const list=q?TOPICS.filter(t=>t.pl.toLowerCase().includes(q)||t.kw.some(k=>k.includes(q))):TOPICS;
-  const rows=list.map(t=>`<div class="row" role="button" tabindex="0" data-topic="${t.id}">
+  const base=q?TOPICS.filter(t=>t.pl.toLowerCase().includes(q)||t.kw.some(k=>k.includes(q))):TOPICS.slice();
+  const list=base.sort((a,b)=>a.pl.localeCompare(b.pl,'pl'));
+  const rowHtml=t=>`<div class="row" role="button" tabindex="0" data-topic="${t.id}">
       <div class="ico">${svg(t.icon)}</div>
-      <div class="tx"><b>${esc(t.pl)}</b><span>${esc(RUB[t.base][1])}</span></div>${chevR}</div>`).join('');
+      <div class="tx"><b>${esc(t.pl)}</b><span>${esc(RUB[t.base][1])}</span></div>${chevR}</div>`;
+  let listHtml;
+  if(q){ listHtml=list.length?`<div class="list">${list.map(rowHtml).join('')}</div>`:`<div class="empty">Brak dopasowań dla „${esc(state.wquery)}”.</div>`; }
+  else{ const groups={}; list.forEach(t=>{const L=(t.pl.charAt(0)||'#').toLocaleUpperCase('pl');(groups[L]=groups[L]||[]).push(t);});
+        listHtml=Object.keys(groups).map(L=>`<div class="alpha">${esc(L)}</div><div class="list">${groups[L].map(rowHtml).join('')}</div>`).join(''); }
   view.innerHTML=`<div class="screen">
     <div class="hero"><h1>Repertorium</h1><p>Wpisz dolegliwość i odpowiedz na pytania — kreator dobierze rubryki i wskaże leki.</p></div>
     ${seg}
     <div class="search"><svg viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <input id="q" type="search" enterkeyhint="search" placeholder="Wpisz dolegliwość…" value="${esc(state.wquery)}" autocomplete="off" autocapitalize="off"></div>
     <div class="grouphdr">${q?'Wyniki':'Wybierz dolegliwość'}</div>
-    ${rows?`<div class="list">${rows}</div>`:`<div class="empty">Brak dopasowań dla „${esc(state.wquery)}”.</div>`}
+    ${listHtml}
     <div class="foot">Źródło: <a href="http://www.homeoint.org/books/kentrep/" target="_blank" rel="noopener">Repertorium Kenta</a> (1897, domena publiczna). <a href="#" onclick="openDisclaimer();return false">Zastrzeżenie</a>.</div>
   </div>`;
   const input=document.getElementById('q');
