@@ -30,6 +30,31 @@
   #app{max-width:480px;margin:0 auto;min-height:100dvh;min-height:100vh;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.10)}
   @media (max-width:520px){ #app{box-shadow:none} body{background:var(--bg)} }
 
+  /* ——— WERSJA KOMPUTEROWA: kinowa scena, aplikacja jako pływająca karta ——— */
+  @keyframes floatA{0%,100%{transform:translate(0,0)}50%{transform:translate(46px,34px)}}
+  @keyframes floatB{0%,100%{transform:translate(0,0)}50%{transform:translate(-52px,-30px)}}
+  @media (min-width:768px) and (min-height:600px){
+    html,body{height:100%}
+    body{min-height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;
+      background:
+        radial-gradient(60% 55% at 16% 20%, rgba(52,201,138,.16), transparent 60%),
+        radial-gradient(55% 50% at 86% 80%, rgba(31,138,96,.15), transparent 62%),
+        linear-gradient(150deg,#0c1512 0%,#0a0f12 55%,#0b1015 100%);}
+    body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(72px);z-index:0;pointer-events:none}
+    body::before{width:540px;height:540px;left:-130px;top:-110px;background:radial-gradient(circle,rgba(52,201,138,.22),transparent 70%);animation:floatA 20s ease-in-out infinite}
+    body::after{width:580px;height:580px;right:-150px;bottom:-130px;background:radial-gradient(circle,rgba(31,138,96,.20),transparent 70%);animation:floatB 24s ease-in-out infinite}
+    #app{width:440px;max-width:440px;height:min(900px,calc(100vh - 80px));min-height:0;margin:0;
+      border-radius:30px;overflow-y:auto;overflow-x:hidden;transform:translateZ(0);position:relative;z-index:1;
+      box-shadow:0 40px 120px -24px rgba(0,0,0,.66), 0 0 0 1px rgba(255,255,255,.05), 0 0 70px rgba(52,201,138,.07);
+      scrollbar-width:thin;scrollbar-color:rgba(140,140,150,.4) transparent}
+    body.dark #app{box-shadow:0 40px 120px -24px rgba(0,0,0,.82), 0 0 0 1px rgba(52,201,138,.16), 0 0 70px rgba(52,201,138,.10)}
+    #app::-webkit-scrollbar{width:8px}
+    #app::-webkit-scrollbar-thumb{background:rgba(140,140,150,.38);border-radius:8px}
+    #app::-webkit-scrollbar-track{background:transparent}
+    .nav{border-radius:30px 30px 0 0}
+    @media (prefers-reduced-motion:reduce){ body::before,body::after{animation:none} }
+  }
+
   .nav{position:sticky;top:0;z-index:30;height:52px;display:flex;align-items:center;padding:0 8px;background:rgba(237,239,234,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--sep)}
   .nav .title{flex:1;text-align:center;font-size:17px;font-weight:600;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
   .nav button{border:0;background:none;color:var(--accent);font-family:var(--ff);font-size:17px;padding:8px 10px;min-width:60px;cursor:pointer;display:flex;align-items:center;gap:2px}
